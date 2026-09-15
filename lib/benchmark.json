@@ -1,0 +1,599 @@
+{
+  "schema": "contract-eval.web-benchmark.v1",
+  "version": "0.7.0rc1",
+  "repository": "https://github.com/sebastianfoerste/contract-review-eval-harness",
+  "sourceCommit": "a78391a3a8146109c3bc55fd4ec5becf2e02e156",
+  "goldStatus": "v1 reference answers; adjudicated v2 artifacts not imported",
+  "cases": [
+    {
+      "id": "nda",
+      "title": "Mutual NDA",
+      "source": "# Mutual Non-Disclosure Agreement (SYNTHETIC)\n\nThis Mutual Non-Disclosure Agreement (\"Agreement\") is entered into between\nNorthwind Materials GmbH (\"Disclosing Party\") and Cverbio Labs Inc.\n(\"Receiving Party\"). This document is fabricated for evaluation purposes and is\nnot a real agreement.\n\n## 1. Definition of Confidential Information\n\nConfidential Information means any and all information disclosed by either party\nto the other, whether oral, written, or electronic, whether or not marked as\nconfidential.\n\n## 2. Confidentiality Obligations\n\nThe Receiving Party shall keep all Confidential Information secret and shall not\ndisclose it to any third party without the prior written consent of the\nDisclosing Party.\n\n## 3. Term\n\nThis Agreement and the obligations of confidentiality set out herein shall\nremain in effect in perpetuity.\n\n## 4. Return or Destruction\n\nUpon written request, the Receiving Party shall return or destroy all\nConfidential Information in its possession within thirty (30) days.\n\n## 5. Governing Law\n\nThis Agreement shall be governed by and construed in accordance with the laws of\nthe Federal Republic of Germany.\n\n## 6. Permitted Disclosures\n\nThe Receiving Party may disclose Confidential Information where disclosure is\nrequired by law, court order, or a competent regulatory authority, provided that\nthe Receiving Party first obtains the prior written consent of the Disclosing\nParty.\n\n## 7. Residual Knowledge\n\nNothing in this Agreement restricts the Receiving Party from using ideas,\nconcepts, know-how, or techniques retained in the unaided memory of its personnel,\nincluding for the benefit of third parties.\n\n## 8. No Licence\n\nNothing in this Agreement grants the Receiving Party any licence or other right in\nrespect of the Disclosing Party's intellectual property.\n\n## 9. Injunctive Relief\n\nThe parties acknowledge that damages may be an inadequate remedy for breach and\nthat the Disclosing Party may seek injunctive relief in addition to any other\nremedy available at law.\n\n## 10. Assignment\n\nThe Receiving Party may assign this Agreement, in whole or in part, to any third\nparty, including a competitor of the disclosing counterparty, and no consent is\nrequired for such an assignment.\n\n## 11. Notices\n\nNotices under this Agreement are effective when sent by email to the address\nstated in the signature block.\n",
+      "gold": {
+        "comment": "Human-authored gold answer for the synthetic mutual NDA. severity_rationale records why each flag carries its severity, so the calibration can be challenged rather than assumed. Sections 8, 9 and 11 are deliberately unremarkable: a reviewer who flags them is producing false positives. clause_aliases declares synonyms for the SAME clause of the SAME document — spelling, plural and hyphenation variants, or an equally accurate name. Scoring a correct review as a miss because it wrote 'no_licence' for 'no_license' measures vocabulary, not legal judgment. An alias never maps onto a different clause.",
+        "review_context": {
+          "party": "Disclosing Party (Northwind Materials GmbH)",
+          "governing_law": "Germany",
+          "objective": "Pre-signature review before disclosing technical information to a prospective supplier.",
+          "risk_appetite": "conservative"
+        },
+        "clause_types": [
+          "definition",
+          "confidentiality",
+          "term",
+          "return_destruction",
+          "governing_law",
+          "permitted_disclosure",
+          "residual_knowledge",
+          "no_license",
+          "injunctive_relief",
+          "assignment",
+          "notices"
+        ],
+        "risk_flags": {
+          "term": "high",
+          "residual_knowledge": "high",
+          "permitted_disclosure": "high",
+          "assignment": "high",
+          "definition": "medium",
+          "notices": "low"
+        },
+        "severity_rationale": {
+          "term": "high — a perpetual confidentiality obligation with no survival period and no trade-secret carve-out is unenforceable in substance and unmanageable in practice; the receiving party cannot ever demonstrate compliance has ended.",
+          "residual_knowledge": "high — an unaided-memory residuals clause that permits use for the benefit of third parties defeats the operative obligation in section 2. Whatever a person remembers may be used for a competitor, so the agreement protects only documents, not information.",
+          "permitted_disclosure": "high — conditioning a legally compelled disclosure on the disclosing party's prior written consent is not capable of performance. The standard position is notice where lawful and cooperation in seeking protective relief, not consent.",
+          "assignment": "high — free assignment to a competitor of the disclosing party defeats the purpose of the agreement, since the counterparty can change to the one party the discloser would never have contracted with.",
+          "definition": "medium — a definition covering all information whether or not marked confidential is over-broad and lacks the standard public-domain, prior-possession and independent-development carve-outs. It is worse than market but negotiable.",
+          "notices": "low — email-only notice with no read receipt or deemed-delivery rule is slightly off-market and worth a note, not a blocker."
+        },
+        "thresholds": {},
+        "clause_aliases": {
+          "definition_of_confidential_information": "definition",
+          "confidential_information_definition": "definition",
+          "confidentiality_obligations": "confidentiality",
+          "return_or_destruction": "return_destruction",
+          "return_and_destruction": "return_destruction",
+          "permitted_disclosures": "permitted_disclosure",
+          "required_disclosure": "permitted_disclosure",
+          "no_licence": "no_license",
+          "residuals": "residual_knowledge",
+          "notice": "notices"
+        },
+        "clause_anchors": {
+          "definition": "any and all information disclosed by either party",
+          "confidentiality": "shall keep all Confidential Information secret",
+          "term": "shall remain in effect in perpetuity",
+          "return_destruction": "return or destroy all Confidential Information in its possession",
+          "governing_law": "laws of the Federal Republic of Germany",
+          "permitted_disclosure": "required by law, court order, or a competent regulatory authority",
+          "residual_knowledge": "retained in the unaided memory of its personnel",
+          "no_license": "grants the Receiving Party any licence or other right",
+          "injunctive_relief": "damages may be an inadequate remedy for breach",
+          "assignment": "including a competitor of the disclosing counterparty",
+          "notices": "effective when sent by email to the address"
+        }
+      },
+      "review": {
+        "clauses": [
+          {
+            "clause_type": "definition",
+            "text": "Defines Confidential Information broadly, including unmarked information."
+          },
+          {
+            "clause_type": "confidentiality",
+            "text": "Receiving Party must keep information secret and not disclose without consent."
+          },
+          {
+            "clause_type": "term",
+            "text": "Confidentiality obligations continue in perpetuity."
+          },
+          {
+            "clause_type": "return_destruction",
+            "text": "Return or destroy on request within 30 days."
+          },
+          {
+            "clause_type": "governing_law",
+            "text": "Governed by the laws of Germany."
+          },
+          {
+            "clause_type": "permitted_disclosure",
+            "text": "Legally compelled disclosure is permitted subject to prior written consent."
+          },
+          {
+            "clause_type": "residual_knowledge",
+            "text": "Unaided memory residuals may be used, including for third parties."
+          },
+          {
+            "clause_type": "no_license",
+            "text": "No licence granted in the disclosing party's intellectual property."
+          },
+          {
+            "clause_type": "injunctive_relief",
+            "text": "Injunctive relief available in addition to damages."
+          },
+          {
+            "clause_type": "assignment",
+            "text": "Receiving Party may assign to any third party without consent."
+          },
+          {
+            "clause_type": "notices",
+            "text": "Notices effective when sent by email."
+          },
+          {
+            "clause_type": "indemnification",
+            "text": "Receiving Party indemnifies the Disclosing Party for any breach."
+          }
+        ],
+        "risk_flags": [
+          {
+            "clause_type": "term",
+            "severity": "high",
+            "rationale": "A perpetual confidentiality term with no survival period is unenforceable in substance."
+          },
+          {
+            "clause_type": "residual_knowledge",
+            "severity": "high",
+            "rationale": "Unaided-memory residuals usable for third parties defeat the confidentiality obligation."
+          },
+          {
+            "clause_type": "definition",
+            "severity": "medium",
+            "rationale": "Definition covers unmarked information and lacks standard carve-outs."
+          },
+          {
+            "clause_type": "permitted_disclosure",
+            "severity": "medium",
+            "rationale": "Requiring consent before a compelled disclosure is unusual drafting."
+          },
+          {
+            "clause_type": "assignment",
+            "severity": "low",
+            "rationale": "Broad assignment rights are common in commercial agreements."
+          },
+          {
+            "clause_type": "governing_law",
+            "severity": "low",
+            "rationale": "Standard German governing-law clause."
+          }
+        ],
+        "citations": [
+          {
+            "quote": "whether or not marked as confidential",
+            "clause_type": "definition"
+          },
+          {
+            "quote": "shall keep all Confidential Information secret",
+            "clause_type": "confidentiality"
+          },
+          {
+            "quote": "shall remain in effect in perpetuity",
+            "clause_type": "term"
+          },
+          {
+            "quote": "return or destroy all Confidential Information in its possession within thirty (30) days",
+            "clause_type": "return_destruction"
+          },
+          {
+            "quote": "the laws of the Federal Republic of Germany",
+            "clause_type": "governing_law"
+          },
+          {
+            "quote": "first obtains the prior written consent of the Disclosing Party",
+            "clause_type": "permitted_disclosure"
+          },
+          {
+            "quote": "retained in the unaided memory of its personnel",
+            "clause_type": "residual_knowledge"
+          },
+          {
+            "quote": "including a competitor of the disclosing counterparty",
+            "clause_type": "assignment"
+          },
+          {
+            "quote": "notices shall be deemed received three business days after posting",
+            "clause_type": "notices"
+          }
+        ],
+        "abstentions": []
+      },
+      "hashes": {
+        "source": "915cfb648881a251528062ec95a4131ba8e9e72f30e1f639747293b4df3bdb43",
+        "gold": "d4752986143f9e0f3bedf9ff1035f65f3b72ba2b00133f23507ec69e542223b8",
+        "review": "f8f9b17131c68054df54c45d0782ae472914ec580ea3a345ab22df67b6e82fa8"
+      }
+    },
+    {
+      "id": "saas",
+      "title": "SaaS agreement",
+      "source": "# Software-as-a-Service Agreement (SYNTHETIC)\n\nThis Software-as-a-Service Agreement (\"Agreement\") is entered into between\nCverbio Labs Inc. (\"Provider\") and Northwind Materials GmbH (\"Customer\"). This\ndocument is fabricated for evaluation purposes and is not a real agreement.\n\n## 1. Service Levels\n\nThe Provider shall use commercially reasonable efforts to maintain 99.5% monthly\nuptime, measured over each calendar month.\n\n## 2. Data Protection\n\nThe Provider shall process Customer Personal Data only on documented instructions\nfrom the Customer, in accordance with applicable data protection law.\n\n## 3. Limitation of Liability\n\nThe Provider's total liability under this Agreement shall not exceed the fees paid\nin the twelve (12) months preceding the claim.\n\n## 4. Term\n\nThe initial term of this Agreement is twelve (12) months from the effective date.\n\n## 5. Auto-Renewal\n\nThis Agreement renews automatically for successive twelve (12) month terms unless\neither party gives ninety (90) days written notice prior to the end of the\nthen-current term.\n\n## 6. Sub-processors\n\nThe Provider may appoint sub-processors to process Customer Personal Data and\nshall publish an updated list on its website. No notice to the Customer is\nrequired.\n\n## 7. Security\n\nThe Provider shall maintain industry standard security measures appropriate to a\nprovider of its size.\n\n## 8. Intellectual Property and Service Improvement\n\nThe Customer grants the Provider a perpetual, irrevocable, worldwide licence to\nuse Customer Data, including Customer Personal Data, to develop and train the\nProvider's machine learning models and to create derivative products.\n\n## 9. Indemnity\n\nThe Customer shall indemnify and hold harmless the Provider against all claims\narising from the use of the service, including claims that the service infringes\nthe intellectual property rights of a third party.\n\n## 10. Fees\n\nThe Provider may increase the fees at any time on thirty (30) days written notice.\nThe Customer has no right to terminate on account of a fee increase.\n\n## 11. Data Export on Termination\n\nThe Provider shall delete all Customer Data seven (7) days after termination. The\nCustomer may request an export within that period.\n",
+      "gold": {
+        "comment": "Human-authored gold answer for the synthetic SaaS agreement. severity_rationale records why each flag carries its severity. Service levels, data protection and term are deliberately clean: a reviewer who flags them is producing false positives. clause_aliases declares synonyms for the SAME clause of the SAME document — spelling, plural and hyphenation variants, or an equally accurate name. Scoring a correct review as a miss because it wrote 'no_licence' for 'no_license' measures vocabulary, not legal judgment. An alias never maps onto a different clause.",
+        "review_context": {
+          "party": "Customer (Northwind Materials GmbH)",
+          "governing_law": "Germany",
+          "objective": "Pre-signature review of a vendor paper contract for a business-critical system.",
+          "risk_appetite": "conservative"
+        },
+        "clause_types": [
+          "service_levels",
+          "data_protection",
+          "limitation_of_liability",
+          "term",
+          "auto_renewal",
+          "subprocessors",
+          "security",
+          "ip_and_model_training",
+          "indemnity",
+          "fees",
+          "data_export_on_termination"
+        ],
+        "risk_flags": {
+          "auto_renewal": "high",
+          "ip_and_model_training": "high",
+          "indemnity": "high",
+          "fees": "high",
+          "subprocessors": "high",
+          "limitation_of_liability": "medium",
+          "security": "medium",
+          "data_export_on_termination": "medium"
+        },
+        "severity_rationale": {
+          "auto_renewal": "high — a ninety day notice window against a twelve month term means the decision point falls at month nine, and a single missed date commits the customer to another full year.",
+          "ip_and_model_training": "high — a perpetual irrevocable licence to train models on Customer Data expressly including Customer Personal Data has no lawful basis under the data protection clause in section 2, which limits processing to documented instructions. The two clauses contradict each other, and this one would make the provider a controller for that processing.",
+          "indemnity": "high — the customer indemnifying the provider against third-party claims that the provider's own service infringes reverses the normal allocation. The party that built the service and can clear the rights bears none of the risk.",
+          "fees": "high — an uncapped increase at any time on thirty days notice with no corresponding termination right is a unilateral right to reprice a locked-in customer.",
+          "subprocessors": "high — appointing sub-processors with website publication and no notice gives the customer no opportunity to object and does not meet Art. 28(2) GDPR, which the data protection clause purports to comply with.",
+          "limitation_of_liability": "medium — a twelve month fee cap is common market practice, but it carves out nothing for data breach, confidentiality or IP indemnity, which is worse than market and should be negotiated.",
+          "security": "medium — 'industry standard measures appropriate to a provider of its size' is unmeasurable and gives the customer nothing to audit against, but it is a drafting weakness rather than an absent obligation.",
+          "data_export_on_termination": "medium — a seven day deletion window with export only on request risks irreversible data loss on a missed deadline; thirty days with a standing export right is the ordinary position."
+        },
+        "thresholds": {},
+        "clause_aliases": {
+          "service_level_agreement": "service_levels",
+          "service_level": "service_levels",
+          "uptime": "service_levels",
+          "sub_processors": "subprocessors",
+          "sub_processing": "subprocessors",
+          "intellectual_property": "ip_and_model_training",
+          "intellectual_property_and_service_improvement": "ip_and_model_training",
+          "model_training": "ip_and_model_training",
+          "security_measures": "security",
+          "indemnification": "indemnity",
+          "fees_and_charges": "fees",
+          "data_export": "data_export_on_termination",
+          "deletion_and_export": "data_export_on_termination"
+        },
+        "clause_anchors": {
+          "service_levels": "commercially reasonable efforts to maintain 99.5% monthly",
+          "data_protection": "process Customer Personal Data only on documented instructions",
+          "limitation_of_liability": "shall not exceed the fees paid",
+          "term": "initial term of this Agreement is twelve (12) months",
+          "auto_renewal": "renews automatically for successive twelve (12) month terms",
+          "subprocessors": "may appoint sub-processors to process Customer Personal Data",
+          "security": "industry standard security measures appropriate to a provider",
+          "ip_and_model_training": "perpetual, irrevocable, worldwide licence",
+          "indemnity": "indemnify and hold harmless the Provider",
+          "fees": "may increase the fees at any time on thirty (30) days written notice",
+          "data_export_on_termination": "delete all Customer Data seven (7) days after termination"
+        }
+      },
+      "review": {
+        "clauses": [
+          {
+            "clause_type": "service_levels",
+            "text": "Commercially reasonable efforts to maintain 99.5% monthly uptime."
+          },
+          {
+            "clause_type": "data_protection",
+            "text": "Processing only on documented instructions from the customer."
+          },
+          {
+            "clause_type": "limitation_of_liability",
+            "text": "Liability capped at twelve months of fees."
+          },
+          {
+            "clause_type": "term",
+            "text": "Initial term of twelve months."
+          },
+          {
+            "clause_type": "auto_renewal",
+            "text": "Renews automatically unless ninety days notice is given."
+          },
+          {
+            "clause_type": "subprocessors",
+            "text": "Provider may appoint sub-processors and publish a list on its website."
+          },
+          {
+            "clause_type": "security",
+            "text": "Industry standard security measures appropriate to the provider's size."
+          },
+          {
+            "clause_type": "ip_and_model_training",
+            "text": "Provider licensed to use Customer Data to train machine learning models."
+          },
+          {
+            "clause_type": "indemnity",
+            "text": "Customer indemnifies the provider against claims arising from use of the service."
+          },
+          {
+            "clause_type": "fees",
+            "text": "Provider may increase fees on thirty days notice."
+          },
+          {
+            "clause_type": "data_export_on_termination",
+            "text": "Data deleted seven days after termination, export on request."
+          },
+          {
+            "clause_type": "data_residency",
+            "text": "Customer Data is stored within the European Economic Area."
+          }
+        ],
+        "risk_flags": [
+          {
+            "clause_type": "auto_renewal",
+            "severity": "high",
+            "rationale": "A ninety day notice window against a twelve month term commits the customer to another year on a single missed date."
+          },
+          {
+            "clause_type": "fees",
+            "severity": "high",
+            "rationale": "Uncapped increases with no termination right allow unilateral repricing of a locked-in customer."
+          },
+          {
+            "clause_type": "limitation_of_liability",
+            "severity": "medium",
+            "rationale": "A twelve month fee cap carves out nothing for data breach or confidentiality."
+          },
+          {
+            "clause_type": "security",
+            "severity": "medium",
+            "rationale": "The standard is unmeasurable and gives the customer nothing to audit against."
+          },
+          {
+            "clause_type": "ip_and_model_training",
+            "severity": "low",
+            "rationale": "Service improvement licences are common in SaaS terms."
+          },
+          {
+            "clause_type": "indemnity",
+            "severity": "low",
+            "rationale": "Customer indemnities for use of the service are standard."
+          },
+          {
+            "clause_type": "data_export_on_termination",
+            "severity": "low",
+            "rationale": "A defined deletion window is good data hygiene."
+          }
+        ],
+        "citations": [
+          {
+            "quote": "99.5% monthly uptime",
+            "clause_type": "service_levels"
+          },
+          {
+            "quote": "only on documented instructions",
+            "clause_type": "data_protection"
+          },
+          {
+            "quote": "shall not exceed the fees paid in the twelve (12) months preceding the claim",
+            "clause_type": "limitation_of_liability"
+          },
+          {
+            "quote": "initial term of this Agreement is twelve (12) months",
+            "clause_type": "term"
+          },
+          {
+            "quote": "ninety (90) days written notice",
+            "clause_type": "auto_renewal"
+          },
+          {
+            "quote": "perpetual, irrevocable, worldwide licence to use Customer Data",
+            "clause_type": "ip_and_model_training"
+          },
+          {
+            "quote": "industry standard security measures",
+            "clause_type": "security"
+          },
+          {
+            "quote": "may increase the fees at any time on thirty (30) days written notice",
+            "clause_type": "fees"
+          },
+          {
+            "quote": "the Provider shall maintain SOC 2 Type II certification throughout the term",
+            "clause_type": "security"
+          }
+        ],
+        "abstentions": []
+      },
+      "hashes": {
+        "source": "47f67a676df59622621a3fccfc09f0737d0564414df6e730f7accb9198145c73",
+        "gold": "00681d1682ac5a079e03aef11c70af7d9ad9ca4eb206f929a68da7b97b13791e",
+        "review": "610ead111d79a99c1f78e2d4ccf86442a502f270d1d2dbc5dcb867209e814a21"
+      }
+    },
+    {
+      "id": "dpa",
+      "title": "Data processing agreement",
+      "source": "# Data Processing Agreement (SYNTHETIC)\n\nThis Data Processing Agreement (\"DPA\") is entered into between Northwind\nMaterials GmbH (\"Controller\") and Cverbio Analytics Inc. (\"Processor\") pursuant\nto Article 28 of Regulation (EU) 2016/679. This document is fabricated for\nevaluation purposes and is not a real agreement.\n\n## 1. Subject Matter and Instructions\n\nThe Processor shall process personal data only on documented instructions from\nthe Controller, including with regard to transfers of personal data to a third\ncountry, unless required to do so by Union or Member State law to which the\nProcessor is subject.\n\n## 2. Confidentiality\n\nThe Processor shall ensure that persons authorised to process the personal data\nhave committed themselves to confidentiality or are under an appropriate\nstatutory obligation of confidentiality.\n\n## 3. Security of Processing\n\nThe Processor shall implement appropriate technical and organisational measures\nto ensure a level of security appropriate to the risk, having regard to the\nstate of the art and the costs of implementation. A summary of such measures is\navailable on request.\n\n## 4. Sub-processors\n\nThe Processor may engage sub-processors at its own discretion and shall inform\nthe Controller of any intended changes within a reasonable period after such\nchanges take effect. The Controller waives any right to object to the\nappointment of a sub-processor.\n\n## 5. Assistance with Data Subject Rights\n\nTaking into account the nature of the processing, the Processor shall assist the\nController by appropriate technical and organisational measures for the\nfulfilment of the Controller's obligation to respond to requests for exercising\nthe data subject's rights laid down in Chapter III.\n\n## 6. Personal Data Breaches and Impact Assessments\n\nThe Processor shall notify the Controller of a personal data breach within\nfourteen (14) days of becoming aware of it, and shall provide reasonable\nassistance with data protection impact assessments where commercially agreed.\n\n## 7. Deletion and Return\n\nFollowing termination of the services, the Processor may retain personal data\nfor its own legitimate business purposes, including product improvement and\nmodel training, for an indefinite period.\n\n## 8. Audits and Inspections\n\nThe Processor shall make available to the Controller a third-party audit\ncertificate once per calendar year. On-site inspections and audits by the\nController or an auditor mandated by the Controller are expressly excluded.\n\n## 9. International Transfers\n\nThe Processor may transfer personal data to its affiliates in third countries as\nnecessary for the provision of the services. The parties shall address any\nrequired transfer mechanism separately if and when the need arises.\n\n## 10. Governing Law\n\nThis DPA is governed by the laws of Germany.\n",
+      "gold": {
+        "comment": "Human-authored gold answer for the synthetic Art. 28 GDPR data processing agreement. Clause types follow Art. 28(3) lit. a to h in the regulation's own order, plus Chapter V transfers and governing law. severity_rationale records why each flag carries its severity, so the calibration can be challenged rather than assumed. clause_aliases declares synonyms for the SAME clause of the SAME document — spelling, plural and hyphenation variants, or an equally accurate name. Scoring a correct review as a miss because it wrote 'no_licence' for 'no_license' measures vocabulary, not legal judgment. An alias never maps onto a different clause.",
+        "review_context": {
+          "party": "Controller (Northwind Materials GmbH)",
+          "governing_law": "Germany, Regulation (EU) 2016/679",
+          "objective": "Art. 28 GDPR compliance review before appointing the processor.",
+          "risk_appetite": "conservative"
+        },
+        "clause_types": [
+          "documented_instructions",
+          "confidentiality",
+          "security_measures",
+          "subprocessor_authorization",
+          "data_subject_rights_assistance",
+          "breach_and_dpia_assistance",
+          "deletion_return",
+          "audit_rights",
+          "international_transfers",
+          "governing_law"
+        ],
+        "risk_flags": {
+          "subprocessor_authorization": "high",
+          "deletion_return": "high",
+          "audit_rights": "high",
+          "international_transfers": "high",
+          "breach_and_dpia_assistance": "medium"
+        },
+        "severity_rationale": {
+          "subprocessor_authorization": "high — Art. 28(3)(d) and Art. 28(2) require the controller's prior specific or general written authorisation. The clause appoints sub-processors at the processor's discretion and has the controller waive its right to object, which removes the authorisation entirely rather than channelling it.",
+          "deletion_return": "high — Art. 28(3)(g) requires deletion or return at the controller's choice at the end of the services. Indefinite retention for the processor's own purposes, including model training, converts the processor into a controller for that processing without a lawful basis.",
+          "audit_rights": "high — Art. 28(3)(h) requires the processor to allow for and contribute to audits, including inspections, conducted by the controller or a mandated auditor. Certification-first audit regimes are ordinary market practice and would be medium; this clause expressly excludes inspections, which removes a mandatory element rather than channelling it.",
+          "international_transfers": "high — Chapter V requires an adequacy decision or an Art. 46 safeguard to be in place before a transfer occurs. Permitting transfers now and addressing the mechanism 'if and when the need arises' inverts that sequence.",
+          "breach_and_dpia_assistance": "medium — Art. 28(3)(f) and Art. 33(2) require notification without undue delay. A fourteen day window is materially worse than the controller's own 72 hour obligation can absorb and should be negotiated, but a reviewer who accepted it with reasons would not be negligent."
+        },
+        "thresholds": {},
+        "clause_aliases": {
+          "subject_matter_and_instructions": "documented_instructions",
+          "processing_on_documented_instructions": "documented_instructions",
+          "security_of_processing": "security_measures",
+          "technical_and_organisational_measures": "security_measures",
+          "sub_processors": "subprocessor_authorization",
+          "subprocessors": "subprocessor_authorization",
+          "assistance_data_subject_rights": "data_subject_rights_assistance",
+          "data_subject_rights": "data_subject_rights_assistance",
+          "personal_data_breach_notification": "breach_and_dpia_assistance",
+          "breach_notification": "breach_and_dpia_assistance",
+          "deletion_and_return": "deletion_return",
+          "audits_and_inspections": "audit_rights",
+          "audit": "audit_rights",
+          "transfers": "international_transfers"
+        },
+        "clause_anchors": {
+          "documented_instructions": "process personal data only on documented instructions from",
+          "confidentiality": "committed themselves to confidentiality or are under an appropriate",
+          "security_measures": "appropriate technical and organisational measures to ensure a level of security",
+          "subprocessor_authorization": "engage sub-processors at its own discretion",
+          "data_subject_rights_assistance": "rights laid down in Chapter III",
+          "breach_and_dpia_assistance": "notify the Controller of a personal data breach",
+          "deletion_return": "retain personal data for its own legitimate business purposes",
+          "audit_rights": "On-site inspections and audits by the Controller",
+          "international_transfers": "transfer personal data to its affiliates in third countries",
+          "governing_law": "This DPA is governed by the laws of Germany"
+        }
+      },
+      "review": {
+        "clauses": [
+          {
+            "clause_type": "documented_instructions",
+            "text": "Processing only on documented instructions from the controller, including transfers."
+          },
+          {
+            "clause_type": "confidentiality",
+            "text": "Authorised persons are committed to confidentiality."
+          },
+          {
+            "clause_type": "security_measures",
+            "text": "Appropriate technical and organisational measures, summary available on request."
+          },
+          {
+            "clause_type": "subprocessor_authorization",
+            "text": "Processor may engage sub-processors at its own discretion."
+          },
+          {
+            "clause_type": "data_subject_rights_assistance",
+            "text": "Assistance with Chapter III data subject requests."
+          },
+          {
+            "clause_type": "breach_and_dpia_assistance",
+            "text": "Breach notification within fourteen days; DPIA assistance where commercially agreed."
+          },
+          {
+            "clause_type": "deletion_return",
+            "text": "Processor may retain personal data after termination."
+          },
+          {
+            "clause_type": "audit_rights",
+            "text": "Annual third-party audit certificate provided to the controller."
+          },
+          {
+            "clause_type": "international_transfers",
+            "text": "Transfers to affiliates in third countries as necessary."
+          },
+          {
+            "clause_type": "governing_law",
+            "text": "Governed by the laws of Germany."
+          },
+          {
+            "clause_type": "data_localisation",
+            "text": "Personal data is stored within the European Economic Area."
+          }
+        ],
+        "risk_flags": [
+          {
+            "clause_type": "subprocessor_authorization",
+            "severity": "high",
+            "rationale": "Sub-processors appointed at the processor's discretion and the controller waives its right to object, which does not meet Art. 28(3)(d) GDPR."
+          },
+          {
+            "clause_type": "deletion_return",
+            "severity": "high",
+            "rationale": "Indefinite retention for the processor's own purposes after termination conflicts with Art. 28(3)(g) GDPR, which requires deletion or return at the controller's choice."
+          },
+          {
+            "clause_type": "breach_and_dpia_assistance",
+            "severity": "medium",
+            "rationale": "A fourteen day breach notification period is long relative to the controller's own 72 hour obligation."
+          },
+          {
+            "clause_type": "audit_rights",
+            "severity": "low",
+            "rationale": "An annual third-party certificate is a common market position."
+          },
+          {
+            "clause_type": "international_transfers",
+            "severity": "low",
+            "rationale": "Transfers are limited to affiliates for service provision."
+          }
+        ],
+        "citations": [
+          {
+            "quote": "only on documented instructions from the Controller",
+            "clause_type": "documented_instructions"
+          },
+          {
+            "quote": "committed themselves to confidentiality",
+            "clause_type": "confidentiality"
+          },
+          {
+            "quote": "appropriate technical and organisational measures",
+            "clause_type": "security_measures"
+          },
+          {
+            "quote": "may engage sub-processors at its own discretion",
+            "clause_type": "subprocessor_authorization"
+          },
+          {
+            "quote": "the data subject's rights laid down in Chapter III",
+            "clause_type": "data_subject_rights_assistance"
+          },
+          {
+            "quote": "within\nfourteen (14) days of becoming aware of it",
+            "clause_type": "breach_and_dpia_assistance"
+          },
+          {
+            "quote": "for its own legitimate business purposes",
+            "clause_type": "deletion_return"
+          },
+          {
+            "quote": "all personal data shall be stored exclusively within the European Economic Area",
+            "clause_type": "data_localisation"
+          }
+        ],
+        "abstentions": []
+      },
+      "hashes": {
+        "source": "17a0c7b0dc7e74fe23fda6fcb394d331ada6e7286c2fb6a9497a9e58ed96f79e",
+        "gold": "e7f5ee192939560fa0ed3dd013eb77c438ab9f7fd27659d590471977d37f4a75",
+        "review": "6592d913925873f822de383026aee309f01d020cd40beacbdcafc103bdc735fe"
+      }
+    }
+  ]
+}

@@ -1,0 +1,1754 @@
+[
+  {
+    "caseId": "nda",
+    "scenario": "baseline",
+    "aliases": "on",
+    "expected": {
+      "clause_precision": 0.9166666666666666,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9565217391304348,
+      "risk_flag_accuracy": 0.5,
+      "risk_precision": 0.8333333333333334,
+      "risk_recall": 0.8333333333333334,
+      "risk_f1": 0.8333333333333334,
+      "risk_severity_accuracy": 0.6,
+      "risk_false_positives": [
+        "governing_law"
+      ],
+      "risk_missed": [
+        "notices"
+      ],
+      "risk_severity_confusion": {
+        "high->low": 1,
+        "medium->medium": 1,
+        "high->medium": 1,
+        "high->high": 2
+      },
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.7272727272727273,
+      "span_uncovered_clauses": [
+        "injunctive_relief",
+        "no_license",
+        "notices"
+      ],
+      "citation_grounded": 8,
+      "citation_total": 9,
+      "citation_grounding": 0.8888888888888888,
+      "hallucination_count": 1,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "nda",
+    "scenario": "baseline",
+    "aliases": "off",
+    "expected": {
+      "clause_precision": 0.9166666666666666,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9565217391304348,
+      "risk_flag_accuracy": 0.5,
+      "risk_precision": 0.8333333333333334,
+      "risk_recall": 0.8333333333333334,
+      "risk_f1": 0.8333333333333334,
+      "risk_severity_accuracy": 0.6,
+      "risk_false_positives": [
+        "governing_law"
+      ],
+      "risk_missed": [
+        "notices"
+      ],
+      "risk_severity_confusion": {
+        "high->low": 1,
+        "medium->medium": 1,
+        "high->medium": 1,
+        "high->high": 2
+      },
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.7272727272727273,
+      "span_uncovered_clauses": [
+        "injunctive_relief",
+        "no_license",
+        "notices"
+      ],
+      "citation_grounded": 8,
+      "citation_total": 9,
+      "citation_grounding": 0.8888888888888888,
+      "hallucination_count": 1,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "nda",
+    "scenario": "no-evidence",
+    "aliases": "on",
+    "expected": {
+      "clause_precision": 0.9166666666666666,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9565217391304348,
+      "risk_flag_accuracy": 0.5,
+      "risk_precision": 0.8333333333333334,
+      "risk_recall": 0.8333333333333334,
+      "risk_f1": 0.8333333333333334,
+      "risk_severity_accuracy": 0.6,
+      "risk_false_positives": [
+        "governing_law"
+      ],
+      "risk_missed": [
+        "notices"
+      ],
+      "risk_severity_confusion": {
+        "high->low": 1,
+        "medium->medium": 1,
+        "high->medium": 1,
+        "high->high": 2
+      },
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.0,
+      "span_uncovered_clauses": [
+        "assignment",
+        "confidentiality",
+        "definition",
+        "governing_law",
+        "injunctive_relief",
+        "no_license",
+        "notices",
+        "permitted_disclosure",
+        "residual_knowledge",
+        "return_destruction",
+        "term"
+      ],
+      "citation_grounded": 0,
+      "citation_total": 0,
+      "citation_grounding": 0.0,
+      "hallucination_count": 0,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "nda",
+    "scenario": "no-evidence",
+    "aliases": "off",
+    "expected": {
+      "clause_precision": 0.9166666666666666,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9565217391304348,
+      "risk_flag_accuracy": 0.5,
+      "risk_precision": 0.8333333333333334,
+      "risk_recall": 0.8333333333333334,
+      "risk_f1": 0.8333333333333334,
+      "risk_severity_accuracy": 0.6,
+      "risk_false_positives": [
+        "governing_law"
+      ],
+      "risk_missed": [
+        "notices"
+      ],
+      "risk_severity_confusion": {
+        "high->low": 1,
+        "medium->medium": 1,
+        "high->medium": 1,
+        "high->high": 2
+      },
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.0,
+      "span_uncovered_clauses": [
+        "assignment",
+        "confidentiality",
+        "definition",
+        "governing_law",
+        "injunctive_relief",
+        "no_license",
+        "notices",
+        "permitted_disclosure",
+        "residual_knowledge",
+        "return_destruction",
+        "term"
+      ],
+      "citation_grounded": 0,
+      "citation_total": 0,
+      "citation_grounding": 0.0,
+      "hallucination_count": 0,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "nda",
+    "scenario": "missed-risks",
+    "aliases": "on",
+    "expected": {
+      "clause_precision": 0.9166666666666666,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9565217391304348,
+      "risk_flag_accuracy": 0.0,
+      "risk_precision": 1.0,
+      "risk_recall": 0.0,
+      "risk_f1": 0.0,
+      "risk_severity_accuracy": 0.0,
+      "risk_false_positives": [],
+      "risk_missed": [
+        "assignment",
+        "definition",
+        "notices",
+        "permitted_disclosure",
+        "residual_knowledge",
+        "term"
+      ],
+      "risk_severity_confusion": {},
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.7272727272727273,
+      "span_uncovered_clauses": [
+        "injunctive_relief",
+        "no_license",
+        "notices"
+      ],
+      "citation_grounded": 8,
+      "citation_total": 9,
+      "citation_grounding": 0.8888888888888888,
+      "hallucination_count": 1,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "nda",
+    "scenario": "missed-risks",
+    "aliases": "off",
+    "expected": {
+      "clause_precision": 0.9166666666666666,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9565217391304348,
+      "risk_flag_accuracy": 0.0,
+      "risk_precision": 1.0,
+      "risk_recall": 0.0,
+      "risk_f1": 0.0,
+      "risk_severity_accuracy": 0.0,
+      "risk_false_positives": [],
+      "risk_missed": [
+        "assignment",
+        "definition",
+        "notices",
+        "permitted_disclosure",
+        "residual_knowledge",
+        "term"
+      ],
+      "risk_severity_confusion": {},
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.7272727272727273,
+      "span_uncovered_clauses": [
+        "injunctive_relief",
+        "no_license",
+        "notices"
+      ],
+      "citation_grounded": 8,
+      "citation_total": 9,
+      "citation_grounding": 0.8888888888888888,
+      "hallucination_count": 1,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "nda",
+    "scenario": "conflicting-flags",
+    "aliases": "on",
+    "expected": {
+      "clause_precision": 0.9166666666666666,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9565217391304348,
+      "risk_flag_accuracy": 0.5,
+      "risk_precision": 0.8333333333333334,
+      "risk_recall": 0.8333333333333334,
+      "risk_f1": 0.8333333333333334,
+      "risk_severity_accuracy": 0.6,
+      "risk_false_positives": [
+        "governing_law"
+      ],
+      "risk_missed": [
+        "notices"
+      ],
+      "risk_severity_confusion": {
+        "high->low": 1,
+        "medium->medium": 1,
+        "high->medium": 1,
+        "high->high": 2
+      },
+      "risk_duplicate_flags": [
+        "term"
+      ],
+      "risk_conflicting_flags": [
+        "term"
+      ],
+      "span_coverage": 0.7272727272727273,
+      "span_uncovered_clauses": [
+        "injunctive_relief",
+        "no_license",
+        "notices"
+      ],
+      "citation_grounded": 8,
+      "citation_total": 9,
+      "citation_grounding": 0.8888888888888888,
+      "hallucination_count": 1,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "nda",
+    "scenario": "conflicting-flags",
+    "aliases": "off",
+    "expected": {
+      "clause_precision": 0.9166666666666666,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9565217391304348,
+      "risk_flag_accuracy": 0.5,
+      "risk_precision": 0.8333333333333334,
+      "risk_recall": 0.8333333333333334,
+      "risk_f1": 0.8333333333333334,
+      "risk_severity_accuracy": 0.6,
+      "risk_false_positives": [
+        "governing_law"
+      ],
+      "risk_missed": [
+        "notices"
+      ],
+      "risk_severity_confusion": {
+        "high->low": 1,
+        "medium->medium": 1,
+        "high->medium": 1,
+        "high->high": 2
+      },
+      "risk_duplicate_flags": [
+        "term"
+      ],
+      "risk_conflicting_flags": [
+        "term"
+      ],
+      "span_coverage": 0.7272727272727273,
+      "span_uncovered_clauses": [
+        "injunctive_relief",
+        "no_license",
+        "notices"
+      ],
+      "citation_grounded": 8,
+      "citation_total": 9,
+      "citation_grounding": 0.8888888888888888,
+      "hallucination_count": 1,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "nda",
+    "customReview": {
+      "clauses": [],
+      "risk_flags": [],
+      "citations": [],
+      "abstentions": []
+    },
+    "aliases": "on",
+    "expected": {
+      "clause_precision": 0.0,
+      "clause_recall": 0.0,
+      "clause_f1": 0.0,
+      "risk_flag_accuracy": 0.0,
+      "risk_precision": 1.0,
+      "risk_recall": 0.0,
+      "risk_f1": 0.0,
+      "risk_severity_accuracy": 0.0,
+      "risk_false_positives": [],
+      "risk_missed": [
+        "assignment",
+        "definition",
+        "notices",
+        "permitted_disclosure",
+        "residual_knowledge",
+        "term"
+      ],
+      "risk_severity_confusion": {},
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.0,
+      "span_uncovered_clauses": [
+        "assignment",
+        "confidentiality",
+        "definition",
+        "governing_law",
+        "injunctive_relief",
+        "no_license",
+        "notices",
+        "permitted_disclosure",
+        "residual_knowledge",
+        "return_destruction",
+        "term"
+      ],
+      "citation_grounded": 0,
+      "citation_total": 0,
+      "citation_grounding": 0.0,
+      "hallucination_count": 0,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "nda",
+    "customReview": {
+      "clauses": [
+        {
+          "clause_type": "definition",
+          "text": "Defines Confidential Information broadly, including unmarked information."
+        },
+        {
+          "clause_type": "confidentiality",
+          "text": "Receiving Party must keep information secret and not disclose without consent."
+        },
+        {
+          "clause_type": "term",
+          "text": "Confidentiality obligations continue in perpetuity."
+        },
+        {
+          "clause_type": "return_destruction",
+          "text": "Return or destroy on request within 30 days."
+        },
+        {
+          "clause_type": "governing_law",
+          "text": "Governed by the laws of Germany."
+        },
+        {
+          "clause_type": "permitted_disclosure",
+          "text": "Legally compelled disclosure is permitted subject to prior written consent."
+        },
+        {
+          "clause_type": "residual_knowledge",
+          "text": "Unaided memory residuals may be used, including for third parties."
+        },
+        {
+          "clause_type": "no_license",
+          "text": "No licence granted in the disclosing party's intellectual property."
+        },
+        {
+          "clause_type": "injunctive_relief",
+          "text": "Injunctive relief available in addition to damages."
+        },
+        {
+          "clause_type": "assignment",
+          "text": "Receiving Party may assign to any third party without consent."
+        },
+        {
+          "clause_type": "notices",
+          "text": "Notices effective when sent by email."
+        },
+        {
+          "clause_type": "indemnification",
+          "text": "Receiving Party indemnifies the Disclosing Party for any breach."
+        }
+      ],
+      "risk_flags": [
+        {
+          "clause_type": "term",
+          "severity": "high",
+          "rationale": "A perpetual confidentiality term with no survival period is unenforceable in substance."
+        },
+        {
+          "clause_type": "residual_knowledge",
+          "severity": "high",
+          "rationale": "Unaided-memory residuals usable for third parties defeat the confidentiality obligation."
+        },
+        {
+          "clause_type": "definition",
+          "severity": "medium",
+          "rationale": "Definition covers unmarked information and lacks standard carve-outs."
+        },
+        {
+          "clause_type": "permitted_disclosure",
+          "severity": "medium",
+          "rationale": "Requiring consent before a compelled disclosure is unusual drafting."
+        },
+        {
+          "clause_type": "assignment",
+          "severity": "low",
+          "rationale": "Broad assignment rights are common in commercial agreements."
+        },
+        {
+          "clause_type": "governing_law",
+          "severity": "low",
+          "rationale": "Standard German governing-law clause."
+        }
+      ],
+      "citations": [
+        {
+          "quote": "whether or not marked as confidential",
+          "clause_type": "definition"
+        },
+        {
+          "quote": "shall keep all Confidential Information secret",
+          "clause_type": "confidentiality"
+        },
+        {
+          "quote": "shall remain in effect in perpetuity",
+          "clause_type": "term"
+        },
+        {
+          "quote": "return or destroy all Confidential Information in its possession within thirty (30) days",
+          "clause_type": "return_destruction"
+        },
+        {
+          "quote": "the laws of the Federal Republic of Germany",
+          "clause_type": "governing_law"
+        },
+        {
+          "quote": "first obtains the prior written consent of the Disclosing Party",
+          "clause_type": "permitted_disclosure"
+        },
+        {
+          "quote": "retained in the unaided memory of its personnel",
+          "clause_type": "residual_knowledge"
+        },
+        {
+          "quote": "including a competitor of the disclosing counterparty",
+          "clause_type": "assignment"
+        },
+        {
+          "quote": "notices shall be deemed received three business days after posting",
+          "clause_type": "notices"
+        }
+      ],
+      "abstentions": []
+    },
+    "aliases": "on",
+    "expected": {
+      "clause_precision": 0.9166666666666666,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9565217391304348,
+      "risk_flag_accuracy": 0.5,
+      "risk_precision": 0.8333333333333334,
+      "risk_recall": 0.8333333333333334,
+      "risk_f1": 0.8333333333333334,
+      "risk_severity_accuracy": 0.6,
+      "risk_false_positives": [
+        "governing_law"
+      ],
+      "risk_missed": [
+        "notices"
+      ],
+      "risk_severity_confusion": {
+        "high->low": 1,
+        "medium->medium": 1,
+        "high->medium": 1,
+        "high->high": 2
+      },
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.7272727272727273,
+      "span_uncovered_clauses": [
+        "injunctive_relief",
+        "no_license",
+        "notices"
+      ],
+      "citation_grounded": 8,
+      "citation_total": 9,
+      "citation_grounding": 0.8888888888888888,
+      "hallucination_count": 1,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "saas",
+    "scenario": "baseline",
+    "aliases": "on",
+    "expected": {
+      "clause_precision": 0.9166666666666666,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9565217391304348,
+      "risk_flag_accuracy": 0.5,
+      "risk_precision": 1.0,
+      "risk_recall": 0.875,
+      "risk_f1": 0.9333333333333333,
+      "risk_severity_accuracy": 0.5714285714285714,
+      "risk_false_positives": [],
+      "risk_missed": [
+        "subprocessors"
+      ],
+      "risk_severity_confusion": {
+        "high->high": 2,
+        "medium->low": 1,
+        "high->low": 2,
+        "medium->medium": 2
+      },
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.7272727272727273,
+      "span_uncovered_clauses": [
+        "data_export_on_termination",
+        "indemnity",
+        "subprocessors"
+      ],
+      "citation_grounded": 8,
+      "citation_total": 9,
+      "citation_grounding": 0.8888888888888888,
+      "hallucination_count": 1,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "saas",
+    "scenario": "baseline",
+    "aliases": "off",
+    "expected": {
+      "clause_precision": 0.9166666666666666,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9565217391304348,
+      "risk_flag_accuracy": 0.5,
+      "risk_precision": 1.0,
+      "risk_recall": 0.875,
+      "risk_f1": 0.9333333333333333,
+      "risk_severity_accuracy": 0.5714285714285714,
+      "risk_false_positives": [],
+      "risk_missed": [
+        "subprocessors"
+      ],
+      "risk_severity_confusion": {
+        "high->high": 2,
+        "medium->low": 1,
+        "high->low": 2,
+        "medium->medium": 2
+      },
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.7272727272727273,
+      "span_uncovered_clauses": [
+        "data_export_on_termination",
+        "indemnity",
+        "subprocessors"
+      ],
+      "citation_grounded": 8,
+      "citation_total": 9,
+      "citation_grounding": 0.8888888888888888,
+      "hallucination_count": 1,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "saas",
+    "scenario": "no-evidence",
+    "aliases": "on",
+    "expected": {
+      "clause_precision": 0.9166666666666666,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9565217391304348,
+      "risk_flag_accuracy": 0.5,
+      "risk_precision": 1.0,
+      "risk_recall": 0.875,
+      "risk_f1": 0.9333333333333333,
+      "risk_severity_accuracy": 0.5714285714285714,
+      "risk_false_positives": [],
+      "risk_missed": [
+        "subprocessors"
+      ],
+      "risk_severity_confusion": {
+        "high->high": 2,
+        "medium->low": 1,
+        "high->low": 2,
+        "medium->medium": 2
+      },
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.0,
+      "span_uncovered_clauses": [
+        "auto_renewal",
+        "data_export_on_termination",
+        "data_protection",
+        "fees",
+        "indemnity",
+        "ip_and_model_training",
+        "limitation_of_liability",
+        "security",
+        "service_levels",
+        "subprocessors",
+        "term"
+      ],
+      "citation_grounded": 0,
+      "citation_total": 0,
+      "citation_grounding": 0.0,
+      "hallucination_count": 0,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "saas",
+    "scenario": "no-evidence",
+    "aliases": "off",
+    "expected": {
+      "clause_precision": 0.9166666666666666,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9565217391304348,
+      "risk_flag_accuracy": 0.5,
+      "risk_precision": 1.0,
+      "risk_recall": 0.875,
+      "risk_f1": 0.9333333333333333,
+      "risk_severity_accuracy": 0.5714285714285714,
+      "risk_false_positives": [],
+      "risk_missed": [
+        "subprocessors"
+      ],
+      "risk_severity_confusion": {
+        "high->high": 2,
+        "medium->low": 1,
+        "high->low": 2,
+        "medium->medium": 2
+      },
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.0,
+      "span_uncovered_clauses": [
+        "auto_renewal",
+        "data_export_on_termination",
+        "data_protection",
+        "fees",
+        "indemnity",
+        "ip_and_model_training",
+        "limitation_of_liability",
+        "security",
+        "service_levels",
+        "subprocessors",
+        "term"
+      ],
+      "citation_grounded": 0,
+      "citation_total": 0,
+      "citation_grounding": 0.0,
+      "hallucination_count": 0,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "saas",
+    "scenario": "missed-risks",
+    "aliases": "on",
+    "expected": {
+      "clause_precision": 0.9166666666666666,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9565217391304348,
+      "risk_flag_accuracy": 0.0,
+      "risk_precision": 1.0,
+      "risk_recall": 0.0,
+      "risk_f1": 0.0,
+      "risk_severity_accuracy": 0.0,
+      "risk_false_positives": [],
+      "risk_missed": [
+        "auto_renewal",
+        "data_export_on_termination",
+        "fees",
+        "indemnity",
+        "ip_and_model_training",
+        "limitation_of_liability",
+        "security",
+        "subprocessors"
+      ],
+      "risk_severity_confusion": {},
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.7272727272727273,
+      "span_uncovered_clauses": [
+        "data_export_on_termination",
+        "indemnity",
+        "subprocessors"
+      ],
+      "citation_grounded": 8,
+      "citation_total": 9,
+      "citation_grounding": 0.8888888888888888,
+      "hallucination_count": 1,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "saas",
+    "scenario": "missed-risks",
+    "aliases": "off",
+    "expected": {
+      "clause_precision": 0.9166666666666666,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9565217391304348,
+      "risk_flag_accuracy": 0.0,
+      "risk_precision": 1.0,
+      "risk_recall": 0.0,
+      "risk_f1": 0.0,
+      "risk_severity_accuracy": 0.0,
+      "risk_false_positives": [],
+      "risk_missed": [
+        "auto_renewal",
+        "data_export_on_termination",
+        "fees",
+        "indemnity",
+        "ip_and_model_training",
+        "limitation_of_liability",
+        "security",
+        "subprocessors"
+      ],
+      "risk_severity_confusion": {},
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.7272727272727273,
+      "span_uncovered_clauses": [
+        "data_export_on_termination",
+        "indemnity",
+        "subprocessors"
+      ],
+      "citation_grounded": 8,
+      "citation_total": 9,
+      "citation_grounding": 0.8888888888888888,
+      "hallucination_count": 1,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "saas",
+    "scenario": "conflicting-flags",
+    "aliases": "on",
+    "expected": {
+      "clause_precision": 0.9166666666666666,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9565217391304348,
+      "risk_flag_accuracy": 0.5,
+      "risk_precision": 1.0,
+      "risk_recall": 0.875,
+      "risk_f1": 0.9333333333333333,
+      "risk_severity_accuracy": 0.5714285714285714,
+      "risk_false_positives": [],
+      "risk_missed": [
+        "subprocessors"
+      ],
+      "risk_severity_confusion": {
+        "high->high": 2,
+        "medium->low": 1,
+        "high->low": 2,
+        "medium->medium": 2
+      },
+      "risk_duplicate_flags": [
+        "auto_renewal"
+      ],
+      "risk_conflicting_flags": [
+        "auto_renewal"
+      ],
+      "span_coverage": 0.7272727272727273,
+      "span_uncovered_clauses": [
+        "data_export_on_termination",
+        "indemnity",
+        "subprocessors"
+      ],
+      "citation_grounded": 8,
+      "citation_total": 9,
+      "citation_grounding": 0.8888888888888888,
+      "hallucination_count": 1,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "saas",
+    "scenario": "conflicting-flags",
+    "aliases": "off",
+    "expected": {
+      "clause_precision": 0.9166666666666666,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9565217391304348,
+      "risk_flag_accuracy": 0.5,
+      "risk_precision": 1.0,
+      "risk_recall": 0.875,
+      "risk_f1": 0.9333333333333333,
+      "risk_severity_accuracy": 0.5714285714285714,
+      "risk_false_positives": [],
+      "risk_missed": [
+        "subprocessors"
+      ],
+      "risk_severity_confusion": {
+        "high->high": 2,
+        "medium->low": 1,
+        "high->low": 2,
+        "medium->medium": 2
+      },
+      "risk_duplicate_flags": [
+        "auto_renewal"
+      ],
+      "risk_conflicting_flags": [
+        "auto_renewal"
+      ],
+      "span_coverage": 0.7272727272727273,
+      "span_uncovered_clauses": [
+        "data_export_on_termination",
+        "indemnity",
+        "subprocessors"
+      ],
+      "citation_grounded": 8,
+      "citation_total": 9,
+      "citation_grounding": 0.8888888888888888,
+      "hallucination_count": 1,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "saas",
+    "customReview": {
+      "clauses": [],
+      "risk_flags": [],
+      "citations": [],
+      "abstentions": []
+    },
+    "aliases": "on",
+    "expected": {
+      "clause_precision": 0.0,
+      "clause_recall": 0.0,
+      "clause_f1": 0.0,
+      "risk_flag_accuracy": 0.0,
+      "risk_precision": 1.0,
+      "risk_recall": 0.0,
+      "risk_f1": 0.0,
+      "risk_severity_accuracy": 0.0,
+      "risk_false_positives": [],
+      "risk_missed": [
+        "auto_renewal",
+        "data_export_on_termination",
+        "fees",
+        "indemnity",
+        "ip_and_model_training",
+        "limitation_of_liability",
+        "security",
+        "subprocessors"
+      ],
+      "risk_severity_confusion": {},
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.0,
+      "span_uncovered_clauses": [
+        "auto_renewal",
+        "data_export_on_termination",
+        "data_protection",
+        "fees",
+        "indemnity",
+        "ip_and_model_training",
+        "limitation_of_liability",
+        "security",
+        "service_levels",
+        "subprocessors",
+        "term"
+      ],
+      "citation_grounded": 0,
+      "citation_total": 0,
+      "citation_grounding": 0.0,
+      "hallucination_count": 0,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "saas",
+    "customReview": {
+      "clauses": [
+        {
+          "clause_type": "service_levels",
+          "text": "Commercially reasonable efforts to maintain 99.5% monthly uptime."
+        },
+        {
+          "clause_type": "data_protection",
+          "text": "Processing only on documented instructions from the customer."
+        },
+        {
+          "clause_type": "limitation_of_liability",
+          "text": "Liability capped at twelve months of fees."
+        },
+        {
+          "clause_type": "term",
+          "text": "Initial term of twelve months."
+        },
+        {
+          "clause_type": "auto_renewal",
+          "text": "Renews automatically unless ninety days notice is given."
+        },
+        {
+          "clause_type": "subprocessors",
+          "text": "Provider may appoint sub-processors and publish a list on its website."
+        },
+        {
+          "clause_type": "security",
+          "text": "Industry standard security measures appropriate to the provider's size."
+        },
+        {
+          "clause_type": "ip_and_model_training",
+          "text": "Provider licensed to use Customer Data to train machine learning models."
+        },
+        {
+          "clause_type": "indemnity",
+          "text": "Customer indemnifies the provider against claims arising from use of the service."
+        },
+        {
+          "clause_type": "fees",
+          "text": "Provider may increase fees on thirty days notice."
+        },
+        {
+          "clause_type": "data_export_on_termination",
+          "text": "Data deleted seven days after termination, export on request."
+        },
+        {
+          "clause_type": "data_residency",
+          "text": "Customer Data is stored within the European Economic Area."
+        }
+      ],
+      "risk_flags": [
+        {
+          "clause_type": "auto_renewal",
+          "severity": "high",
+          "rationale": "A ninety day notice window against a twelve month term commits the customer to another year on a single missed date."
+        },
+        {
+          "clause_type": "fees",
+          "severity": "high",
+          "rationale": "Uncapped increases with no termination right allow unilateral repricing of a locked-in customer."
+        },
+        {
+          "clause_type": "limitation_of_liability",
+          "severity": "medium",
+          "rationale": "A twelve month fee cap carves out nothing for data breach or confidentiality."
+        },
+        {
+          "clause_type": "security",
+          "severity": "medium",
+          "rationale": "The standard is unmeasurable and gives the customer nothing to audit against."
+        },
+        {
+          "clause_type": "ip_and_model_training",
+          "severity": "low",
+          "rationale": "Service improvement licences are common in SaaS terms."
+        },
+        {
+          "clause_type": "indemnity",
+          "severity": "low",
+          "rationale": "Customer indemnities for use of the service are standard."
+        },
+        {
+          "clause_type": "data_export_on_termination",
+          "severity": "low",
+          "rationale": "A defined deletion window is good data hygiene."
+        }
+      ],
+      "citations": [
+        {
+          "quote": "99.5% monthly uptime",
+          "clause_type": "service_levels"
+        },
+        {
+          "quote": "only on documented instructions",
+          "clause_type": "data_protection"
+        },
+        {
+          "quote": "shall not exceed the fees paid in the twelve (12) months preceding the claim",
+          "clause_type": "limitation_of_liability"
+        },
+        {
+          "quote": "initial term of this Agreement is twelve (12) months",
+          "clause_type": "term"
+        },
+        {
+          "quote": "ninety (90) days written notice",
+          "clause_type": "auto_renewal"
+        },
+        {
+          "quote": "perpetual, irrevocable, worldwide licence to use Customer Data",
+          "clause_type": "ip_and_model_training"
+        },
+        {
+          "quote": "industry standard security measures",
+          "clause_type": "security"
+        },
+        {
+          "quote": "may increase the fees at any time on thirty (30) days written notice",
+          "clause_type": "fees"
+        },
+        {
+          "quote": "the Provider shall maintain SOC 2 Type II certification throughout the term",
+          "clause_type": "security"
+        }
+      ],
+      "abstentions": []
+    },
+    "aliases": "on",
+    "expected": {
+      "clause_precision": 0.9166666666666666,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9565217391304348,
+      "risk_flag_accuracy": 0.5,
+      "risk_precision": 1.0,
+      "risk_recall": 0.875,
+      "risk_f1": 0.9333333333333333,
+      "risk_severity_accuracy": 0.5714285714285714,
+      "risk_false_positives": [],
+      "risk_missed": [
+        "subprocessors"
+      ],
+      "risk_severity_confusion": {
+        "high->high": 2,
+        "medium->low": 1,
+        "high->low": 2,
+        "medium->medium": 2
+      },
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.7272727272727273,
+      "span_uncovered_clauses": [
+        "data_export_on_termination",
+        "indemnity",
+        "subprocessors"
+      ],
+      "citation_grounded": 8,
+      "citation_total": 9,
+      "citation_grounding": 0.8888888888888888,
+      "hallucination_count": 1,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "dpa",
+    "scenario": "baseline",
+    "aliases": "on",
+    "expected": {
+      "clause_precision": 0.9090909090909091,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9523809523809523,
+      "risk_flag_accuracy": 0.6,
+      "risk_precision": 1.0,
+      "risk_recall": 1.0,
+      "risk_f1": 1.0,
+      "risk_severity_accuracy": 0.6,
+      "risk_false_positives": [],
+      "risk_missed": [],
+      "risk_severity_confusion": {
+        "high->low": 2,
+        "medium->medium": 1,
+        "high->high": 2
+      },
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.7,
+      "span_uncovered_clauses": [
+        "audit_rights",
+        "governing_law",
+        "international_transfers"
+      ],
+      "citation_grounded": 7,
+      "citation_total": 8,
+      "citation_grounding": 0.875,
+      "hallucination_count": 1,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "dpa",
+    "scenario": "baseline",
+    "aliases": "off",
+    "expected": {
+      "clause_precision": 0.9090909090909091,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9523809523809523,
+      "risk_flag_accuracy": 0.6,
+      "risk_precision": 1.0,
+      "risk_recall": 1.0,
+      "risk_f1": 1.0,
+      "risk_severity_accuracy": 0.6,
+      "risk_false_positives": [],
+      "risk_missed": [],
+      "risk_severity_confusion": {
+        "high->low": 2,
+        "medium->medium": 1,
+        "high->high": 2
+      },
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.7,
+      "span_uncovered_clauses": [
+        "audit_rights",
+        "governing_law",
+        "international_transfers"
+      ],
+      "citation_grounded": 7,
+      "citation_total": 8,
+      "citation_grounding": 0.875,
+      "hallucination_count": 1,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "dpa",
+    "scenario": "no-evidence",
+    "aliases": "on",
+    "expected": {
+      "clause_precision": 0.9090909090909091,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9523809523809523,
+      "risk_flag_accuracy": 0.6,
+      "risk_precision": 1.0,
+      "risk_recall": 1.0,
+      "risk_f1": 1.0,
+      "risk_severity_accuracy": 0.6,
+      "risk_false_positives": [],
+      "risk_missed": [],
+      "risk_severity_confusion": {
+        "high->low": 2,
+        "medium->medium": 1,
+        "high->high": 2
+      },
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.0,
+      "span_uncovered_clauses": [
+        "audit_rights",
+        "breach_and_dpia_assistance",
+        "confidentiality",
+        "data_subject_rights_assistance",
+        "deletion_return",
+        "documented_instructions",
+        "governing_law",
+        "international_transfers",
+        "security_measures",
+        "subprocessor_authorization"
+      ],
+      "citation_grounded": 0,
+      "citation_total": 0,
+      "citation_grounding": 0.0,
+      "hallucination_count": 0,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "dpa",
+    "scenario": "no-evidence",
+    "aliases": "off",
+    "expected": {
+      "clause_precision": 0.9090909090909091,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9523809523809523,
+      "risk_flag_accuracy": 0.6,
+      "risk_precision": 1.0,
+      "risk_recall": 1.0,
+      "risk_f1": 1.0,
+      "risk_severity_accuracy": 0.6,
+      "risk_false_positives": [],
+      "risk_missed": [],
+      "risk_severity_confusion": {
+        "high->low": 2,
+        "medium->medium": 1,
+        "high->high": 2
+      },
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.0,
+      "span_uncovered_clauses": [
+        "audit_rights",
+        "breach_and_dpia_assistance",
+        "confidentiality",
+        "data_subject_rights_assistance",
+        "deletion_return",
+        "documented_instructions",
+        "governing_law",
+        "international_transfers",
+        "security_measures",
+        "subprocessor_authorization"
+      ],
+      "citation_grounded": 0,
+      "citation_total": 0,
+      "citation_grounding": 0.0,
+      "hallucination_count": 0,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "dpa",
+    "scenario": "missed-risks",
+    "aliases": "on",
+    "expected": {
+      "clause_precision": 0.9090909090909091,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9523809523809523,
+      "risk_flag_accuracy": 0.0,
+      "risk_precision": 1.0,
+      "risk_recall": 0.0,
+      "risk_f1": 0.0,
+      "risk_severity_accuracy": 0.0,
+      "risk_false_positives": [],
+      "risk_missed": [
+        "audit_rights",
+        "breach_and_dpia_assistance",
+        "deletion_return",
+        "international_transfers",
+        "subprocessor_authorization"
+      ],
+      "risk_severity_confusion": {},
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.7,
+      "span_uncovered_clauses": [
+        "audit_rights",
+        "governing_law",
+        "international_transfers"
+      ],
+      "citation_grounded": 7,
+      "citation_total": 8,
+      "citation_grounding": 0.875,
+      "hallucination_count": 1,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "dpa",
+    "scenario": "missed-risks",
+    "aliases": "off",
+    "expected": {
+      "clause_precision": 0.9090909090909091,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9523809523809523,
+      "risk_flag_accuracy": 0.0,
+      "risk_precision": 1.0,
+      "risk_recall": 0.0,
+      "risk_f1": 0.0,
+      "risk_severity_accuracy": 0.0,
+      "risk_false_positives": [],
+      "risk_missed": [
+        "audit_rights",
+        "breach_and_dpia_assistance",
+        "deletion_return",
+        "international_transfers",
+        "subprocessor_authorization"
+      ],
+      "risk_severity_confusion": {},
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.7,
+      "span_uncovered_clauses": [
+        "audit_rights",
+        "governing_law",
+        "international_transfers"
+      ],
+      "citation_grounded": 7,
+      "citation_total": 8,
+      "citation_grounding": 0.875,
+      "hallucination_count": 1,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "dpa",
+    "scenario": "conflicting-flags",
+    "aliases": "on",
+    "expected": {
+      "clause_precision": 0.9090909090909091,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9523809523809523,
+      "risk_flag_accuracy": 0.6,
+      "risk_precision": 1.0,
+      "risk_recall": 1.0,
+      "risk_f1": 1.0,
+      "risk_severity_accuracy": 0.6,
+      "risk_false_positives": [],
+      "risk_missed": [],
+      "risk_severity_confusion": {
+        "high->low": 2,
+        "medium->medium": 1,
+        "high->high": 2
+      },
+      "risk_duplicate_flags": [
+        "subprocessor_authorization"
+      ],
+      "risk_conflicting_flags": [
+        "subprocessor_authorization"
+      ],
+      "span_coverage": 0.7,
+      "span_uncovered_clauses": [
+        "audit_rights",
+        "governing_law",
+        "international_transfers"
+      ],
+      "citation_grounded": 7,
+      "citation_total": 8,
+      "citation_grounding": 0.875,
+      "hallucination_count": 1,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "dpa",
+    "scenario": "conflicting-flags",
+    "aliases": "off",
+    "expected": {
+      "clause_precision": 0.9090909090909091,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9523809523809523,
+      "risk_flag_accuracy": 0.6,
+      "risk_precision": 1.0,
+      "risk_recall": 1.0,
+      "risk_f1": 1.0,
+      "risk_severity_accuracy": 0.6,
+      "risk_false_positives": [],
+      "risk_missed": [],
+      "risk_severity_confusion": {
+        "high->low": 2,
+        "medium->medium": 1,
+        "high->high": 2
+      },
+      "risk_duplicate_flags": [
+        "subprocessor_authorization"
+      ],
+      "risk_conflicting_flags": [
+        "subprocessor_authorization"
+      ],
+      "span_coverage": 0.7,
+      "span_uncovered_clauses": [
+        "audit_rights",
+        "governing_law",
+        "international_transfers"
+      ],
+      "citation_grounded": 7,
+      "citation_total": 8,
+      "citation_grounding": 0.875,
+      "hallucination_count": 1,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "dpa",
+    "customReview": {
+      "clauses": [],
+      "risk_flags": [],
+      "citations": [],
+      "abstentions": []
+    },
+    "aliases": "on",
+    "expected": {
+      "clause_precision": 0.0,
+      "clause_recall": 0.0,
+      "clause_f1": 0.0,
+      "risk_flag_accuracy": 0.0,
+      "risk_precision": 1.0,
+      "risk_recall": 0.0,
+      "risk_f1": 0.0,
+      "risk_severity_accuracy": 0.0,
+      "risk_false_positives": [],
+      "risk_missed": [
+        "audit_rights",
+        "breach_and_dpia_assistance",
+        "deletion_return",
+        "international_transfers",
+        "subprocessor_authorization"
+      ],
+      "risk_severity_confusion": {},
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.0,
+      "span_uncovered_clauses": [
+        "audit_rights",
+        "breach_and_dpia_assistance",
+        "confidentiality",
+        "data_subject_rights_assistance",
+        "deletion_return",
+        "documented_instructions",
+        "governing_law",
+        "international_transfers",
+        "security_measures",
+        "subprocessor_authorization"
+      ],
+      "citation_grounded": 0,
+      "citation_total": 0,
+      "citation_grounding": 0.0,
+      "hallucination_count": 0,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  },
+  {
+    "caseId": "dpa",
+    "customReview": {
+      "clauses": [
+        {
+          "clause_type": "documented_instructions",
+          "text": "Processing only on documented instructions from the controller, including transfers."
+        },
+        {
+          "clause_type": "confidentiality",
+          "text": "Authorised persons are committed to confidentiality."
+        },
+        {
+          "clause_type": "security_measures",
+          "text": "Appropriate technical and organisational measures, summary available on request."
+        },
+        {
+          "clause_type": "subprocessor_authorization",
+          "text": "Processor may engage sub-processors at its own discretion."
+        },
+        {
+          "clause_type": "data_subject_rights_assistance",
+          "text": "Assistance with Chapter III data subject requests."
+        },
+        {
+          "clause_type": "breach_and_dpia_assistance",
+          "text": "Breach notification within fourteen days; DPIA assistance where commercially agreed."
+        },
+        {
+          "clause_type": "deletion_return",
+          "text": "Processor may retain personal data after termination."
+        },
+        {
+          "clause_type": "audit_rights",
+          "text": "Annual third-party audit certificate provided to the controller."
+        },
+        {
+          "clause_type": "international_transfers",
+          "text": "Transfers to affiliates in third countries as necessary."
+        },
+        {
+          "clause_type": "governing_law",
+          "text": "Governed by the laws of Germany."
+        },
+        {
+          "clause_type": "data_localisation",
+          "text": "Personal data is stored within the European Economic Area."
+        }
+      ],
+      "risk_flags": [
+        {
+          "clause_type": "subprocessor_authorization",
+          "severity": "high",
+          "rationale": "Sub-processors appointed at the processor's discretion and the controller waives its right to object, which does not meet Art. 28(3)(d) GDPR."
+        },
+        {
+          "clause_type": "deletion_return",
+          "severity": "high",
+          "rationale": "Indefinite retention for the processor's own purposes after termination conflicts with Art. 28(3)(g) GDPR, which requires deletion or return at the controller's choice."
+        },
+        {
+          "clause_type": "breach_and_dpia_assistance",
+          "severity": "medium",
+          "rationale": "A fourteen day breach notification period is long relative to the controller's own 72 hour obligation."
+        },
+        {
+          "clause_type": "audit_rights",
+          "severity": "low",
+          "rationale": "An annual third-party certificate is a common market position."
+        },
+        {
+          "clause_type": "international_transfers",
+          "severity": "low",
+          "rationale": "Transfers are limited to affiliates for service provision."
+        }
+      ],
+      "citations": [
+        {
+          "quote": "only on documented instructions from the Controller",
+          "clause_type": "documented_instructions"
+        },
+        {
+          "quote": "committed themselves to confidentiality",
+          "clause_type": "confidentiality"
+        },
+        {
+          "quote": "appropriate technical and organisational measures",
+          "clause_type": "security_measures"
+        },
+        {
+          "quote": "may engage sub-processors at its own discretion",
+          "clause_type": "subprocessor_authorization"
+        },
+        {
+          "quote": "the data subject's rights laid down in Chapter III",
+          "clause_type": "data_subject_rights_assistance"
+        },
+        {
+          "quote": "within\nfourteen (14) days of becoming aware of it",
+          "clause_type": "breach_and_dpia_assistance"
+        },
+        {
+          "quote": "for its own legitimate business purposes",
+          "clause_type": "deletion_return"
+        },
+        {
+          "quote": "all personal data shall be stored exclusively within the European Economic Area",
+          "clause_type": "data_localisation"
+        }
+      ],
+      "abstentions": []
+    },
+    "aliases": "on",
+    "expected": {
+      "clause_precision": 0.9090909090909091,
+      "clause_recall": 1.0,
+      "clause_f1": 0.9523809523809523,
+      "risk_flag_accuracy": 0.6,
+      "risk_precision": 1.0,
+      "risk_recall": 1.0,
+      "risk_f1": 1.0,
+      "risk_severity_accuracy": 0.6,
+      "risk_false_positives": [],
+      "risk_missed": [],
+      "risk_severity_confusion": {
+        "high->low": 2,
+        "medium->medium": 1,
+        "high->high": 2
+      },
+      "risk_duplicate_flags": [],
+      "risk_conflicting_flags": [],
+      "span_coverage": 0.7,
+      "span_uncovered_clauses": [
+        "audit_rights",
+        "governing_law",
+        "international_transfers"
+      ],
+      "citation_grounded": 7,
+      "citation_total": 8,
+      "citation_grounding": 0.875,
+      "hallucination_count": 1,
+      "thresholds": {
+        "f1": 0.85,
+        "risk_accuracy": 0.45,
+        "grounding_rate": 0.75,
+        "hallucinations": 1.0
+      }
+    }
+  }
+]
