@@ -1,6 +1,8 @@
-# Contract Review Evidence Lab
+# Contract Review Evidence Lab — Interactive Web Explorer
 
-A public, hosted evaluation workspace for the synthetic NDA, SaaS and DPA cases in Sebastian Förste's contract-review-eval-harness.
+A public, hosted evaluation workspace for the synthetic NDA, SaaS and DPA cases in Sebastian Förste's [contract-review-eval-harness](https://github.com/sebastianfoerste/contract-review-eval-harness).
+
+This application serves as the **interactive explorer** tier of the Contract Review Evaluation project. While the authoritative Python engine develops the evaluation methodology, release certificates, and model adapters, this web app provides a zero-dependency, browser-safe environment for visitors to explore evaluation results, inspect failure scenarios, and download reports.
 
 ## Features
 
@@ -20,29 +22,31 @@ This release uses v1 reference answers from the Python repository. Independent v
 
 Use Node 22.13 or later.
 
-```
+```bash
 npm run install:ci
 npm run dev
-node --experimental-strip-types --test tests/scoring.test.mjs
-npx tsc --noEmit
+npm test
+npm run test:types
 npm run build
 ```
 
-The Sites build is Cloudflare Worker compatible. Logical hosting metadata is in `.openai/hosting.json`. The site is maintained in its own source repository, separately from the Python harness.
+The Sites build is Cloudflare Worker compatible. Logical hosting metadata is in `.openai/hosting.json`. The site is maintained in its own source repository, separately from the Python harness. See [PROJECT_ARCHITECTURE.md](https://github.com/sebastianfoerste/contract-review-eval-harness/blob/main/docs/PROJECT_ARCHITECTURE.md) for architectural details.
 
-The production scoring port is `lib/scoring.ts`. Regenerate inputs and expected parity scores with the Python harness's environment:
+The production scoring port is `lib/scoring.ts`. Regenerate inputs and expected parity scores from the harness:
 
-```
-/path/to/harness/.venv/bin/python scripts/export-benchmark.py --repo /path/to/harness
+```bash
+npm run export:benchmark
+# or with an explicit harness path:
+python3 scripts/export-benchmark.py --repo /path/to/contract-review-eval-harness
 ```
 
 Run the HTTP integration checks against an actual local or deployed URL:
 
-```
+```bash
 node tests/api-check.mjs https://YOUR_SITE
 ```
 
-Every supported case and scenario is checked against Python `score_review`. Empty reviews, conflicting flags and quote matching have additional checks. These checks cover the bounded public inputs; they do not establish general equivalence for arbitrary documents or Unicode inputs.
+Every supported case and scenario is checked against Python `score_review` (32 tests in `tests/scoring.test.mjs`). Empty reviews, conflicting flags and quote matching have additional checks. These checks cover the bounded public inputs; they do not establish general equivalence for arbitrary documents or Unicode inputs.
 
 ## Incorporating adjudicated evidence
 
