@@ -15,6 +15,7 @@
     "test:types": "tsc --noEmit",
     "export:benchmark": "python3 scripts/export-benchmark.py",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
+    "check": "npm run lint && npm run test:types && npm test && npm run build",
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
