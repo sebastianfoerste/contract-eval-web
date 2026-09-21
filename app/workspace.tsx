@@ -1,5 +1,6 @@
 'use client';
 import {useCallback,useEffect,useRef,useState} from 'react';
+import Link from 'next/link';
 import {Activity,ArrowDownToLine,ArrowUpRight,Check,ChevronRight,FileText,FlaskConical,GitCompareArrows,LoaderCircle,Play,Search,ShieldCheck,TriangleAlert} from 'lucide-react';
 import {Tabs,TabsList,TabsTrigger,TabsContent} from '@/components/ui/tabs';
 import {Select,SelectContent,SelectItem,SelectTrigger,SelectValue} from '@/components/ui/select';
@@ -58,11 +59,13 @@ export default function Workspace(){
   type Context={registerTool:(t:{name:string;description:string;inputSchema:object;execute:(input:unknown)=>Promise<unknown>;annotations:{readOnlyHint:boolean}},o:{signal:AbortSignal})=>void|Promise<void>};
   const context=(document as Document&{modelContext?:Context}).modelContext;if(!context)return;
   const life=new AbortController();
-  try{Promise.resolve(context.registerTool({name:'run_synthetic_contract_evaluation',description:'Run and display a deterministic synthetic contract evaluation. No model call or payment.',inputSchema:{type:'object',properties:{caseId:{type:'string',enum:benchmark.cases.map(c=>c.id)},scenario:{type:'string',enum:Object.keys(scenarios)}},required:['caseId','scenario'],additionalProperties:false},annotations:{readOnlyHint:false},execute:async(input:unknown)=>{
+  // Registration runs in a microtask so a failure never sets state synchronously in the effect body.
+  const unavailable=()=>{if(!life.signal.aborted)setNotice('Browser agent controls are unavailable. Use the evaluation button.');};
+  Promise.resolve().then(()=>context.registerTool({name:'run_synthetic_contract_evaluation',description:'Run and display a deterministic synthetic contract evaluation. No model call or payment.',inputSchema:{type:'object',properties:{caseId:{type:'string',enum:benchmark.cases.map(c=>c.id)},scenario:{type:'string',enum:Object.keys(scenarios)}},required:['caseId','scenario'],additionalProperties:false},annotations:{readOnlyHint:false},execute:async(input:unknown)=>{
    if(!input||typeof input!=='object'||Array.isArray(input))throw new Error('Expected a case and scenario.');const a=input as Record<string,unknown>;
    if(Object.keys(a).some(k=>k!=='caseId'&&k!=='scenario')||!benchmark.cases.some(c=>c.id===a.caseId)||typeof a.scenario!=='string'||!Object.hasOwn(scenarios,a.scenario))throw new Error('Unknown case or scenario.');
    return perform(String(a.caseId),a.scenario as Scenario);
-  }},{signal:life.signal})).catch(()=>setNotice('Browser agent controls are unavailable. Use the evaluation button.'));}catch{setNotice('Browser agent controls are unavailable. Use the evaluation button.');}
+  }},{signal:life.signal})).catch(unavailable);
   return()=>life.abort();
  },[perform]);
  function changeCase(id:string){setCaseId(id);setRun(baseline(id));setScenario('baseline');setSelected(benchmark.cases.find(c=>c.id===id)!.gold.clause_types[0]);setQuery('');setComparisonId('reference');setNotice('');setError('');}
@@ -71,7 +74,7 @@ export default function Workspace(){
   download(`${caseId}-${run.scenario}-report.md`,lines.join('\n'),'text/markdown');setNotice('Report downloaded.');
  }
  return <div className="app-shell"><a className="skip-link" href="#workspace">Skip to evaluation</a>
-  <header className="topbar"><a className="brand" href="/"><span className="brand-mark"><FlaskConical size={22}/></span><span>CONTRACT REVIEW<strong>Evidence Lab</strong></span></a><div className="topbar-right"><span className="public-label">Public research demo</span><a href={benchmark.repository} target="_blank" rel="noreferrer">Source code<ArrowUpRight size={15}/></a></div></header>
+  <header className="topbar"><Link className="brand" href="/"><span className="brand-mark"><FlaskConical size={22}/></span><span>CONTRACT REVIEW<strong>Evidence Lab</strong></span></Link><div className="topbar-right"><span className="public-label">Public research demo</span><a href={benchmark.repository} target="_blank" rel="noreferrer">Source code<ArrowUpRight size={15}/></a></div></header>
   <main id="workspace"><section className="intro"><div><div className="eyebrow">EVALUATE / INSPECT / COMPARE</div><h1>Put the review to the test.</h1><p>Measure what a contract review found, missed and supported with evidence.</p></div><div className="edition"><span>BENCHMARK EDITION</span><strong>03 contracts <span>/</span> v1 reference</strong><small>Synthetic data · deterministic evaluation</small></div></section>
    <section className="run-bar" aria-label="Evaluation controls"><div className="control"><label htmlFor="case-select">Contract</label><Select value={caseId} onValueChange={changeCase} disabled={busy}><SelectTrigger id="case-select"><SelectValue/></SelectTrigger><SelectContent>{benchmark.cases.map(c=><SelectItem value={c.id} key={c.id}>{c.title}</SelectItem>)}</SelectContent></Select></div><div className="control scenario-control"><label htmlFor="scenario-select">Evaluation scenario</label><Select value={scenario} onValueChange={v=>setScenario(v as Scenario)} disabled={busy}><SelectTrigger id="scenario-select"><SelectValue/></SelectTrigger><SelectContent>{Object.entries(scenarios).map(([k,s])=><SelectItem value={k} key={k}>{s.title}</SelectItem>)}</SelectContent></Select></div><div className="run-explanation"><span>Offline fixture</span><small>No API key or model cost</small></div><button className="primary" disabled={busy} onClick={()=>void perform(caseId,scenario).catch(()=>{})}>{busy?<LoaderCircle className="spin" size={17}/>:<Play size={16}/>} {busy?'Evaluating…':'Run evaluation'}</button></section>
    <div className={`status-line ${error?'error':''}`} role="status" aria-live="polite">{error||notice||scenarios[scenario].description}</div>
