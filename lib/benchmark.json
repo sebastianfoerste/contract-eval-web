@@ -592,7 +592,7 @@
     }
   ],
   "goldStatus": "v1 reference answers; v2 evidence: awaiting_returns",
-  "integritySha256": "6de10179e60481b9716e8a7cdb0e262d475ab3ea2cfa548ff8db08ccf5c4305f",
+  "integritySha256": "d6a175541190bccc733b6d4e95ace24ede93dc152fc88f5e3599768ca629cc43",
   "methodologyHashes": {
     "src/contract_eval/__init__.py": "8dfa209ea9d707f840e324a4ec38a77a4205579e5a61cc80002b92665f97e598",
     "src/contract_eval/__main__.py": "aed5144e7ede0574db80acd4336c9d7d8491285921234e5fda90d13ce45d5381",
@@ -662,6 +662,6 @@
   "repository": "https://github.com/sebastianfoerste/contract-review-eval-harness",
   "schema": "contract-eval.web-benchmark.v2",
   "scoringEdition": "v1",
-  "sourceCommit": "930fdbca63c1d0cf6726f6173d2fca0e69dd170a",
+  "sourceCommit": "f4f835e5d1019ca6ca2c77f0d6030cea91b02c78",
   "version": "0.7.0rc1"
 }
