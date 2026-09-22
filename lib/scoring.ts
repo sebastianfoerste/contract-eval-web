@@ -38,6 +38,33 @@ export function locate(source: string, quote: string): [number, number] | null {
   const start = normalize(source).indexOf(needle);
   return start < 0 ? null : [start, start + needle.length];
 }
+/** Map a grounded quotation back to offsets in the original contract text. */
+export function locateSource(source: string, quote: string): [number, number] | null {
+  const span = locate(source, quote);
+  if (!span) return null;
+  const offsets: [number, number][] = [];
+  let pendingSpace: [number, number] | null = null;
+  let hasContent = false;
+  for (let index = 0; index < source.length;) {
+    const character = String.fromCodePoint(source.codePointAt(index)!);
+    const end = index + character.length;
+    const normalized = punctuation.has(character) ? ' ' : character.toLowerCase();
+    for (const unit of normalized) {
+      if (/\s/u.test(unit)) {
+        pendingSpace = pendingSpace ? [pendingSpace[0], end] : [index, end];
+      } else {
+        if (hasContent && pendingSpace) offsets.push(pendingSpace);
+        pendingSpace = null;
+        offsets.push([index, end]);
+        hasContent = true;
+      }
+    }
+    index = end;
+  }
+  const first = offsets[span[0]];
+  const last = offsets[span[1] - 1];
+  return first && last ? [first[0], last[1]] : null;
+}
 const unique = (items: string[]) => [...new Set(items)].sort();
 const harmonic = (p: number, r: number) => p + r ? 2 * p * r / (p + r) : 0;
 export function scoreReview(source: string, gold: Gold, review: Review, aliasMode: 'on' | 'off' = 'on') {

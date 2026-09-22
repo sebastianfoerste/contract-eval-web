@@ -8,8 +8,8 @@ This application serves as the **interactive explorer** tier of the Contract Rev
 
 - Recompute deterministic review scores with a bounded server API.
 - Compare original fixtures, removed evidence, missed risks and conflicting severities.
-- Inspect reference severity, review reasoning, supporting quotations and full synthetic sources.
-- Compare runs within the current session and export Markdown reports or complete JSON results.
+- Inspect reference severity, review reasoning and supporting quotations; jump from a grounded quotation to its highlighted source passage.
+- Compare runs within the current session and export evidence reports with rationales, quotation status and provenance, or complete JSON results.
 - See source hashes and the exact originating Python repository commit.
 
 The app calls no live model, accepts no contract uploads and stores no shared user history. Session runs are held in memory, capped at 30 and cleared on refresh. Reports must be downloaded for retention. The public API accepts only allowlisted synthetic cases and scenarios, with a 1 KiB input limit.
@@ -59,7 +59,7 @@ Never replace missing annotation evidence with generated answers or remove the P
 
 ## Validation limits
 
-Browser visual and interaction QA was not requested and was not performed. The optional WebMCP registration is feature-detected; no supported browser validation context was available. Ordinary app functions use the visible controls and evaluation API independently of WebMCP.
+The local browser check covered quotation navigation, scenario selection, evaluation refresh and narrow-viewport layout. The optional WebMCP registration is feature-detected. Ordinary app functions use the visible controls and evaluation API independently of WebMCP.
 
 ## License
 
