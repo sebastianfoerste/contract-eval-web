@@ -10,20 +10,21 @@ Companion repository to [`contract-review-eval-harness`](https://github.com/seba
 - `lib/scoring.ts` — Deterministic TypeScript scoring engine (`scoreReview`, `locate`, `normalize`). Port of Python `score_review`.
 - `lib/benchmark.json` — Static snapshot of synthetic cases (`nda`, `saas`, `dpa`), gold answers, stub fixtures, and cryptographic hashes.
 - `scripts/export-benchmark.py` — Synchronizes synthetic inputs and parity vectors from `contract-review-eval-harness`.
-- `tests/scoring.test.mjs` — 32 automated tests verifying scoring parity against Python outputs.
+- `tests/scoring.test.mjs` — 30 Python scoring parity vectors plus edge-case tests; `tests/inspection.test.mjs` checks presentation and inspection logic.
 - `tests/python-parity.json` — Parity test vectors produced directly by the Python harness.
 - `.openai/hosting.json` & `build/sites-vite-plugin.ts` — OpenAI Sites / Cloudflare Worker deployment configuration.
 
 ## Rules
 - **Authoritative Source**: The Python harness is the single source of truth for evaluation methodology, gold answers, and scoring algorithms. Never modify `lib/benchmark.json` or `tests/python-parity.json` manually.
-- **Scoring Parity Invariant**: Any change to `lib/scoring.ts` must pass all 32 parity tests (`npm test`). If the Python scorer changes, regenerate vectors via `npm run export:benchmark` (or `make web-export` in the harness).
+- **Scoring Parity Invariant**: Any change to `lib/scoring.ts` must pass all 30 parity vectors (`npm test`). If the Python scorer changes, regenerate vectors via `npm run export:benchmark` (or `make web-export` in the harness).
 - **Public Safety & Privacy**: Synthetic contracts only. Zero live model calls, no arbitrary document uploads, no persistent shared state. Runs stay in-memory.
 - **Sites Deployment Compatibility**: Keep the repository root compatible with OpenAI Sites / Cloudflare Worker requirements.
 
 ## Commands
 - `npm run install:ci` — Install dependencies for the Sites environment.
-- `npm test` — Run Node parity test suite (all 32 tests must pass).
+- `npm test` — Run Node parity and inspection tests.
 - `npm run test:types` — Typecheck TypeScript without emitting output (`tsc --noEmit`).
 - `npm run dev` — Launch local development server.
 - `npm run build` — Build production distribution for Sites runtime.
+- `npm run check` — Run lint, types, Node tests, build, and local HTTP API checks.
 - `npm run export:benchmark` — Refresh benchmark data from adjacent harness.

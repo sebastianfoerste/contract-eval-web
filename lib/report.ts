@@ -1,6 +1,7 @@
 import benchmark from './benchmark';
 import type { Evaluation } from './evaluation';
 import { locateSource, scenarios } from './scoring';
+import { clauseFindings, displayMetric } from './inspection';
 
 type BenchmarkCase = (typeof benchmark.cases)[number];
 
@@ -36,18 +37,26 @@ export function renderReport(item: BenchmarkCase, run: Evaluation): string {
     '## Scores',
     '',
     `- Clause F1: ${percent(scores.clause_f1)}`,
-    `- Risk precision: ${percent(scores.risk_precision)}`,
+    `- Risk precision: ${displayMetric('risk_precision', scores, run.review).value}${run.review.risk_flags.length ? '' : ' (no risk flags supplied)'}`,
     `- Risk recall: ${percent(scores.risk_recall)}`,
-    `- Severity accuracy: ${percent(scores.risk_severity_accuracy)}`,
-    `- Citation grounding: ${percent(scores.citation_grounding)} (${scores.citation_grounded} of ${scores.citation_total})`,
+    `- Severity accuracy: ${displayMetric('risk_severity_accuracy', scores, run.review).value}`,
+    `- Citation grounding: ${displayMetric('citation_grounding', scores, run.review).value} (${scores.citation_grounded} of ${scores.citation_total})`,
     `- Source span coverage: ${percent(scores.span_coverage)}`,
     `- Ungrounded quotations: ${scores.hallucination_count}`,
     `- Missed reference risks: ${scores.risk_missed.length}`,
     `- Extra risk flags: ${scores.risk_false_positives.length}`,
     `- Contradictory severities: ${scores.risk_conflicting_flags.length}`,
     '',
-    '## Findings and evidence',
+    'N/A means the review supplied no observations for that metric. The JSON export retains the Python-compatible numeric scoring values.',
+    '',
+    '## Clause coverage',
   ];
+
+  for (const clause of clauseFindings(item.gold, run.review)) {
+    lines.push(`- ${title(clause.key)}: ${clause.status}; reference: ${clause.expected ? 'yes' : 'no'}; reported as: ${clause.reportedAs.join(', ') || 'none'}${clause.abstentions.length ? `; abstention: ${clause.abstentions.map(value => value.reason).join(' | ')}` : ''}`);
+  }
+
+  lines.push('', '## Findings and evidence');
 
   for (const finding of riskFindings(item, run)) {
     lines.push('', `### ${title(finding.key)}`, '',
@@ -83,6 +92,9 @@ export function renderReport(item: BenchmarkCase, run: Evaluation): string {
     `- Original review fixture SHA-256: ${run.provenance.hashes.review}`,
     `- Evaluator: ${run.provenance.evaluator}`,
     `- Adapter: ${run.provenance.adapter}`,
+    `- Reference evidence stage: ${benchmark.referenceEvidence.stage}`,
+    `- Final reference release eligible: ${benchmark.referenceEvidence.finalReleaseEligible ? 'yes' : 'no'}`,
+    `- Missing reference evidence: ${benchmark.referenceEvidence.missing.join(', ') || 'none'}`,
     '',
     'Hashes identify the original exported inputs. They do not prove reviewer independence, adjudication, or legal accuracy.');
   return `${lines.join('\n')}\n`;

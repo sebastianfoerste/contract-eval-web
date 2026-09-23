@@ -8,8 +8,8 @@ This application serves as the **interactive explorer** tier of the Contract Rev
 
 - Recompute deterministic review scores with a bounded server API.
 - Compare original fixtures, removed evidence, missed risks and conflicting severities.
-- Inspect reference severity, review reasoning and supporting quotations; jump from a grounded quotation to its highlighted source passage.
-- Compare runs within the current session and export evidence reports with rationales, quotation status and provenance, or complete JSON results.
+- Inspect clause coverage, reference severity, review reasoning and supporting quotations; jump from a grounded quotation to its highlighted source passage.
+- Compare runs within the current session, see the specific changes in clauses, flags and quotations, and export evidence reports with rationales, quotation status and provenance, or complete JSON results.
 - See source hashes and the exact originating Python repository commit.
 
 The app calls no live model, accepts no contract uploads and stores no shared user history. Session runs are held in memory, capped at 30 and cleared on refresh. Reports must be downloaded for retention. The public API accepts only allowlisted synthetic cases and scenarios, with a 1 KiB input limit.
@@ -17,6 +17,8 @@ The app calls no live model, accepts no contract uploads and stores no shared us
 ## Reference status
 
 This release uses v1 reference answers from the Python repository. Independent v2 annotation returns and written adjudication artifacts were not available in the checkout. Their completion has been reported by the owner, but this app cannot verify or publish a v2 benchmark until the files are imported and checked. It issues no release certificate. The Python harness version remains 0.7.0rc1.
+
+The interface reads the exported `referenceEvidence` gate directly. A missing denominator appears as N/A in the interface and report; JSON results retain the Python-compatible numeric values.
 
 ## Development
 
@@ -28,6 +30,7 @@ npm run dev
 npm test
 npm run test:types
 npm run build
+npm run check
 ```
 
 The Sites build is Cloudflare Worker compatible. Logical hosting metadata is in `.openai/hosting.json`. The site is maintained in its own source repository, separately from the Python harness. See [PROJECT_ARCHITECTURE.md](https://github.com/sebastianfoerste/contract-review-eval-harness/blob/main/docs/PROJECT_ARCHITECTURE.md) for architectural details.
@@ -40,13 +43,13 @@ npm run export:benchmark
 python3 scripts/export-benchmark.py --repo /path/to/contract-review-eval-harness
 ```
 
-Run the HTTP integration checks against an actual local or deployed URL:
+`npm run check` also starts the built local Worker and runs the HTTP contract checks. To check a deployed URL separately:
 
 ```bash
 node tests/api-check.mjs https://YOUR_SITE
 ```
 
-Every supported case and scenario is checked against Python `score_review` (32 tests in `tests/scoring.test.mjs`). Empty reviews, conflicting flags and quote matching have additional checks. These checks cover the bounded public inputs; they do not establish general equivalence for arbitrary documents or Unicode inputs.
+Every supported case and scenario is checked against Python `score_review` (30 parity vectors in `tests/scoring.test.mjs`). Additional tests cover edge cases, score presentation, clause coverage, comparison changes and the reference gate. The HTTP suite checks 12 supported case-scenario combinations and five invalid requests. These checks cover the bounded public inputs; they do not establish general equivalence for arbitrary documents or Unicode inputs.
 
 ## Incorporating adjudicated evidence
 
@@ -56,6 +59,8 @@ Every supported case and scenario is checked against Python `score_review` (32 t
 4. Extend this app's versioned input export and scoring parity coverage to the v2 scorer before displaying v2 validation status.
 
 Never replace missing annotation evidence with generated answers or remove the Python release hold based on this web deployment.
+
+An [independent challenge-set protocol](docs/challenge-set-protocol.md) records the acceptance criteria for a future blinded evaluation. No unseen, independently adjudicated challenge set is claimed in this release.
 
 ## Validation limits
 

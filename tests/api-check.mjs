@@ -11,4 +11,4 @@ for(const v of vectors){
 for(const [body,type,status] of [['{','application/json',400],[JSON.stringify({caseId:'unknown',scenario:'baseline'}),'application/json',400],[JSON.stringify({caseId:'nda',scenario:'baseline',apiKey:'rejected'}),'application/json',400],['x'.repeat(1025),'application/json',413],['hello','text/plain',415]]){
  const res=await fetch(new URL('/api/evaluate',origin),{method:'POST',headers:{'Content-Type':type},body});assert.equal(res.status,status);assert.ok((await res.json()).error);
 }
-console.log('PASS: 12 hosted scoring comparisons and 5 invalid-request checks.');
+console.log('PASS: 12 HTTP scoring comparisons and 5 invalid-request checks.');
