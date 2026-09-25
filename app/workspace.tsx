@@ -1,104 +1,256 @@
 'use client';
-import {useCallback,useEffect,useRef,useState} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import {Activity,ArrowDownToLine,ArrowUpRight,Check,ChevronRight,FileText,FlaskConical,GitCompareArrows,LoaderCircle,Play,Search,ShieldCheck,TriangleAlert} from 'lucide-react';
-import {Tabs,TabsList,TabsTrigger,TabsContent} from '@/components/ui/tabs';
-import {Select,SelectContent,SelectItem,SelectTrigger,SelectValue} from '@/components/ui/select';
-import {Table,TableBody,TableCell,TableHead,TableHeader,TableRow} from '@/components/ui/table';
+import { ArrowUpRight, Braces, Check, FileText, FlaskConical, GitCompareArrows, ListChecks, ScrollText, ShieldCheck, TriangleAlert } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Compare, scenarioLabels } from '@/components/lab/compare';
+import { Evidence } from '@/components/lab/evidence';
+import { Coverage, FindingsTable, Inspector, ScoreCards } from '@/components/lab/findings';
+import { Method } from '@/components/lab/method';
+import { Segmented, download } from '@/components/lab/primitives';
 import benchmark from '@/lib/benchmark';
-import {locateSource,scoreReview,scenarios,type Scenario,type Scores} from '@/lib/scoring';
-import type {Evaluation} from '@/lib/evaluation';
-import {renderReport,riskFindings} from '@/lib/report';
-import {clauseFindings,displayMetric,referenceReleaseReady,reviewChanges,type MetricKey} from '@/lib/inspection';
-const pct=(n:number)=>`${(n*100).toFixed(1)}%`;
-const label=(s:string)=>s.replaceAll('_',' ').replace(/^./,c=>c.toUpperCase());
-const metrics:{key:MetricKey;title:string;description:string}[]=[
- {key:'clause_f1',title:'Clause F1',description:'Balance of clause precision and recall'},
- {key:'risk_precision',title:'Risk precision',description:'Flags supported by the reference'},
- {key:'risk_recall',title:'Risk recall',description:'Reference risks found by the review'},
- {key:'risk_severity_accuracy',title:'Severity accuracy',description:'Correct severity among shared risks'},
- {key:'citation_grounding',title:'Citation grounding',description:'Quotations located in the contract'},
-];
-function baseline(id:string):Evaluation{
- const c=benchmark.cases.find(c=>c.id===id)!;
- return {id:`reference-${id}`,caseId:id,scenario:'baseline',scoredAt:'',review:c.review,scores:scoreReview(c.source,c.gold,c.review),provenance:{sourceCommit:benchmark.sourceCommit,hashes:c.hashes,evaluator:'web-v1 / Python score_review parity',goldStatus:benchmark.goldStatus,adapter:'deterministic-fixture / baseline'}};
+import { findCase, snapshot, type Evaluation } from '@/lib/evaluation';
+import { orderFindings, readout, riskFindings } from '@/lib/inspection';
+import { renderReport } from '@/lib/report';
+import { locateSource, scenarios, type Scenario } from '@/lib/scoring';
+import { viewQuery, type Tab, type View } from '@/lib/view';
+
+type Selection = { caseId: string; scenario: Scenario };
+const defaults = { caseId: benchmark.cases[0].id, scenario: 'baseline' };
+
+function defaultFinding(run: Evaluation) {
+  const item = findCase(run.caseId);
+  const rows = orderFindings(riskFindings(item.gold, run.review, run.scores));
+  return (rows.find(row => row.status !== 'Match') ?? rows[0])?.key ?? item.gold.clause_types[0];
 }
-function download(name:string,text:string,type='application/json'){
- const url=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
-}
-function Severity({value}:{value?:string}){return <span className={`severity ${value||'none'}`}>{value||'None'}</span>;}
-export default function Workspace(){
- const [caseId,setCaseId]=useState('nda'),[scenario,setScenario]=useState<Scenario>('baseline'),[tab,setTab]=useState('evaluation');
- const [run,setRun]=useState<Evaluation>(()=>baseline('nda')),[runs,setRuns]=useState<Evaluation[]>([]);
- const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
- const [selected,setSelected]=useState('permitted_disclosure'),[selectedCitation,setSelectedCitation]=useState<number|null>(null),[comparisonHighlight,setComparisonHighlight]=useState<[number,number]|null>(null),[query,setQuery]=useState(''),[filter,setFilter]=useState('all'),[comparisonId,setComparisonId]=useState('reference');
- const inFlight=useRef(false),sourceMark=useRef<HTMLElement|null>(null);
- const item=benchmark.cases.find(c=>c.id===caseId)!;
- const gold:Record<string,string>=item.gold.risk_flags,rationales:Record<string,string>=item.gold.severity_rationale;
- const citations=run.review.citations.map(c=>({...c,sourceSpan:locateSource(item.source,c.quote)}));
- const highlightedSpan=comparisonHighlight||(selectedCitation===null?null:citations[selectedCitation]?.sourceSpan);
- const spanStart=highlightedSpan?.[0]??null,spanEnd=highlightedSpan?.[1]??null;
- const previous=runs.filter(r=>r.caseId===caseId&&r.id!==run.id);
- const comparison=previous.find(r=>r.id===comparisonId)||baseline(caseId);
- const rows=riskFindings(item,run);
- const clauses=clauseFindings(item.gold,run.review);
- const changes=reviewChanges(comparison.review,run.review);
- const evidence=benchmark.referenceEvidence;
- const referenceReady=referenceReleaseReady(evidence);
- const visible=rows.filter(r=>(filter==='all'||r.status!=='Match')&&label(r.key).toLowerCase().includes(query.toLowerCase()));
- const issues=rows.some(r=>r.status!=='Match')||clauses.some(clause=>clause.status==='Missed'||clause.status==='Extra')||run.scores.hallucination_count>0;
- const perform=useCallback(async(id:string,variant:Scenario)=>{
-  if(inFlight.current)throw new Error('An evaluation is already running.');
-  inFlight.current=true;setBusy(true);setError('');setNotice('');
-  try{
-   const response=await fetch('/api/evaluate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({caseId:id,scenario:variant}),signal:AbortSignal.timeout(20000)});
-   const data=await response.json();if(!response.ok)throw new Error(data&&typeof data==='object'&&'error' in data?String(data.error):'Evaluation failed. Please try again.');
-   const output=data as Evaluation;setCaseId(id);setScenario(variant);setRun(output);setRuns(old=>[output,...old].slice(0,30));
-   setSelected(benchmark.cases.find(c=>c.id===id)!.gold.clause_types[0]);setSelectedCitation(null);setComparisonHighlight(null);setComparisonId('reference');setQuery('');
-   setNotice(`Evaluation complete. ${output.scores.citation_grounded} of ${output.scores.citation_total} quotations grounded.`);
-   return {runId:output.id,caseId:id,scenario:variant,scores:output.scores};
-  }catch(e){setError(e instanceof Error?e.message:'Evaluation failed.');throw e;}
-  finally{inFlight.current=false;setBusy(false);}
- },[]);
- useEffect(()=>{
-  type Context={registerTool:(t:{name:string;description:string;inputSchema:object;execute:(input:unknown)=>Promise<unknown>;annotations:{readOnlyHint:boolean}},o:{signal:AbortSignal})=>void|Promise<void>};
-  const context=(document as Document&{modelContext?:Context}).modelContext;if(!context)return;
-  const life=new AbortController();
-  // Registration runs in a microtask so a failure never sets state synchronously in the effect body.
-  const unavailable=()=>{if(!life.signal.aborted)setNotice('Browser agent controls are unavailable. Use the evaluation button.');};
-  Promise.resolve().then(()=>context.registerTool({name:'run_synthetic_contract_evaluation',description:'Run and display a deterministic synthetic contract evaluation. No model call or payment.',inputSchema:{type:'object',properties:{caseId:{type:'string',enum:benchmark.cases.map(c=>c.id)},scenario:{type:'string',enum:Object.keys(scenarios)}},required:['caseId','scenario'],additionalProperties:false},annotations:{readOnlyHint:false},execute:async(input:unknown)=>{
-   if(!input||typeof input!=='object'||Array.isArray(input))throw new Error('Expected a case and scenario.');const a=input as Record<string,unknown>;
-   if(Object.keys(a).some(k=>k!=='caseId'&&k!=='scenario')||!benchmark.cases.some(c=>c.id===a.caseId)||typeof a.scenario!=='string'||!Object.hasOwn(scenarios,a.scenario))throw new Error('Unknown case or scenario.');
-   return perform(String(a.caseId),a.scenario as Scenario);
-  }},{signal:life.signal})).catch(unavailable);
-  return()=>life.abort();
- },[perform]);
- useEffect(()=>{
-  if(tab==='evidence'&&spanStart!==null&&spanEnd!==null){
-   sourceMark.current?.scrollIntoView({block:'center',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+
+export default function Workspace({ initialView }: { initialView: View }) {
+  // parseView only admits catalog scenarios, and the catalog is built from `scenarios`.
+  const [run, setRun] = useState<Evaluation>(() => snapshot(initialView.caseId, initialView.scenario as Scenario));
+  const [runs, setRuns] = useState<Evaluation[]>([]);
+  const [tab, setTab] = useState<Tab>(initialView.tab);
+  const [chosenFinding, setChosenFinding] = useState<string | null>(initialView.finding);
+  const [pending, setPending] = useState<Selection | null>(null);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [active, setActive] = useState<number | null>(null);
+  const [external, setExternal] = useState<[number, number] | null>(null);
+  const [target, setTarget] = useState<Scenario>('baseline');
+  const inFlight = useRef(false);
+  const queued = useRef<Selection | null>(null);
+  const shownCase = useRef(initialView.caseId);
+  const revealInspector = useRef(false);
+
+  const item = findCase(run.caseId);
+  const finding = chosenFinding ?? defaultFinding(run);
+  const canonical = useCallback((key: string) => item.gold.clause_aliases[key] || key, [item]);
+  const citations = useMemo(() => run.review.citations.map((citation, index) => ({ ...citation, index, sourceSpan: locateSource(item.source, citation.quote) })), [run, item]);
+  const rows = useMemo(() => orderFindings(riskFindings(item.gold, run.review, run.scores)), [item, run]);
+  const points = useMemo(() => readout(item.gold, run.review, run.scores), [item, run]);
+  const matrix = useMemo(() => Object.fromEntries(Object.keys(scenarios).map(key => [key, snapshot(item.id, key as Scenario)])) as Record<Scenario, Evaluation>, [item.id]);
+  const flaggedChecks = points.filter(point => point.tone === 'issue').length;
+  const openFindings = rows.filter(row => row.status !== 'Match').length;
+  const compareWith: Scenario = target !== run.scenario ? target : run.scenario === 'baseline' ? 'no-evidence' : 'baseline';
+  const shown: Selection = pending ?? { caseId: run.caseId, scenario: run.scenario };
+
+  const show = useCallback((result: Evaluation) => {
+    if (shownCase.current !== result.caseId) setChosenFinding(null);
+    shownCase.current = result.caseId;
+    setRun(result);
+    setActive(null);
+    setExternal(null);
+  }, []);
+
+  const perform = useCallback(async (caseId: string, scenario: Scenario) => {
+    if (inFlight.current) throw new Error('An evaluation is already running.');
+    inFlight.current = true;
+    setError('');
+    let next: Selection | null = { caseId, scenario };
+    let result: Evaluation | null = null;
+    try {
+      // Choices made while a request is in flight replace each other; only the latest runs next.
+      while (next) {
+        const current: Selection = next;
+        queued.current = null;
+        setPending(current);
+        const response = await fetch('/api/evaluate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(current), signal: AbortSignal.timeout(20000) });
+        const data: unknown = await response.json();
+        if (!response.ok) throw new Error(data && typeof data === 'object' && 'error' in data ? String(data.error) : 'Evaluation failed. Please try again.');
+        result = data as Evaluation;
+        setRuns(old => [result!, ...old].slice(0, 30));
+        next = queued.current;
+      }
+      show(result!);
+      setNotice(`Scored on the server at ${new Date(result!.scoredAt).toLocaleTimeString()}.`);
+      return { runId: result!.id, caseId: result!.caseId, scenario: result!.scenario, scores: result!.scores };
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Evaluation failed.');
+      throw cause;
+    } finally {
+      inFlight.current = false;
+      queued.current = null;
+      setPending(null);
+    }
+  }, [show]);
+
+  const choose = (selection: Selection) => {
+    if (inFlight.current) {
+      queued.current = selection;
+      setPending(selection);
+      return;
+    }
+    void perform(selection.caseId, selection.scenario).catch(() => {});
+  };
+
+  useEffect(() => {
+    type Context = { registerTool: (tool: { name: string; description: string; inputSchema: object; execute: (input: unknown) => Promise<unknown>; annotations: { readOnlyHint: boolean } }, options: { signal: AbortSignal }) => void | Promise<void> };
+    const context = (document as Document & { modelContext?: Context }).modelContext;
+    if (!context) return;
+    const life = new AbortController();
+    // Registration runs in a microtask so a failure never sets state synchronously in the effect body.
+    const unavailable = () => { if (!life.signal.aborted) setNotice('Browser agent controls are unavailable. Use the controls on the page.'); };
+    Promise.resolve().then(() => context.registerTool({
+      name: 'run_synthetic_contract_evaluation',
+      description: 'Run and display a deterministic synthetic contract evaluation. No model call or payment.',
+      inputSchema: { type: 'object', properties: { caseId: { type: 'string', enum: benchmark.cases.map(c => c.id) }, scenario: { type: 'string', enum: Object.keys(scenarios) } }, required: ['caseId', 'scenario'], additionalProperties: false },
+      annotations: { readOnlyHint: false },
+      execute: async (input: unknown) => {
+        if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('Expected a case and scenario.');
+        const args = input as Record<string, unknown>;
+        if (Object.keys(args).some(key => key !== 'caseId' && key !== 'scenario') || !benchmark.cases.some(c => c.id === args.caseId) || typeof args.scenario !== 'string' || !Object.hasOwn(scenarios, args.scenario)) throw new Error('Unknown case or scenario.');
+        return perform(String(args.caseId), args.scenario as Scenario);
+      },
+    }, { signal: life.signal })).catch(unavailable);
+    return () => life.abort();
+  }, [perform]);
+
+  useEffect(() => {
+    const query = viewQuery({ caseId: run.caseId, scenario: run.scenario, tab, finding: chosenFinding }, defaults);
+    const { pathname, search, hash } = window.location;
+    if (search !== query) window.history.replaceState(window.history.state, '', `${pathname}${query}${hash}`);
+  }, [run.caseId, run.scenario, tab, chosenFinding]);
+
+  useEffect(() => {
+    if (tab !== 'findings' || !revealInspector.current) return;
+    revealInspector.current = false;
+    document.getElementById('inspector-heading')?.scrollIntoView({ block: 'nearest', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+  }, [tab, finding]);
+
+  function inspect(key: string, reveal = false) {
+    revealInspector.current = reveal;
+    setChosenFinding(canonical(key));
+    setTab('findings');
   }
- },[tab,selectedCitation,spanStart,spanEnd]);
- function changeCase(id:string){setCaseId(id);setRun(baseline(id));setScenario('baseline');setSelected(benchmark.cases.find(c=>c.id===id)!.gold.clause_types[0]);setSelectedCitation(null);setComparisonHighlight(null);setQuery('');setComparisonId('reference');setNotice('');setError('');}
- function inspectQuote(quote:string){const span=locateSource(item.source,quote);if(!span){setNotice('This quotation is not located in the source contract.');return;}setComparisonHighlight(span);setSelectedCitation(null);setTab('evidence');}
- function exportReport(){
-  download(`${caseId}-${run.scenario}-report.md`,renderReport(item,run),'text/markdown');setNotice('Evidence report downloaded.');
- }
- return <div className="app-shell"><a className="skip-link" href="#workspace">Skip to evaluation</a>
-  <header className="topbar"><Link className="brand" href="/"><span className="brand-mark"><FlaskConical size={22}/></span><span>CONTRACT REVIEW<strong>Evidence Lab</strong></span></Link><div className="topbar-right"><span className="public-label">Public research demo</span><a href={benchmark.repository} target="_blank" rel="noreferrer">Source code<ArrowUpRight size={15}/></a></div></header>
-  <main id="workspace"><section className="intro"><div><div className="eyebrow">EVALUATE / INSPECT / COMPARE</div><h1>Put the review to the test.</h1><p>Measure what a contract review found, missed and supported with evidence.</p></div><div className="edition"><span>BENCHMARK EDITION</span><strong>03 contracts <span>/</span> v1 reference</strong><small>Synthetic data · deterministic evaluation</small></div></section>
-   <section className="run-bar" aria-label="Evaluation controls"><div className="control"><label htmlFor="case-select">Contract</label><Select value={caseId} onValueChange={changeCase} disabled={busy}><SelectTrigger id="case-select"><SelectValue/></SelectTrigger><SelectContent>{benchmark.cases.map(c=><SelectItem value={c.id} key={c.id}>{c.title}</SelectItem>)}</SelectContent></Select></div><div className="control scenario-control"><label htmlFor="scenario-select">Evaluation scenario</label><Select value={scenario} onValueChange={v=>{setScenario(v as Scenario);setNotice('');setError('');}} disabled={busy}><SelectTrigger id="scenario-select"><SelectValue/></SelectTrigger><SelectContent>{Object.entries(scenarios).map(([k,s])=><SelectItem value={k} key={k}>{s.title}</SelectItem>)}</SelectContent></Select></div><div className="run-explanation"><span>Offline fixture</span><small>No API key or model cost</small></div><button className="primary" disabled={busy} onClick={()=>void perform(caseId,scenario).catch(()=>{})}>{busy?<LoaderCircle className="spin" size={17}/>:<Play size={16}/>} {busy?'Evaluating…':'Run evaluation'}</button></section>
-   <div className={`status-line ${error?'error':''}`} role="status" aria-live="polite">{error||notice||(scenario!==run.scenario?`Run the selected scenario to update the result below. ${scenarios[scenario].description}`:scenarios[scenario].description)}</div>
-   <Tabs value={tab} onValueChange={setTab} className="workspace-tabs"><div className="tabbar"><TabsList variant="line"><TabsTrigger value="evaluation"><Activity/>Evaluation</TabsTrigger><TabsTrigger value="evidence"><FileText/>Evidence</TabsTrigger><TabsTrigger value="comparison"><GitCompareArrows/>Compare runs</TabsTrigger><TabsTrigger value="methodology"><ShieldCheck/>Methodology</TabsTrigger></TabsList><button className="text-button" onClick={exportReport}><ArrowDownToLine size={16}/>Export report</button></div>
-    <TabsContent value="evaluation"><div className="result-heading"><div><h2>{item.title}</h2><p>{run.scoredAt?'Scored '+new Date(run.scoredAt).toLocaleTimeString():'Reference snapshot'} · {scenarios[run.scenario].title}</p></div><span className={`result-badge ${issues?'attention':''}`}>{issues?<TriangleAlert size={15}/>:<Check size={15}/>} {issues?'Review issues detected':'No scored discrepancies'}</span></div>
-     <div className="metrics">{metrics.map((m,i)=>{const display=displayMetric(m.key,run.scores,run.review);return <article className="metric" key={m.key}><div className="metric-title">{m.title}<span>0{i+1}</span></div><strong className={display.defined&&run.scores[m.key]<.8?'metric-warning':''}>{display.value}</strong><div className="meter"><span style={{width:display.defined?pct(run.scores[m.key]):'0%'}}/></div><p>{display.detail||m.description}</p></article>;})}</div>
-     <div className="findings-layout"><section className="panel findings"><div className="panel-heading"><div><h3>Risk findings</h3><p>Reference judgment alongside the review’s prediction.</p></div><span className="count">{rows.length}</span></div><div className="filters"><label className="search"><Search size={16}/><input aria-label="Search findings" placeholder="Find a clause…" value={query} onChange={e=>setQuery(e.target.value)}/></label><Select value={filter} onValueChange={setFilter}><SelectTrigger aria-label="Filter findings"><SelectValue/></SelectTrigger><SelectContent><SelectItem value="all">All findings</SelectItem><SelectItem value="issues">Issues only</SelectItem></SelectContent></Select></div><Table><TableHeader><TableRow><TableHead>Clause</TableHead><TableHead>Reference</TableHead><TableHead>Predicted</TableHead><TableHead>Finding</TableHead></TableRow></TableHeader><TableBody>{visible.map(r=><TableRow key={r.key} className={selected===r.key?'selected-row':''}><TableCell><button className="clause-button" onClick={()=>setSelected(r.key)}>{label(r.key)}<ChevronRight size={14}/></button></TableCell><TableCell><Severity value={r.expected}/></TableCell><TableCell><Severity value={r.predicted}/></TableCell><TableCell><span className={r.status==='Match'?'match':'issue'}>{r.status}</span></TableCell></TableRow>)}{!visible.length&&<TableRow><TableCell colSpan={4}>No findings match these filters.</TableCell></TableRow>}</TableBody></Table></section>
-      <aside className="panel inspector"><div className="eyebrow">FINDING INSPECTOR</div><h3>{label(selected)}</h3><div className="inspector-label">Reference severity <Severity value={gold[selected]}/></div><p className="muted">Perspective: {item.gold.review_context?.party||"See reference answers"}</p><p className="rationale">{rationales[selected]||'The reference set does not flag this clause as a risk.'}</p><div className="inspector-label">Review’s reasoning</div>{run.review.risk_flags.some(f=>f.clause_type===selected)?run.review.risk_flags.filter(f=>f.clause_type===selected).map((f,i)=><p className="rationale" key={i}>{f.rationale}</p>):<p className="muted">The review did not flag this risk.</p>}<div className="inspector-label">Supporting quotations</div>{citations.some(c=>c.clause_type===selected)?citations.filter(c=>c.clause_type===selected).map((c,i)=><blockquote key={i} className={c.sourceSpan?'':'ungrounded'}>“{c.quote}”<footer>{c.sourceSpan?<Check size={13}/>:<TriangleAlert size={13}/>} {c.sourceSpan?'Located in source':'Not found in source'}</footer></blockquote>):<p className="muted">No quotation was supplied for this clause.</p>}<button className="text-button" onClick={()=>{const index=citations.findIndex(c=>c.clause_type===selected&&c.sourceSpan);setSelectedCitation(index>=0?index:null);setTab('evidence');}}>Inspect the full contract<ArrowUpRight size={15}/></button></aside></div>
-     <section className="panel clause-coverage"><div className="panel-heading"><div><h3>Clause coverage</h3><p>Expected clauses against clauses named by the review. Aliases are resolved using the reference set.</p></div><span className="count">{clauses.filter(clause=>clause.status==='Missed').length} missed · {clauses.filter(clause=>clause.status==='Extra').length} extra</span></div><div className="table-scroll"><Table><TableHeader><TableRow><TableHead>Clause</TableHead><TableHead>Reference</TableHead><TableHead>Reported as</TableHead><TableHead>Coverage</TableHead></TableRow></TableHeader><TableBody>{clauses.map(clause=><TableRow key={clause.key}><TableCell><strong>{label(clause.key)}</strong>{clause.abstentions.map((abstention,index)=><small className="table-note" key={index}>Abstained: {abstention.reason}</small>)}</TableCell><TableCell>{clause.expected?'Expected':'Not expected'}</TableCell><TableCell>{clause.reportedAs.map(label).join(', ')||'None'}</TableCell><TableCell><span className={clause.status==='Missed'||clause.status==='Extra'?'issue':'match'}>{clause.status}</span></TableCell></TableRow>)}</TableBody></Table></div></section>
-     <div className="diagnostics">{[[run.scores.hallucination_count,'Ungrounded quotations'],[run.scores.risk_missed.length,'Missed reference risks'],[run.scores.risk_false_positives.length,'Extra risk flags'],[run.scores.risk_conflicting_flags.length,'Contradictory severities'],[pct(run.scores.span_coverage),'Source span coverage']].map(([value,title])=><div key={title}><strong>{value}</strong><span>{title}</span></div>)}</div>
-    </TabsContent>
-    <TabsContent value="evidence"><div className="result-heading"><div><h2>Follow the evidence.</h2><p>{item.title} · {citations.length} quotations · {run.scores.citation_grounded} grounded</p></div><button className="secondary" onClick={()=>download(`${caseId}-synthetic-contract.md`,item.source,'text/markdown')}><ArrowDownToLine size={16}/>Download contract</button></div><div className="evidence-layout"><section className="panel source-document"><div className="eyebrow">SYNTHETIC SOURCE CONTRACT</div><pre>{highlightedSpan?<>{item.source.slice(0,highlightedSpan[0])}<mark ref={sourceMark}>{item.source.slice(highlightedSpan[0],highlightedSpan[1])}</mark>{item.source.slice(highlightedSpan[1])}</>:item.source}</pre></section><section className="citation-panel"><h3>Review quotations</h3><p className="muted">Select a grounded quotation to locate it in the contract. Matching ignores case, punctuation and whitespace. It does not establish legal correctness.</p>{citations.map((c,i)=><article className={`panel citation ${c.sourceSpan?'':'ungrounded'} ${selectedCitation===i?'active-citation':''}`} key={i}><div className="citation-heading"><strong>{String(i+1).padStart(2,'0')} / {label(c.clause_type)}</strong><span className={c.sourceSpan?'match':'issue'}>{c.sourceSpan?'Grounded':'Ungrounded'}</span></div><blockquote>“{c.quote}”</blockquote>{c.sourceSpan&&<button className="text-button citation-action" onClick={()=>setSelectedCitation(i)}>Show in contract<ChevronRight size={15}/></button>}</article>)}{!citations.length&&<div className="panel empty-state"><FileText/><h3>No evidence supplied</h3><p>This scenario removes all citations.</p></div>}</section></div></TabsContent>
-    <TabsContent value="comparison"><div className="result-heading"><div><h2>Compare like with like.</h2><p>Same contract, source and reference answers. Only the review scenario changes.</p></div><button className="secondary" onClick={()=>download(`${caseId}-comparison.json`,JSON.stringify({baseline:comparison,current:run,changes},null,2))}><ArrowDownToLine size={16}/>Export comparison</button></div><div className="comparison-controls"><label htmlFor="comparison-select">Compare current result against</label><Select value={comparisonId} onValueChange={setComparisonId}><SelectTrigger id="comparison-select"><SelectValue/></SelectTrigger><SelectContent><SelectItem value="reference">Original fixture reference</SelectItem>{previous.map(r=><SelectItem value={r.id} key={r.id}>{scenarios[r.scenario].title} · {new Date(r.scoredAt).toLocaleTimeString()}</SelectItem>)}</SelectContent></Select></div><section className="panel"><Table><TableHeader><TableRow><TableHead>Metric</TableHead><TableHead>{scenarios[comparison.scenario].title}</TableHead><TableHead>Current: {scenarios[run.scenario].title}</TableHead><TableHead>Change</TableHead></TableRow></TableHeader><TableBody>{metrics.map(m=>{const a=displayMetric(m.key,comparison.scores,comparison.review),b=displayMetric(m.key,run.scores,run.review),d=a.defined&&b.defined?(run.scores[m.key]-comparison.scores[m.key])*100:null;return <TableRow key={m.key}><TableCell><strong>{m.title}</strong><small className="table-note">{m.description}</small></TableCell><TableCell>{a.value}{a.detail&&<small className="table-note">{a.detail}</small>}</TableCell><TableCell>{b.value}{b.detail&&<small className="table-note">{b.detail}</small>}</TableCell><TableCell className={d===null?'':d<0?'issue':d>0?'match':''}>{d===null?'N/A':`${d>0?'+':''}${d.toFixed(1)} pp`}</TableCell></TableRow>;})}{([{title:'Ungrounded quotations',value:(s:Scores)=>s.hallucination_count},{title:'Missed risks',value:(s:Scores)=>s.risk_missed.length},{title:'Extra risk flags',value:(s:Scores)=>s.risk_false_positives.length},{title:'Contradictory severities',value:(s:Scores)=>s.risk_conflicting_flags.length}]).map(m=>{const a=m.value(comparison.scores),b=m.value(run.scores),d=b-a;return <TableRow key={m.title}><TableCell><strong>{m.title}</strong></TableCell><TableCell>{a}</TableCell><TableCell>{b}</TableCell><TableCell className={d>0?'issue':d<0?'match':''}>{d>0?'+':''}{d}</TableCell></TableRow>;})}</TableBody></Table></section><section className="panel change-ledger"><div className="panel-heading"><div><h3>What changed in the review</h3><p>Entries explain the score movement. A located quotation can be opened in the synthetic contract.</p></div><span className="count">{changes.length} changes</span></div>{!changes.length?<p className="change-empty">No clause, risk flag or quotation changed between these runs.</p>:<ul>{changes.map((change,index)=><li key={`${change.kind}-${change.change}-${change.key}-${index}`}><span className={change.change==="Added"?"match":"issue"}>{change.change}</span><strong>{change.kind} · {label(change.key)}</strong>{change.kind==="Quotation"?<><blockquote>“{change.quote}”</blockquote><small>{locateSource(item.source,change.quote||"")?"Located in source":"Not found in source"}</small>{locateSource(item.source,change.quote||"")&&<button className="text-button" onClick={()=>inspectQuote(change.quote||"")}>Show in contract<ChevronRight size={14}/></button>}</>:<small>{change.detail}</small>}</li>)}</ul>}</section><section className="session-runs"><div className="panel-heading"><div><h3>Runs in this session</h3><p>Export results to keep them. Refreshing clears this list. Up to 30 runs are retained.</p></div></div>{!runs.length?<div className="panel empty-state"><GitCompareArrows/><h3>Your first comparison starts with a run.</h3><p>Choose a scenario above and run the evaluation.</p></div>:<div className="run-list">{runs.map(r=><button className="panel saved-run" key={r.id} disabled={busy} onClick={()=>{setCaseId(r.caseId);setScenario(r.scenario);setRun(r);setSelected(benchmark.cases.find(c=>c.id===r.caseId)!.gold.clause_types[0]);setComparisonId('reference');setQuery('');setTab('evaluation');}}><span><strong>{benchmark.cases.find(c=>c.id===r.caseId)!.title}</strong><small>{scenarios[r.scenario].title} · {new Date(r.scoredAt).toLocaleTimeString()}</small></span><span>{displayMetric('risk_severity_accuracy',r.scores,r.review).value} severity<ChevronRight size={16}/></span></button>)}</div>}</section></TabsContent>
-    <TabsContent value="methodology"><div className="result-heading"><div><h2>A benchmark you can inspect.</h2><p>Every score traces to a synthetic contract, a reference answer and a review fixture.</p></div><a className="secondary" href={benchmark.repository} target="_blank" rel="noreferrer">Read the source<ArrowUpRight size={16}/></a></div><div className="method-grid"><section className="panel"><div className="eyebrow">01 / SCOPE</div><h3>Three synthetic contracts</h3><p>The cases test clause identification, risk identification, severity and quotation grounding. The fixtures contain deliberate errors.</p><p>Results describe fixture behavior on a small public reference set, not a blinded holdout. They are not a ranking of live models or a certification of legal reliability.</p></section><section className="panel"><div className="eyebrow">02 / REFERENCE STATUS</div><h3>{referenceReady?'Reference evidence frozen · web v1':'v1 reference answers · v2 pending'}</h3><p>Evidence stage: <strong>{label(evidence.stage)}</strong>. Final release eligible: <strong>{referenceReady?'yes':'no'}</strong>.</p><p>{evidence.missing.length?`Still required: ${evidence.missing.map(label).join(', ')}.`:'No missing artifacts are recorded.'} {evidence.errors.length?`Recorded errors: ${evidence.errors.join('; ')}.`:''}</p><p>{evidence.limitation} This web edition remains on the v1 scorer until the v2 scoring export and parity checks are complete.</p></section><section className="panel"><div className="eyebrow">03 / INTERPRETATION</div><h3>Read the dimensions together</h3><p>Risk precision penalizes extra flags; recall measures missed risks. Severity accuracy considers only jointly identified risks.</p><p>Grounding checks quotation matches. Span coverage measures where quotations land. Neither proves legal reasoning.</p></section><section className="panel"><div className="eyebrow">04 / EXECUTION</div><h3>Reproducible and bounded</h3><p>The hosted evaluator recomputes scores from fixed synthetic inputs. Its scoring port is checked against Python outputs. Scenarios remove evidence, remove risks or introduce a conflicting severity.</p><p>No live model is called. This public edition has no document uploads, paid API calls or shared user histories.</p></section></div><section className="panel provenance"><h3>Current result provenance</h3><p>Hashes identify the original input files. The scenario and full evaluated review travel with the exported result.</p><dl><dt>Source commit</dt><dd><a href={`${benchmark.repository}/tree/${benchmark.sourceCommit}`} target="_blank" rel="noreferrer">{benchmark.sourceCommit}</a></dd><dt>Source contract</dt><dd>{item.hashes.source}</dd><dt>Reference answers</dt><dd>{item.hashes.gold}</dd><dt>Original review fixture</dt><dd>{item.hashes.review}</dd><dt>Evaluator</dt><dd>{run.provenance.evaluator}</dd></dl><button className="secondary" onClick={()=>download(`${caseId}-${run.scenario}-evaluation.json`,JSON.stringify(run,null,2))}><ArrowDownToLine size={16}/>Download evaluation JSON</button></section></TabsContent>
-   </Tabs><footer className="page-footer"><span><FlaskConical size={14}/>Contract Review Evidence Lab</span><span>Synthetic benchmark · Human review required · v1 reference edition</span></footer>
-  </main></div>;
+
+  function showCitation(index: number) {
+    setActive(index);
+    setExternal(null);
+    setTab('evidence');
+  }
+
+  function showQuote(quote: string) {
+    const own = citations.find(citation => citation.quote === quote && citation.sourceSpan);
+    if (own) return showCitation(own.index);
+    const span = locateSource(item.source, quote);
+    if (!span) return setNotice('This quotation is not located in the source contract.');
+    setActive(null);
+    setExternal(span);
+    setTab('evidence');
+  }
+
+  function reopen(saved: Evaluation) {
+    show(saved);
+    setTab('findings');
+  }
+
+  const grounded = citations.filter(citation => citation.sourceSpan).length;
+  const context = item.gold.review_context;
+
+  return <div className="lab">
+    <a className="skip-link" href="#workspace">Skip to the evaluation</a>
+    <header className="topbar">
+      <Link className="brand" href="/" aria-label="Contract Review Evidence Lab, home"><span className="brand-mark"><FlaskConical aria-hidden="true" /></span><span className="brand-text"><small>Contract review</small>Evidence Lab</span></Link>
+      <div className="topbar-right"><span className="pill">Public research demo · synthetic data</span><a href={benchmark.repository} target="_blank" rel="noreferrer">Source code<ArrowUpRight aria-hidden="true" /></a></div>
+    </header>
+
+    <main id="workspace" className="lab-main">
+      <section className="intro">
+        <div>
+          <p className="eyebrow">Evaluate · inspect · compare</p>
+          <h1>Put the review to the test.</h1>
+          <p className="lede">Pick a synthetic contract, stress the AI review with a failure scenario, and trace every score back to the words of the contract.</p>
+        </div>
+        <dl className="edition">
+          <div><dt>Contracts</dt><dd>{benchmark.cases.length} synthetic</dd></div>
+          <div><dt>Reference</dt><dd>v1 answers</dd></div>
+          <div><dt>Models called</dt><dd>None</dd></div>
+        </dl>
+      </section>
+
+      <section className="deck" aria-label="Evaluation controls">
+        <Segmented legend={<><span className="step">1</span>Contract</>} name="contract" value={run.caseId} pending={pending?.caseId}
+          options={benchmark.cases.map(c => ({ value: c.id, label: c.title }))} onChange={caseId => choose({ caseId, scenario: shown.scenario })} />
+        <Segmented legend={<><span className="step">2</span>Failure scenario</>} name="scenario" value={run.scenario} pending={pending?.scenario}
+          options={(Object.keys(scenarios) as Scenario[]).map(key => ({ value: key, label: scenarioLabels[key] }))} onChange={scenario => choose({ caseId: shown.caseId, scenario })}>
+          <p className="deck-hint">{scenarios[shown.scenario].description}</p>
+        </Segmented>
+        <p className={`deck-status ${error ? 'is-error' : ''}`} role="status" aria-live="polite">{error || (pending ? 'Scoring on the server…' : notice || 'Reference snapshot computed in your browser. Any choice above is re-scored on the server.')}</p>
+      </section>
+
+      <section className="case-header" aria-labelledby="case-heading">
+        <div className="case-title">
+          <p className="eyebrow">{scenarios[run.scenario].title}</p>
+          <h2 id="case-heading">{item.title}</h2>
+          {context && <dl className="case-context">
+            <div><dt>Reviewed for</dt><dd>{context.party}</dd></div>
+            <div><dt>Law</dt><dd>{context.governing_law}</dd></div>
+            <div><dt>Risk appetite</dt><dd>{context.risk_appetite}</dd></div>
+            <div className="wide"><dt>Objective</dt><dd>{context.objective}</dd></div>
+          </dl>}
+        </div>
+        <div className="case-actions">
+          <span className={`verdict ${flaggedChecks ? 'is-attention' : 'is-clear'}`}>{flaggedChecks ? <TriangleAlert aria-hidden="true" /> : <Check aria-hidden="true" />}{flaggedChecks ? `Issues in ${flaggedChecks} of ${points.length} checks` : `All ${points.length} checks clear`}</span>
+          <div className="button-row">
+            <button className="button" onClick={() => { download(`${item.id}-${run.scenario}-report.md`, renderReport(item, run), 'text/markdown'); setNotice('Evidence report downloaded.'); }}><ScrollText aria-hidden="true" />Report</button>
+            <button className="button button-quiet" onClick={() => download(`${item.id}-${run.scenario}-evaluation.json`, JSON.stringify(run, null, 2))}><Braces aria-hidden="true" />JSON</button>
+          </div>
+        </div>
+      </section>
+
+      <Tabs value={tab} onValueChange={value => setTab(value as Tab)} className="lab-tabs">
+        <TabsList variant="line" className="tab-list" aria-label="Views">
+          <TabsTrigger value="findings"><ListChecks />Findings<span className="tab-count" aria-label={`${openFindings} open`}>{openFindings}</span></TabsTrigger>
+          <TabsTrigger value="evidence"><FileText />Evidence<span className="tab-count">{grounded}/{citations.length}</span></TabsTrigger>
+          <TabsTrigger value="compare"><GitCompareArrows />Compare</TabsTrigger>
+          <TabsTrigger value="method"><ShieldCheck />Method</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="findings" className="tab-panel">
+          <ScoreCards run={run} base={matrix.baseline} points={points} onSelectFinding={key => inspect(key, true)} />
+          <div className="findings-layout">
+            <FindingsTable rows={rows} selected={finding} onSelect={key => setChosenFinding(key)} />
+            <Inspector item={item} run={run} finding={finding} row={rows.find(row => row.key === finding)} citations={citations} canonical={canonical} onShowCitation={showCitation} />
+          </div>
+          <Coverage item={item} run={run} />
+        </TabsContent>
+
+        <TabsContent value="evidence" className="tab-panel">
+          <Evidence item={item} run={run} citations={citations} active={active} external={external}
+            onActivate={index => { setExternal(null); setActive(index); }} onInspect={key => inspect(key, true)} />
+          {external && <p className="external-note" role="status"><span className="legend-swatch is-external" />Highlighted passage comes from the compared run, not from this review. <button className="link-button" onClick={() => setExternal(null)}>Clear</button></p>}
+        </TabsContent>
+
+        <TabsContent value="compare" className="tab-panel">
+          <Compare item={item} run={run} matrix={matrix} target={compareWith} onTarget={setTarget} runs={runs} busy={!!pending} onReopen={reopen} onShowQuote={showQuote} />
+        </TabsContent>
+
+        <TabsContent value="method" className="tab-panel">
+          <Method item={item} run={run} />
+        </TabsContent>
+      </Tabs>
+
+      <footer className="page-footer"><span><FlaskConical aria-hidden="true" />Contract Review Evidence Lab</span><span>Synthetic benchmark · Human review required · v1 reference edition</span></footer>
+    </main>
+  </div>;
 }
+

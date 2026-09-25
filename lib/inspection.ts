@@ -2,6 +2,132 @@ import type { Gold, Review, Scores } from './scoring';
 
 export type MetricKey = 'clause_f1' | 'risk_precision' | 'risk_recall' | 'risk_severity_accuracy' | 'citation_grounding';
 
+const acronyms = new Set(['ip', 'dpia', 'dpa', 'nda', 'saas', 'sla']);
+
+export function clauseLabel(key: string) {
+  return key.split('_').map((word, index) => acronyms.has(word) ? word.toUpperCase() : index === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word).join(' ');
+}
+
+const severityRank: Record<string, number> = { low: 1, medium: 2, high: 3 };
+
+/** Positive when the review rates a risk higher than the reference, negative when it rates it lower. */
+export function severityGap(expected?: string, predicted?: string) {
+  if (!expected || !predicted) return 0;
+  return (severityRank[predicted] ?? 0) - (severityRank[expected] ?? 0);
+}
+
+export type FindingStatus = 'Match' | 'Severity mismatch' | 'Missed' | 'Extra flag' | 'Conflict';
+export type RiskFinding = { key: string; expected?: string; predicted?: string; severities: string[]; status: FindingStatus; gap: number };
+
+/**
+ * One row per clause that the reference or the review treats as a risk. Flags are
+ * resolved through the reference aliases so the rows agree with scoreReview.
+ */
+export function riskFindings(gold: Pick<Gold, 'risk_flags' | 'clause_aliases'>, review: Review, scores: Pick<Scores, 'risk_conflicting_flags'>): RiskFinding[] {
+  const canonical = (key: string) => Object.hasOwn(gold.clause_aliases, key) ? gold.clause_aliases[key] : key;
+  const flagged = new Map<string, string[]>();
+  for (const flag of review.risk_flags) {
+    const key = canonical(flag.clause_type);
+    flagged.set(key, [...(flagged.get(key) || []), flag.severity]);
+  }
+  return [...new Set([...Object.keys(gold.risk_flags), ...flagged.keys()])].map(key => {
+    const expected = Object.hasOwn(gold.risk_flags, key) ? gold.risk_flags[key] : undefined;
+    const severities = flagged.get(key) || [];
+    // scoreReview grades the first severity supplied for a clause, so the table shows the same one.
+    const predicted = severities[0];
+    const status: FindingStatus = scores.risk_conflicting_flags.includes(key) ? 'Conflict'
+      : !expected ? 'Extra flag'
+      : !predicted ? 'Missed'
+      : predicted !== expected ? 'Severity mismatch'
+      : 'Match';
+    return { key, expected, predicted, severities, status, gap: severityGap(expected, predicted) };
+  });
+}
+
+/** Higher numbers are more serious. Used to order findings for a reviewer. */
+export function findingPriority(finding: RiskFinding): number {
+  // TODO(human): rank how serious each kind of discrepancy is for the reviewing party.
+  return 0;
+}
+
+export function orderFindings(findings: RiskFinding[]) {
+  return findings.map((finding, index) => ({ finding, index, priority: findingPriority(finding) }))
+    .sort((a, b) => b.priority - a.priority || a.index - b.index)
+    .map(value => value.finding);
+}
+
+export type ReadoutPoint = { metric: MetricKey; tone: 'good' | 'issue' | 'info'; title: string; detail: string; findings: string[] };
+
+const withSeverity = (finding: RiskFinding, value = finding.expected) => `${clauseLabel(finding.key)} (${value})`;
+const sentence = (prefix: string, items: string[]) => items.length ? `${prefix}: ${items.join(', ')}.` : '';
+const plural = (count: number, word: string, many = `${word}s`) => `${count} ${count === 1 ? word : many}`;
+
+/** A plain-language account of the run, ordered as a reviewer would check it. */
+export function readout(gold: Gold, review: Review, scores: Scores): ReadoutPoint[] {
+  const rows = riskFindings(gold, review, scores);
+  const referenceRisks = Object.keys(gold.risk_flags).length;
+  const found = referenceRisks - scores.risk_missed.length;
+  const missed = rows.filter(row => row.status === 'Missed');
+  const shared = rows.filter(row => row.expected && row.predicted);
+  const correct = shared.filter(row => row.gap === 0);
+  const under = shared.filter(row => row.gap < 0);
+  const over = shared.filter(row => row.gap > 0);
+  const extra = rows.filter(row => !row.expected);
+  const conflicts = rows.filter(row => row.status === 'Conflict');
+  const points: ReadoutPoint[] = [];
+
+  points.push(review.risk_flags.length === 0
+    ? { metric: 'risk_recall', tone: 'issue', title: 'No risks flagged', detail: `The review raised none of the ${plural(referenceRisks, 'reference risk')}.`, findings: missed.map(row => row.key) }
+    : { metric: 'risk_recall', tone: found === referenceRisks ? 'good' : 'issue', title: `Found ${found} of ${plural(referenceRisks, 'reference risk')}`, detail: sentence('Missed', missed.map(row => withSeverity(row))) || 'No reference risk was missed.', findings: missed.map(row => row.key) });
+
+  if (shared.length) {
+    points.push({
+      metric: 'risk_severity_accuracy',
+      tone: correct.length === shared.length ? 'good' : 'issue',
+      title: `${correct.length} of ${shared.length} severities match the reference`,
+      detail: [sentence('Under-rated', under.map(row => `${clauseLabel(row.key)} (${row.expected} → ${row.predicted})`)), sentence('Over-rated', over.map(row => `${clauseLabel(row.key)} (${row.expected} → ${row.predicted})`))].filter(Boolean).join(' ') || 'Every shared risk carries the reference severity.',
+      findings: [...under, ...over].map(row => row.key),
+    });
+  }
+
+  if (extra.length || conflicts.length) {
+    points.push({
+      metric: 'risk_precision',
+      tone: 'issue',
+      title: [extra.length ? plural(extra.length, 'extra flag') : '', conflicts.length ? plural(conflicts.length, 'contradictory severity', 'contradictory severities') : ''].filter(Boolean).join(' and '),
+      detail: [sentence('Not a reference risk', extra.map(row => withSeverity(row, row.predicted))), sentence('Flagged with more than one severity', conflicts.map(row => `${clauseLabel(row.key)} (${[...new Set(row.severities)].join(' and ')})`))].filter(Boolean).join(' '),
+      findings: [...extra, ...conflicts].map(row => row.key),
+    });
+  } else if (review.risk_flags.length) {
+    points.push({ metric: 'risk_precision', tone: 'good', title: 'No extra or contradictory flags', detail: 'Every flag corresponds to a reference risk and carries one severity.', findings: [] });
+  }
+
+  const anchors = Object.keys(gold.clause_anchors).length;
+  const ungrounded = scores.hallucination_count;
+  points.push(scores.citation_total === 0
+    ? { metric: 'citation_grounding', tone: 'issue', title: 'No quotations supplied', detail: 'None of the findings can be traced to the contract text.', findings: [] }
+    : {
+      metric: 'citation_grounding',
+      tone: ungrounded ? 'issue' : 'good',
+      title: `${scores.citation_grounded} of ${plural(scores.citation_total, 'quotation')} located in the contract`,
+      detail: `${ungrounded ? `${plural(ungrounded, 'quotation')} could not be found in the source. ` : ''}Quotations reach ${anchors - scores.span_uncovered_clauses.length} of ${anchors} reference clauses.`,
+      findings: [],
+    });
+
+  const clauses = clauseFindings(gold, review);
+  const expectedClauses = clauses.filter(clause => clause.expected);
+  const missedClauses = clauses.filter(clause => clause.status === 'Missed');
+  const extraClauses = clauses.filter(clause => clause.status === 'Extra');
+  points.push({
+    metric: 'clause_f1',
+    tone: missedClauses.length ? 'issue' : extraClauses.length ? 'info' : 'good',
+    title: `Identified ${expectedClauses.length - missedClauses.length} of ${plural(expectedClauses.length, 'expected clause')}`,
+    detail: [sentence('Missed', missedClauses.map(clause => clauseLabel(clause.key))), sentence('Also named, outside the reference set', extraClauses.map(clause => clauseLabel(clause.key)))].filter(Boolean).join(' ') || 'The review named exactly the reference clause set.',
+    findings: [],
+  });
+  return points;
+}
+
 export function referenceReleaseReady(evidence: { stage: string; finalReleaseEligible: boolean; missing: string[]; errors: string[] }) {
   return evidence.stage === 'frozen' && evidence.finalReleaseEligible && evidence.missing.length === 0 && evidence.errors.length === 0;
 }

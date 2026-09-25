@@ -1,25 +1,10 @@
 import benchmark from './benchmark';
-import type { Evaluation } from './evaluation';
+import type { BenchmarkCase, Evaluation } from './evaluation';
 import { locateSource, scenarios } from './scoring';
-import { clauseFindings, displayMetric } from './inspection';
+import { clauseFindings, clauseLabel as title, displayMetric, readout, riskFindings, type RiskFinding } from './inspection';
 
-type BenchmarkCase = (typeof benchmark.cases)[number];
-
-const title = (key: string) => key.replaceAll('_', ' ').replace(/^./, character => character.toUpperCase());
 const percent = (value: number) => `${(value * 100).toFixed(1)}%`;
-
-export function riskFindings(item: BenchmarkCase, run: Evaluation) {
-  const expected = item.gold.risk_flags;
-  return [...new Set([...Object.keys(expected), ...run.review.risk_flags.map(flag => flag.clause_type)])].map(key => {
-    const predicted = run.review.risk_flags.find(flag => flag.clause_type === key)?.severity;
-    const status = run.scores.risk_conflicting_flags.includes(key) ? 'Conflict'
-      : !expected[key] ? 'Extra flag'
-      : !predicted ? 'Missed'
-      : predicted !== expected[key] ? 'Severity mismatch'
-      : 'Match';
-    return { key, expected: expected[key], predicted, status };
-  });
-}
+const findingText = (finding: RiskFinding) => finding.gap < 0 ? `${finding.status} (under-rated)` : finding.gap > 0 ? `${finding.status} (over-rated)` : finding.status;
 
 export function renderReport(item: BenchmarkCase, run: Evaluation): string {
   const scores = run.scores;
@@ -33,6 +18,10 @@ export function renderReport(item: BenchmarkCase, run: Evaluation): string {
     `Review perspective: ${item.gold.review_context?.party || 'Not specified'}`,
     '',
     'This report evaluates a fixed synthetic review. No live model was called. Grounding means a quotation was located in the source after normalization; it does not establish legal correctness.',
+    '',
+    '## Summary',
+    '',
+    ...readout(item.gold, run.review, scores).map(point => `- ${point.title}. ${point.detail}`),
     '',
     '## Scores',
     '',
@@ -58,9 +47,9 @@ export function renderReport(item: BenchmarkCase, run: Evaluation): string {
 
   lines.push('', '## Findings and evidence');
 
-  for (const finding of riskFindings(item, run)) {
+  for (const finding of riskFindings(item.gold, run.review, run.scores)) {
     lines.push('', `### ${title(finding.key)}`, '',
-      `- Finding: ${finding.status}`,
+      `- Finding: ${findingText(finding)}`,
       `- Reference severity: ${finding.expected || 'none'}`,
       `- Review severity: ${finding.predicted || 'none'}`,
       `- Reference rationale: ${item.gold.severity_rationale[finding.key] || 'No reference risk flag for this clause.'}`);

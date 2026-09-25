@@ -1,2 +1,7 @@
 import Workspace from './workspace';
-export default function Page(){ return <Workspace/>; }
+import { catalog } from '@/lib/evaluation';
+import { parseView, type SearchParams } from '@/lib/view';
+
+export default async function Page({ searchParams }: { searchParams: Promise<SearchParams> }) {
+  return <Workspace initialView={parseView(await searchParams, catalog)} />;
+}

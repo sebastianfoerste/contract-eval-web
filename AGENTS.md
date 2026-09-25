@@ -5,12 +5,17 @@ The public, interactive Evidence Lab for the Contract Review Evaluation project.
 Companion repository to [`contract-review-eval-harness`](https://github.com/sebastianfoerste/contract-review-eval-harness).
 
 ## Layout
-- `app/workspace.tsx` — Main interactive workspace: findings table, inspector, evidence viewer, side-by-side scenario comparisons.
+- `app/page.tsx` — Server component; reads the shareable view (`?case=&scenario=&tab=&finding=`) and passes it to the workspace.
+- `app/workspace.tsx` — Client state: current run, server evaluation queue, URL sync, WebMCP tool registration.
+- `components/lab/` — Workspace views: `findings.tsx` (score cards, findings table, inspector, clause coverage), `evidence.tsx` (rendered contract with in-place quotation highlights), `compare.tsx` (scenario matrix, change ledger, session runs), `method.tsx`, `primitives.tsx`.
 - `app/api/evaluate/route.ts` — Bounded evaluation server endpoint (1 KiB input cap, allowlisted cases only).
 - `lib/scoring.ts` — Deterministic TypeScript scoring engine (`scoreReview`, `locate`, `normalize`). Port of Python `score_review`.
+- `lib/inspection.ts` — Presentation logic: alias-resolved risk findings, severity direction, plain-language readout, clause coverage, run changes.
+- `lib/document.ts` — Contract block parsing with source offsets and overlap-safe highlight segments.
+- `lib/view.ts` — Allowlisted parsing and serialization of the shareable URL view.
 - `lib/benchmark.json` — Static snapshot of synthetic cases (`nda`, `saas`, `dpa`), gold answers, stub fixtures, and cryptographic hashes.
 - `scripts/export-benchmark.py` — Synchronizes synthetic inputs and parity vectors from `contract-review-eval-harness`.
-- `tests/scoring.test.mjs` — 30 Python scoring parity vectors plus edge-case tests; `tests/inspection.test.mjs` checks presentation and inspection logic.
+- `tests/scoring.test.mjs` — 30 Python scoring parity vectors plus edge-case tests; `tests/inspection.test.mjs`, `tests/document.test.mjs` and `tests/view.test.mjs` check presentation, rendering and URL logic.
 - `tests/python-parity.json` — Parity test vectors produced directly by the Python harness.
 - `.openai/hosting.json` & `build/sites-vite-plugin.ts` — OpenAI Sites / Cloudflare Worker deployment configuration.
 
