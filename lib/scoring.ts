@@ -49,8 +49,9 @@ export function locateSource(source: string, quote: string): [number, number] | 
     const character = String.fromCodePoint(source.codePointAt(index)!);
     const end = index + character.length;
     const normalized = punctuation.has(character) ? ' ' : character.toLowerCase();
-    for (const unit of normalized) {
-      if (/\s/u.test(unit)) {
+    // locate() returns UTF-16 indices, so record one offset per code unit, not per code point.
+    for (let unit = 0; unit < normalized.length; unit++) {
+      if (/\s/u.test(normalized[unit])) {
         pendingSpace = pendingSpace ? [pendingSpace[0], end] : [index, end];
       } else {
         if (hasContent && pendingSpace) offsets.push(pendingSpace);

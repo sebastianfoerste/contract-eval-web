@@ -19,9 +19,9 @@ The app calls no live model, accepts no contract uploads and stores no shared us
 
 ## Reference status
 
-This release uses v1 reference answers from the Python repository. Independent v2 annotation returns and written adjudication artifacts were not available in the checkout. Their completion has been reported by the owner, but this app cannot verify or publish a v2 benchmark until the files are imported and checked. It issues no release certificate. The Python harness version remains 0.7.0rc1.
+This release scores reviews against the v1 reference answers from the Python repository. At the recorded harness commit, the exported evidence gate for the v2 candidate answers stands at `awaiting_returns`: independent returns, written adjudication and a verified freeze are still missing. This app cannot verify or publish a v2 benchmark until those artifacts are imported and checked in the Python harness. It issues no release certificate. The Python harness version remains 0.7.0rc1.
 
-The interface reads the exported `referenceEvidence` gate directly. A missing denominator appears as N/A in the interface and report; JSON results retain the Python-compatible numeric values.
+The interface reads the exported `referenceEvidence` gate directly. The gate describes the v2 candidate answers, not the v1 answers used for scoring, and the report and Method tab label the two separately. A missing denominator appears as N/A in the interface and report; JSON results retain the Python-compatible numeric values.
 
 ## Development
 
@@ -52,7 +52,7 @@ python3 scripts/export-benchmark.py --repo /path/to/contract-review-eval-harness
 node tests/api-check.mjs https://YOUR_SITE
 ```
 
-Every supported case and scenario is checked against Python `score_review` (30 parity vectors in `tests/scoring.test.mjs`). Additional tests cover edge cases, score presentation, alias-resolved risk findings, severity direction, the plain-language readout, clause coverage, comparison changes, contract rendering offsets, shareable URL parsing and the reference gate. The HTTP suite checks 12 supported case-scenario combinations and five invalid requests. These checks cover the bounded public inputs; they do not establish general equivalence for arbitrary documents or Unicode inputs.
+Every supported case and scenario is checked against Python `score_review` (30 parity vectors in `tests/scoring.test.mjs`). Additional tests cover edge cases, score presentation, alias-resolved risk findings, severity direction, the plain-language readout, clause coverage, comparison changes, contract rendering offsets, source offsets after characters outside the Basic Multilingual Plane, the evidence report, shareable URL parsing and the reference gate. `tests/export.test.mjs` recomputes the export's integrity and source hashes and checks that its schema, scoring edition and release match this app, so a hand-edited `lib/benchmark.json` fails `npm test`. The HTTP suite checks 12 supported case-scenario combinations and five invalid requests. These checks cover the bounded public inputs; they do not establish general equivalence for arbitrary documents or Unicode inputs.
 
 ## Incorporating adjudicated evidence
 

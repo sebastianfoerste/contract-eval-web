@@ -26,12 +26,17 @@ try {
   }
   if (!ready) throw new Error(`Local Site did not start. ${log}`);
   const check = spawn(process.execPath, ['tests/api-check.mjs', origin], { stdio: 'inherit' });
-  const [code] = await once(check, 'exit');
-  if (code !== 0) throw new Error(`API contract check exited with status ${code}.`);
+  const checkTimer = setTimeout(() => check.kill('SIGKILL'), 120000);
+  const [code, signal] = await once(check, 'exit');
+  clearTimeout(checkTimer);
+  if (code !== 0) throw new Error(signal ? `API contract check was stopped after 120 s (${signal}).` : `API contract check exited with status ${code}.`);
 } finally {
   if (server.exitCode === null && server.signalCode === null) {
     const stopped = once(server, 'exit');
     server.kill('SIGTERM');
-    await Promise.race([stopped, new Promise(resolve => setTimeout(resolve, 5000))]);
+    const exited = await Promise.race([stopped.then(() => true), new Promise(resolve => setTimeout(resolve, 5000, false))]);
+    // Wrangler ignoring SIGTERM would otherwise keep the port bound and this process alive.
+    if (!exited) server.kill('SIGKILL');
   }
+  for (const stream of [server.stdout, server.stderr]) stream.destroy();
 }

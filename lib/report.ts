@@ -1,13 +1,19 @@
-import benchmark from './benchmark';
+import type benchmark from './benchmark';
 import type { BenchmarkCase, Evaluation } from './evaluation';
-import { locateSource, scenarios } from './scoring';
-import { clauseFindings, clauseLabel as title, displayMetric, readout, riskFindings, type RiskFinding } from './inspection';
+import { locateSource, scenarios } from './scoring.ts';
+import { clauseFindings, clauseLabel as title, displayMetric, readout, riskFindings, type RiskFinding } from './inspection.ts';
+
+/** Export metadata the report needs. Passed in so the report stays loadable by the Node test runner. */
+export type ReportContext = Pick<typeof benchmark, 'repository' | 'referenceEvidence'>;
 
 const percent = (value: number) => `${(value * 100).toFixed(1)}%`;
 const findingText = (finding: RiskFinding) => finding.gap < 0 ? `${finding.status} (under-rated)` : finding.gap > 0 ? `${finding.status} (over-rated)` : finding.status;
 
-export function renderReport(item: BenchmarkCase, run: Evaluation): string {
+export function renderReport(item: BenchmarkCase, run: Evaluation, context: ReportContext): string {
   const scores = run.scores;
+  const canonical = (key: string) => Object.hasOwn(item.gold.clause_aliases, key) ? item.gold.clause_aliases[key] : key;
+  const evidence = context.referenceEvidence;
+  const candidate = evidence.cases.find(entry => entry.case === item.id);
   const lines = [
     '# Contract Review Evidence Lab',
     '',
@@ -53,13 +59,13 @@ export function renderReport(item: BenchmarkCase, run: Evaluation): string {
       `- Reference severity: ${finding.expected || 'none'}`,
       `- Review severity: ${finding.predicted || 'none'}`,
       `- Reference rationale: ${item.gold.severity_rationale[finding.key] || 'No reference risk flag for this clause.'}`);
-    const flags = run.review.risk_flags.filter(flag => flag.clause_type === finding.key);
+    const flags = run.review.risk_flags.filter(flag => canonical(flag.clause_type) === finding.key);
     if (flags.length) {
       for (const flag of flags) lines.push(`- Review reasoning (${flag.severity}): ${flag.rationale}`);
     } else {
       lines.push('- Review reasoning: No risk flag supplied.');
     }
-    const citationCount = run.review.citations.filter(citation => citation.clause_type === finding.key).length;
+    const citationCount = run.review.citations.filter(citation => canonical(citation.clause_type) === finding.key).length;
     lines.push(`- Supporting quotations: ${citationCount} (see quotation ledger).`);
   }
 
@@ -74,16 +80,22 @@ export function renderReport(item: BenchmarkCase, run: Evaluation): string {
   }
 
   lines.push('', '## Provenance', '',
-    `- Harness repository: ${benchmark.repository}`,
+    `- Harness repository: ${context.repository}`,
     `- Harness source commit: ${run.provenance.sourceCommit}`,
     `- Source contract SHA-256: ${run.provenance.hashes.source}`,
-    `- Reference answers SHA-256: ${run.provenance.hashes.gold}`,
+    `- Reference answers used for scoring (v1) SHA-256: ${run.provenance.hashes.gold}`,
     `- Original review fixture SHA-256: ${run.provenance.hashes.review}`,
     `- Evaluator: ${run.provenance.evaluator}`,
     `- Adapter: ${run.provenance.adapter}`,
-    `- Reference evidence stage: ${benchmark.referenceEvidence.stage}`,
-    `- Final reference release eligible: ${benchmark.referenceEvidence.finalReleaseEligible ? 'yes' : 'no'}`,
-    `- Missing reference evidence: ${benchmark.referenceEvidence.missing.join(', ') || 'none'}`,
+    '',
+    '## Reference evidence gate (v2 candidate answers)',
+    '',
+    'The gate tracks the v2 candidate reference answers. It does not describe the v1 reference answers used for the scores above.',
+    '',
+    `- v2 candidate answers SHA-256: ${candidate?.candidateSha256 || 'not recorded'}`,
+    `- Evidence stage: ${evidence.stage}`,
+    `- Final release eligible: ${evidence.finalReleaseEligible ? 'yes' : 'no'}`,
+    `- Missing evidence: ${evidence.missing.join(', ') || 'none'}`,
     '',
     'Hashes identify the original exported inputs. They do not prove reviewer independence, adjudication, or legal accuracy.');
   return `${lines.join('\n')}\n`;

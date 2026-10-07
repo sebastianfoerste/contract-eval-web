@@ -41,7 +41,11 @@ test('run comparison identifies added and removed evidence without collapsing du
 
 test('exported reference evidence is fail-closed', () => {
   const evidence = benchmark.referenceEvidence;
-  assert.equal(referenceReleaseReady(evidence), evidence.stage === 'frozen' && evidence.finalReleaseEligible && evidence.missing.length === 0 && evidence.errors.length === 0);
+  // Tripwire: README.md states this stage. Update both when a harness export advances it.
+  assert.equal(evidence.stage, 'awaiting_returns');
+  assert.equal(referenceReleaseReady(evidence), false);
+  assert.equal(referenceReleaseReady({ ...evidence, stage: 'frozen', finalReleaseEligible: true, missing: [], errors: [] }), true);
+  assert.equal(referenceReleaseReady({ ...evidence, stage: 'frozen', finalReleaseEligible: false, missing: [], errors: [] }), false);
   assert.equal(referenceReleaseReady({ ...evidence, stage: 'frozen', finalReleaseEligible: true, missing: ['written_adjudication'] }), false);
   assert.equal(referenceReleaseReady({ ...evidence, stage: 'frozen', finalReleaseEligible: true, missing: [], errors: ['hash mismatch'] }), false);
 });

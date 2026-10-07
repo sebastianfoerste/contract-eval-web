@@ -109,7 +109,8 @@ export default function Workspace({ initialView }: { initialView: View }) {
     const life = new AbortController();
     // Registration runs in a microtask so a failure never sets state synchronously in the effect body.
     const unavailable = () => { if (!life.signal.aborted) setNotice('Browser agent controls are unavailable. Use the controls on the page.'); };
-    Promise.resolve().then(() => context.registerTool({
+    // A cleanup that already ran (fast unmount, StrictMode remount) must not register a stale tool.
+    Promise.resolve().then(() => life.signal.aborted ? undefined : context.registerTool({
       name: 'run_synthetic_contract_evaluation',
       description: 'Run and display a deterministic synthetic contract evaluation. No model call or payment.',
       inputSchema: { type: 'object', properties: { caseId: { type: 'string', enum: benchmark.cases.map(c => c.id) }, scenario: { type: 'string', enum: Object.keys(scenarios) } }, required: ['caseId', 'scenario'], additionalProperties: false },
@@ -211,7 +212,7 @@ export default function Workspace({ initialView }: { initialView: View }) {
         <div className="case-actions">
           <span className={`verdict ${flaggedChecks ? 'is-attention' : 'is-clear'}`}>{flaggedChecks ? <TriangleAlert aria-hidden="true" /> : <Check aria-hidden="true" />}{flaggedChecks ? `Issues in ${flaggedChecks} of ${points.length} checks` : `All ${points.length} checks clear`}</span>
           <div className="button-row">
-            <button className="button" onClick={() => { download(`${item.id}-${run.scenario}-report.md`, renderReport(item, run), 'text/markdown'); setNotice('Evidence report downloaded.'); }}><ScrollText aria-hidden="true" />Report</button>
+            <button className="button" onClick={() => { download(`${item.id}-${run.scenario}-report.md`, renderReport(item, run, benchmark), 'text/markdown'); setNotice('Evidence report downloaded.'); }}><ScrollText aria-hidden="true" />Report</button>
             <button className="button button-quiet" onClick={() => download(`${item.id}-${run.scenario}-evaluation.json`, JSON.stringify(run, null, 2))}><Braces aria-hidden="true" />JSON</button>
           </div>
         </div>

@@ -15,12 +15,13 @@ Companion repository to [`contract-review-eval-harness`](https://github.com/seba
 - `lib/view.ts` — Allowlisted parsing and serialization of the shareable URL view.
 - `lib/benchmark.json` — Static snapshot of synthetic cases (`nda`, `saas`, `dpa`), gold answers, stub fixtures, and cryptographic hashes.
 - `scripts/export-benchmark.py` — Synchronizes synthetic inputs and parity vectors from `contract-review-eval-harness`.
-- `tests/scoring.test.mjs` — 30 Python scoring parity vectors plus edge-case tests; `tests/inspection.test.mjs`, `tests/document.test.mjs` and `tests/view.test.mjs` check presentation, rendering and URL logic.
+- `tests/scoring.test.mjs` — 30 Python scoring parity vectors plus edge-case tests; `tests/inspection.test.mjs`, `tests/document.test.mjs`, `tests/view.test.mjs` and `tests/report.test.mjs` check presentation, rendering, URL and report logic; `tests/export.test.mjs` verifies the export's integrity hashes, edition and release.
 - `tests/python-parity.json` — Parity test vectors produced directly by the Python harness.
 - `.openai/hosting.json` & `build/sites-vite-plugin.ts` — OpenAI Sites / Cloudflare Worker deployment configuration.
 
 ## Rules
 - **Authoritative Source**: The Python harness is the single source of truth for evaluation methodology, gold answers, and scoring algorithms. Never modify `lib/benchmark.json` or `tests/python-parity.json` manually.
+- **Node-loadable library modules**: Tests import `lib/*.ts` directly under Node type stripping. A module the tests load must import runtime helpers with explicit `.ts` extensions and receive `benchmark` data as a parameter rather than importing `lib/benchmark.ts`.
 - **Scoring Parity Invariant**: Any change to `lib/scoring.ts` must pass all 30 parity vectors (`npm test`). If the Python scorer changes, regenerate vectors via `npm run export:benchmark` (or `make web-export` in the harness).
 - **Public Safety & Privacy**: Synthetic contracts only. Zero live model calls, no arbitrary document uploads, no persistent shared state. Runs stay in-memory.
 - **Sites Deployment Compatibility**: Keep the repository root compatible with OpenAI Sites / Cloudflare Worker requirements.

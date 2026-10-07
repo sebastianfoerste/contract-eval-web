@@ -32,3 +32,19 @@ test('grounded quotations map to the original source text',()=>{
     }
   }
 });
+test('source offsets stay aligned after characters outside the Basic Multilingual Plane',()=>{
+  assert.deepEqual(locateSource('Clause 😀 one two three','one two'),[10,17]);
+  const bold='𝐀 Recipient shall keep it.';
+  assert.equal(bold.slice(...locateSource(bold,'keep it')),'keep it');
+  for(const source of ['😀😀 A, b\n c','x 𝐀𝐁 “quoted” text 😀 end','İstanbul clause 𝒜 — final']){
+    const characters=Array.from(source);
+    for(let start=0;start<characters.length;start++){
+      for(let end=start+1;end<=characters.length;end++){
+        const quote=characters.slice(start,end).join(''),span=locateSource(source,quote);
+        assert.equal(span!==null,locate(source,quote)!==null,JSON.stringify({source,quote}));
+        // A span covers whole source characters, so a match inside a multi-character lowercase form (İ → i̇) widens to that character.
+        if(span) assert.ok(normalize(source.slice(...span)).includes(normalize(quote)),JSON.stringify({source,quote,span}));
+      }
+    }
+  }
+});

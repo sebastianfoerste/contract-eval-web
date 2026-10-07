@@ -19,7 +19,7 @@ export function Method({ item, run }: { item: BenchmarkCase; run: Evaluation }) 
   return <div className="method">
     <div className="method-grid">
       <section className="panel"><span className="eyebrow">01 / Scope</span><h3>Three synthetic contracts</h3><p>The cases test clause identification, risk identification, severity and quotation grounding. The fixtures contain deliberate errors.</p><p>Results describe fixture behavior on a small public reference set, not a blinded holdout. They are not a ranking of live models or a certification of legal reliability.</p></section>
-      <section className="panel"><span className="eyebrow">02 / Reference status</span><h3>{ready ? 'Reference evidence frozen · web v1' : 'v1 reference answers · v2 pending'}</h3><p>Evidence stage: <strong>{clauseLabel(evidence.stage)}</strong>. Final release eligible: <strong>{ready ? 'yes' : 'no'}</strong>.</p><p>{evidence.missing.length ? `Still required: ${evidence.missing.map(clauseLabel).join(', ')}.` : 'No missing artifacts are recorded.'} {evidence.errors.length ? `Recorded errors: ${evidence.errors.join('; ')}.` : ''}</p><p>{evidence.limitation} This web edition remains on the v1 scorer until the v2 scoring export and parity checks are complete.</p></section>
+      <section className="panel"><span className="eyebrow">02 / Reference status</span><h3>{ready ? 'v2 evidence frozen · scores still use v1 answers' : 'v1 reference answers · v2 pending'}</h3><p>The gate tracks the v2 candidate reference answers. The scores on this page use the v1 answers. Evidence stage: <strong>{clauseLabel(evidence.stage)}</strong>. Final release eligible: <strong>{ready ? 'yes' : 'no'}</strong>.</p><p>{evidence.missing.length ? `Still required: ${evidence.missing.map(clauseLabel).join(', ')}.` : 'No missing artifacts are recorded.'} {evidence.errors.length ? `Recorded errors: ${evidence.errors.join('; ')}.` : ''}</p><p>{evidence.limitation} This web edition remains on the v1 scorer until the v2 scoring export and parity checks are complete.</p></section>
       <section className="panel"><span className="eyebrow">03 / Interpretation</span><h3>Read the dimensions together</h3><p>Risk precision penalizes extra flags; recall measures missed risks. Severity accuracy considers only jointly identified risks.</p><p>Grounding checks quotation matches. Span coverage measures where quotations land. Neither proves legal reasoning.</p></section>
       <section className="panel"><span className="eyebrow">04 / Execution</span><h3>Reproducible and bounded</h3><p>The hosted evaluator recomputes scores from fixed synthetic inputs. Its scoring port is checked against Python outputs. Scenarios remove evidence, remove risks or introduce a conflicting severity.</p><p>No live model is called. This public edition has no document uploads, paid API calls or shared user histories.</p></section>
     </div>
@@ -39,7 +39,8 @@ export function Method({ item, run }: { item: BenchmarkCase; run: Evaluation }) 
       <dl>
         <dt>Source commit</dt><dd><a href={`${benchmark.repository}/tree/${benchmark.sourceCommit}`} target="_blank" rel="noreferrer">{benchmark.sourceCommit}</a></dd>
         <dt>Source contract</dt><dd>{item.hashes.source}</dd>
-        <dt>Reference answers</dt><dd>{item.hashes.gold}</dd>
+        <dt>Reference answers (v1, scored)</dt><dd>{item.hashes.gold}</dd>
+        <dt>v2 candidate answers</dt><dd>{evidence.cases.find(entry => entry.case === item.id)?.candidateSha256 ?? 'Not recorded'}</dd>
         <dt>Original review fixture</dt><dd>{item.hashes.review}</dd>
         <dt>Evaluator</dt><dd>{run.provenance.evaluator}</dd>
         <dt>Adapter</dt><dd>{run.provenance.adapter}</dd>
