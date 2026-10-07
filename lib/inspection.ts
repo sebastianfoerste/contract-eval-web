@@ -44,10 +44,22 @@ export function riskFindings(gold: Pick<Gold, 'risk_flags' | 'clause_aliases'>, 
   });
 }
 
-/** Higher numbers are more serious. Used to order findings for a reviewer. */
+/**
+ * Higher numbers are more serious. The reference reviews for a conservative party before
+ * signature, so exposure the reader cannot see outranks every false alarm.
+ */
 export function findingPriority(finding: RiskFinding): number {
-  // TODO(human): rank how serious each kind of discrepancy is for the reviewing party.
-  return 0;
+  if (finding.status === 'Match') return 0;
+  const level = (severity?: string) => severityRank[severity ?? ''] ?? 0;
+  const reference = level(finding.expected);
+  const supplied = finding.severities.map(level);
+  // Reference severity the reader cannot rely on: all of a missed risk, the gap of an
+  // under-rated one, the worst case of a contradictory one.
+  const hidden = Math.max(reference - (supplied.length ? Math.min(...supplied) : 0), 0);
+  // Alarm beyond the reference: an over-rated risk, or a flag on a clause that is no reference risk.
+  const overstated = Math.max((supplied.length ? Math.max(...supplied) : 0) - reference, 0);
+  // Ties go to the higher-stakes clause, then to a contradiction, which makes the flag unusable.
+  return 100 * hidden + 10 * overstated + 2 * reference + (finding.status === 'Conflict' ? 1 : 0);
 }
 
 export function orderFindings(findings: RiskFinding[]) {
@@ -64,7 +76,7 @@ const plural = (count: number, word: string, many = `${word}s`) => `${count} ${c
 
 /** A plain-language account of the run, ordered as a reviewer would check it. */
 export function readout(gold: Gold, review: Review, scores: Scores): ReadoutPoint[] {
-  const rows = riskFindings(gold, review, scores);
+  const rows = orderFindings(riskFindings(gold, review, scores));
   const referenceRisks = Object.keys(gold.risk_flags).length;
   const found = referenceRisks - scores.risk_missed.length;
   const missed = rows.filter(row => row.status === 'Missed');

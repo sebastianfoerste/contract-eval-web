@@ -62,7 +62,7 @@ export function FindingsTable({ rows, selected, onSelect }: { rows: RiskFinding[
 
   return <section className="panel findings" aria-labelledby="findings-heading">
     <div className="panel-heading">
-      <div><h3 id="findings-heading">Risk findings</h3><p>Reference judgment against the review’s flag, clause by clause. Use ↑ ↓ to step through.</p></div>
+      <div><h3 id="findings-heading">Risk findings</h3><p>Reference judgment against the review’s flag, most serious first: hidden exposure before false alarms. Use ↑ ↓ to step through.</p></div>
     </div>
     <div className="toolbar">
       <label className="search"><Search aria-hidden="true" /><input type="search" aria-label="Search findings" placeholder="Find a clause" value={query} onChange={event => setQuery(event.target.value)} /></label>

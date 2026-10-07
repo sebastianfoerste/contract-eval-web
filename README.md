@@ -8,7 +8,7 @@ This application serves as the **interactive explorer** tier of the Contract Rev
 
 - Choose a contract and a failure scenario with one click. Each choice is re-scored by the bounded server API; the first view is a reference snapshot computed in the browser with the same scorer.
 - Read each score with its meaning: the five score cards state in plain language what the review found, missed, under-rated or over-rated, and which quotations could not be located.
-- Inspect every risk finding against the reference severity, rationale, review reasoning and supporting quotations. Step through findings with the arrow keys.
+- Inspect every risk finding against the reference severity, rationale, review reasoning and supporting quotations. Findings are listed most serious first: reference severity the review hides (a missed, under-rated or contradictory risk) ranks above any false alarm, and ties go to the higher-severity clause. Step through findings with the arrow keys.
 - Follow the evidence in the rendered contract: every located quotation is highlighted and numbered in place, linked both ways to the quotation list, and reference clauses without a located quotation are listed.
 - Compare all four scenarios in a sensitivity matrix, list every clause, flag and quotation that differs between two scenarios, and reopen server runs from this session.
 - Share any view: contract, scenario, tab and selected finding are kept in the URL.
