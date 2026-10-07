@@ -592,7 +592,7 @@
     }
   ],
   "goldStatus": "v1 reference answers; v2 evidence: awaiting_returns",
-  "integritySha256": "d6a175541190bccc733b6d4e95ace24ede93dc152fc88f5e3599768ca629cc43",
+  "integritySha256": "9f3d070811b669f0d355e034b19a327dc4ca85a69cec9c0f0bf96eac953b4054",
   "methodologyHashes": {
     "src/contract_eval/__init__.py": "8dfa209ea9d707f840e324a4ec38a77a4205579e5a61cc80002b92665f97e598",
     "src/contract_eval/__main__.py": "aed5144e7ede0574db80acd4336c9d7d8491285921234e5fda90d13ce45d5381",
@@ -622,7 +622,7 @@
     "src/contract_eval/scorecard.py": "b3198b19a03a476ec02d4f03345f107435e5db1501e08749637804353fc54e1c",
     "src/contract_eval/scorer.py": "99cb93e91893d0d4e6e70a32f67501bd13323e2e7886f3a9196c72be348c2d55",
     "src/contract_eval/upgrade.py": "40384666cb857aba973db9590c472545e86192e53d3b41c520f91b1b75800e44",
-    "src/contract_eval/web_export.py": "efbf3fc5d4744c3c8ebc56d24e01fac2fd1cb5a36dd013c10fc7fc1921ad215e"
+    "src/contract_eval/web_export.py": "1f71421622fe389a196908ec8283054dc4b88afdb6258485a7a22d033bc62e3f"
   },
   "referenceEvidence": {
     "cases": [
@@ -662,6 +662,6 @@
   "repository": "https://github.com/sebastianfoerste/contract-review-eval-harness",
   "schema": "contract-eval.web-benchmark.v2",
   "scoringEdition": "v1",
-  "sourceCommit": "f4f835e5d1019ca6ca2c77f0d6030cea91b02c78",
+  "sourceCommit": "e748e9c238dacf30164b8ee342456a69593f7340",
   "version": "0.7.0rc1"
 }
