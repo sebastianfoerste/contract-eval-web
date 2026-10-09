@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { test } from 'node:test';
 import { applyScenario, scoreReview } from '../lib/scoring.ts';
-import { clauseFindings, clauseLabel, displayMetric, findingPriority, orderFindings, readout, referenceReleaseReady, reviewChanges, riskFindings, severityGap } from '../lib/inspection.ts';
+import { canonicalClause, clauseFindings, clauseLabel, displayMetric, findingPriority, findingTier, orderFindings, readout, referenceReleaseReady, reviewChanges, riskFindings, severityGap } from '../lib/inspection.ts';
 
 const benchmark = JSON.parse(fs.readFileSync(new URL('../lib/benchmark.json', import.meta.url)));
 const item = benchmark.cases[0];
@@ -152,4 +152,20 @@ test('readout lists name the most serious finding first', () => {
   const severity = points.find(point => point.metric === 'risk_severity_accuracy');
   assert.equal(severity.detail, 'Under-rated: Indemnity (high → low), IP and model training (high → low), Data export on termination (medium → low).');
   assert.equal(severity.findings[0], 'indemnity');
+});
+
+test('finding tiers separate hidden exposure from false alarms', () => {
+  assert.equal(findingTier(finding('high', ['high'])), 'match');
+  assert.equal(findingTier(finding('low', [])), 'exposure');
+  assert.equal(findingTier(finding('high', ['medium'])), 'exposure');
+  assert.equal(findingTier(finding('high', ['high', 'low'])), 'exposure');
+  assert.equal(findingTier(finding('low', ['high'])), 'alarm');
+  assert.equal(findingTier(finding(undefined, ['high'])), 'alarm');
+});
+
+test('alias resolution ignores inherited object properties', () => {
+  assert.equal(canonicalClause({ secrecy: 'confidentiality' }, 'secrecy'), 'confidentiality');
+  assert.equal(canonicalClause({}, 'constructor'), 'constructor');
+  const review = { clauses: [{ clause_type: 'constructor', text: '' }], risk_flags: [], citations: [] };
+  assert.equal(clauseFindings({ ...item.gold, clause_types: [], clause_aliases: {} }, review)[0].key, 'constructor');
 });

@@ -45,3 +45,17 @@ export function segmentRange(start: number, end: number, marks: Mark[]): Segment
   }
   return segments;
 }
+
+/**
+ * The blocks of the section that contains `offset`: its heading and the paragraphs up to
+ * the next heading. Returned as a half-open range of block indexes.
+ */
+export function sectionBlocks(blocks: ContractBlock[], offset: number): [number, number] | null {
+  const at = blocks.findIndex(block => offset >= block.start && offset < block.end);
+  if (at < 0) return null;
+  let first = at;
+  while (first > 0 && blocks[first].kind === 'paragraph') first--;
+  let last = at + 1;
+  while (last < blocks.length && blocks[last].kind === 'paragraph') last++;
+  return [first, last];
+}

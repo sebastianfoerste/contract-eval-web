@@ -1,21 +1,24 @@
 'use client';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowUpRight, Braces, Check, FileText, FlaskConical, GitCompareArrows, ListChecks, ScrollText, ShieldCheck, TriangleAlert } from 'lucide-react';
+import { ArrowUpRight, Braces, Check, FlaskConical, ScrollText, TriangleAlert } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Compare, scenarioLabels } from '@/components/lab/compare';
-import { Evidence } from '@/components/lab/evidence';
-import { Coverage, FindingsTable, Inspector, ScoreCards } from '@/components/lab/findings';
 import { Method } from '@/components/lab/method';
-import { Segmented, download } from '@/components/lab/primitives';
+import { CopyLink, Segmented, ThemeSwitch, download } from '@/components/lab/primitives';
+import { ReviewSheet } from '@/components/lab/review';
+import { ScoreBand } from '@/components/lab/scores';
 import benchmark from '@/lib/benchmark';
 import { findCase, snapshot, type Evaluation } from '@/lib/evaluation';
-import { orderFindings, readout, riskFindings } from '@/lib/inspection';
+import { canonicalClause, orderFindings, readout, riskFindings } from '@/lib/inspection';
 import { renderReport } from '@/lib/report';
 import { locateSource, scenarios, type Scenario } from '@/lib/scoring';
-import { viewQuery, type Tab, type View } from '@/lib/view';
+import { viewQuery, type List, type Tab, type View } from '@/lib/view';
 
 type Selection = { caseId: string; scenario: Scenario };
+
+/** The server scored against a different benchmark export than the one this page was built with. */
+class StalePageError extends Error {}
 const defaults = { caseId: benchmark.cases[0].id, scenario: 'baseline' };
 
 function defaultFinding(run: Evaluation) {
@@ -29,21 +32,25 @@ export default function Workspace({ initialView }: { initialView: View }) {
   const [run, setRun] = useState<Evaluation>(() => snapshot(initialView.caseId, initialView.scenario as Scenario));
   const [runs, setRuns] = useState<Evaluation[]>([]);
   const [tab, setTab] = useState<Tab>(initialView.tab);
+  const [list, setList] = useState<List>(initialView.list);
   const [chosenFinding, setChosenFinding] = useState<string | null>(initialView.finding);
   const [pending, setPending] = useState<Selection | null>(null);
+  const [failed, setFailed] = useState<Selection | null>(null);
+  const [stale, setStale] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [active, setActive] = useState<number | null>(null);
   const [external, setExternal] = useState<[number, number] | null>(null);
   const [target, setTarget] = useState<Scenario>('baseline');
+  // Counts deliberate selections, so choosing the current item again still scrolls back to it.
+  const [request, setRequest] = useState(0);
   const inFlight = useRef(false);
   const queued = useRef<Selection | null>(null);
   const shownCase = useRef(initialView.caseId);
-  const revealInspector = useRef(false);
 
   const item = findCase(run.caseId);
-  const finding = chosenFinding ?? defaultFinding(run);
-  const canonical = useCallback((key: string) => item.gold.clause_aliases[key] || key, [item]);
+  const selected = chosenFinding ?? defaultFinding(run);
+  const canonical = useCallback((key: string) => canonicalClause(item.gold.clause_aliases, key), [item]);
   const citations = useMemo(() => run.review.citations.map((citation, index) => ({ ...citation, index, sourceSpan: locateSource(item.source, citation.quote) })), [run, item]);
   const rows = useMemo(() => orderFindings(riskFindings(item.gold, run.review, run.scores)), [item, run]);
   const points = useMemo(() => readout(item.gold, run.review, run.scores), [item, run]);
@@ -65,6 +72,7 @@ export default function Workspace({ initialView }: { initialView: View }) {
     if (inFlight.current) throw new Error('An evaluation is already running.');
     inFlight.current = true;
     setError('');
+    setFailed(null);
     let next: Selection | null = { caseId, scenario };
     let result: Evaluation | null = null;
     try {
@@ -75,8 +83,10 @@ export default function Workspace({ initialView }: { initialView: View }) {
         setPending(current);
         const response = await fetch('/api/evaluate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(current), signal: AbortSignal.timeout(20000) });
         const data: unknown = await response.json();
-        if (!response.ok) throw new Error(data && typeof data === 'object' && 'error' in data ? String(data.error) : 'Evaluation failed. Please try again.');
+        if (!response.ok) throw new Error(data && typeof data === 'object' && 'error' in data ? String(data.error) : 'The server could not score this choice.');
         result = data as Evaluation;
+        // The page holds the contract and reference answers; scores from another export must not be shown against them.
+        if (result.provenance?.sourceCommit !== benchmark.sourceCommit) throw new StalePageError('This page is older than the server’s benchmark.');
         setRuns(old => [result!, ...old].slice(0, 30));
         next = queued.current;
       }
@@ -84,7 +94,10 @@ export default function Workspace({ initialView }: { initialView: View }) {
       setNotice(`Scored on the server at ${new Date(result!.scoredAt).toLocaleTimeString()}.`);
       return { runId: result!.id, caseId: result!.caseId, scenario: result!.scenario, scores: result!.scores };
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Evaluation failed.');
+      const timedOut = cause instanceof DOMException && cause.name === 'TimeoutError';
+      setError(timedOut ? 'The server did not answer in time.' : cause instanceof TypeError ? 'The server could not be reached. Check your connection.' : cause instanceof Error ? cause.message : 'The server could not score this choice.');
+      setStale(cause instanceof StalePageError);
+      setFailed(queued.current ?? { caseId, scenario });
       throw cause;
     } finally {
       inFlight.current = false;
@@ -126,82 +139,81 @@ export default function Workspace({ initialView }: { initialView: View }) {
   }, [perform]);
 
   useEffect(() => {
-    const query = viewQuery({ caseId: run.caseId, scenario: run.scenario, tab, finding: chosenFinding }, defaults);
+    const query = viewQuery({ caseId: run.caseId, scenario: run.scenario, tab, list, finding: chosenFinding }, defaults);
     const { pathname, search, hash } = window.location;
     if (search !== query) window.history.replaceState(window.history.state, '', `${pathname}${query}${hash}`);
-  }, [run.caseId, run.scenario, tab, chosenFinding]);
+  }, [run.caseId, run.scenario, tab, list, chosenFinding]);
 
   useEffect(() => {
-    if (tab !== 'findings' || !revealInspector.current) return;
-    revealInspector.current = false;
-    document.getElementById('inspector-heading')?.scrollIntoView({ block: 'nearest', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
-  }, [tab, finding]);
+    // On one-column layouts the notes sit below the list, so bring them to the reader after a choice.
+    if (request === 0 || !window.matchMedia('(max-width: 999px)').matches) return;
+    document.getElementById('detail')?.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+  }, [request]);
 
-  function inspect(key: string, reveal = false) {
-    revealInspector.current = reveal;
+  function selectClause(key: string, from?: List) {
     setChosenFinding(canonical(key));
-    setTab('findings');
+    setActive(null);
+    setExternal(null);
+    if (from) setList(from);
+    setTab('review');
+    setRequest(count => count + 1);
   }
 
-  function showCitation(index: number) {
+  function selectCitation(index: number) {
+    setChosenFinding(canonical(citations[index].clause_type));
     setActive(index);
     setExternal(null);
-    setTab('evidence');
+    setTab('review');
+    setRequest(count => count + 1);
   }
 
-  function showQuote(quote: string) {
+  function showQuote(quote: string, clause: string) {
     const own = citations.find(citation => citation.quote === quote && citation.sourceSpan);
-    if (own) return showCitation(own.index);
+    if (own) return selectCitation(own.index);
     const span = locateSource(item.source, quote);
-    if (!span) return setNotice('This quotation is not located in the source contract.');
+    if (!span) return setNotice('This quotation does not appear in the contract.');
+    setChosenFinding(canonical(clause));
     setActive(null);
     setExternal(span);
-    setTab('evidence');
+    setTab('review');
+    setRequest(count => count + 1);
   }
 
   function reopen(saved: Evaluation) {
     show(saved);
-    setTab('findings');
+    setNotice(`Showing the run scored at ${new Date(saved.scoredAt).toLocaleTimeString()}.`);
+    setTab('review');
   }
 
-  const grounded = citations.filter(citation => citation.sourceSpan).length;
   const context = item.gold.review_context;
 
   return <div className="lab">
     <a className="skip-link" href="#workspace">Skip to the evaluation</a>
     <header className="topbar">
       <Link className="brand" href="/" aria-label="Contract Review Evidence Lab, home"><span className="brand-mark"><FlaskConical aria-hidden="true" /></span><span className="brand-text"><small>Contract review</small>Evidence Lab</span></Link>
-      <div className="topbar-right"><span className="pill">Public research demo · synthetic data</span><a href={benchmark.repository} target="_blank" rel="noreferrer">Source code<ArrowUpRight aria-hidden="true" /></a></div>
+      <div className="topbar-right"><a href={benchmark.repository} target="_blank" rel="noreferrer">Source code<ArrowUpRight aria-hidden="true" /></a><ThemeSwitch /></div>
     </header>
 
     <main id="workspace" className="lab-main">
-      <section className="intro">
-        <div>
-          <p className="eyebrow">Evaluate · inspect · compare</p>
-          <h1>Put the review to the test.</h1>
-          <p className="lede">Pick a synthetic contract, stress the AI review with a failure scenario, and trace every score back to the words of the contract.</p>
-        </div>
-        <dl className="edition">
-          <div><dt>Contracts</dt><dd>{benchmark.cases.length} synthetic</dd></div>
-          <div><dt>Reference</dt><dd>v1 answers</dd></div>
-          <div><dt>Models called</dt><dd>None</dd></div>
-        </dl>
-      </section>
+      <p className="premise">Each synthetic contract comes with a fixed contract review that contains deliberate errors. This lab scores that review against reference answers and shows, in the contract itself, what it found, what it missed and whether its quotations exist. No live model is called.</p>
 
       <section className="deck" aria-label="Evaluation controls">
-        <Segmented legend={<><span className="step">1</span>Contract</>} name="contract" value={run.caseId} pending={pending?.caseId}
+        <Segmented legend="Contract" name="contract" value={run.caseId} pending={pending?.caseId}
           options={benchmark.cases.map(c => ({ value: c.id, label: c.title }))} onChange={caseId => choose({ caseId, scenario: shown.scenario })} />
-        <Segmented legend={<><span className="step">2</span>Failure scenario</>} name="scenario" value={run.scenario} pending={pending?.scenario}
+        <Segmented legend="What to do to the review" name="scenario" value={run.scenario} pending={pending?.scenario}
           options={(Object.keys(scenarios) as Scenario[]).map(key => ({ value: key, label: scenarioLabels[key] }))} onChange={scenario => choose({ caseId: shown.caseId, scenario })}>
           <p className="deck-hint">{scenarios[shown.scenario].description}</p>
         </Segmented>
-        <p className={`deck-status ${error ? 'is-error' : ''}`} role="status" aria-live="polite">{error || (pending ? 'Scoring on the server…' : notice || 'Reference snapshot computed in your browser. Any choice above is re-scored on the server.')}</p>
+        <p className={`deck-status ${error ? 'is-error' : ''}`} role="status" aria-live="polite">
+          {error || (pending ? 'Scoring on the server…' : notice || 'Reference snapshot computed in your browser. Any choice above is scored again on the server.')}
+          {error && (stale ? <button className="link-button" onClick={() => window.location.reload()}>Reload the page</button> : failed && <button className="link-button" onClick={() => choose(failed)}>Try again</button>)}
+        </p>
       </section>
 
-      <section className="case-header" aria-labelledby="case-heading">
+      <section className="case" aria-labelledby="case-heading">
         <div className="case-title">
-          <p className="eyebrow">{scenarios[run.scenario].title}</p>
-          <h2 id="case-heading">{item.title}</h2>
+          <h1 id="case-heading">{item.title}</h1>
+          <p className="case-scenario">{scenarios[run.scenario].title}</p>
           {context && <dl className="case-context">
             <div><dt>Reviewed for</dt><dd>{context.party}</dd></div>
             <div><dt>Law</dt><dd>{context.governing_law}</dd></div>
@@ -212,33 +224,25 @@ export default function Workspace({ initialView }: { initialView: View }) {
         <div className="case-actions">
           <span className={`verdict ${flaggedChecks ? 'is-attention' : 'is-clear'}`}>{flaggedChecks ? <TriangleAlert aria-hidden="true" /> : <Check aria-hidden="true" />}{flaggedChecks ? `Issues in ${flaggedChecks} of ${points.length} checks` : `All ${points.length} checks clear`}</span>
           <div className="button-row">
-            <button className="button" onClick={() => { download(`${item.id}-${run.scenario}-report.md`, renderReport(item, run, benchmark), 'text/markdown'); setNotice('Evidence report downloaded.'); }}><ScrollText aria-hidden="true" />Report</button>
-            <button className="button button-quiet" onClick={() => download(`${item.id}-${run.scenario}-evaluation.json`, JSON.stringify(run, null, 2))}><Braces aria-hidden="true" />JSON</button>
+            <button className="button" onClick={() => { download(`${item.id}-${run.scenario}-report.md`, renderReport(item, run, benchmark), 'text/markdown'); setNotice('Report downloaded.'); }}><ScrollText aria-hidden="true" />Download report</button>
+            <button className="button button-quiet" onClick={() => { download(`${item.id}-${run.scenario}-evaluation.json`, JSON.stringify(run, null, 2)); setNotice('JSON downloaded.'); }}><Braces aria-hidden="true" />JSON</button>
+            <CopyLink />
           </div>
         </div>
       </section>
 
+      <ScoreBand run={run} base={matrix.baseline} points={points} onSelectClause={key => selectClause(key, 'findings')} />
+
       <Tabs value={tab} onValueChange={value => setTab(value as Tab)} className="lab-tabs">
         <TabsList variant="line" className="tab-list" aria-label="Views">
-          <TabsTrigger value="findings"><ListChecks />Findings<span className="tab-count" aria-label={`${openFindings} open`}>{openFindings}</span></TabsTrigger>
-          <TabsTrigger value="evidence"><FileText />Evidence<span className="tab-count">{grounded}/{citations.length}</span></TabsTrigger>
-          <TabsTrigger value="compare"><GitCompareArrows />Compare</TabsTrigger>
-          <TabsTrigger value="method"><ShieldCheck />Method</TabsTrigger>
+          <TabsTrigger value="review">Review<span className="tab-count" aria-label={`${openFindings} findings differ from the reference`}>{openFindings}</span></TabsTrigger>
+          <TabsTrigger value="compare">Compare scenarios</TabsTrigger>
+          <TabsTrigger value="method">Method</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="findings" className="tab-panel">
-          <ScoreCards run={run} base={matrix.baseline} points={points} onSelectFinding={key => inspect(key, true)} />
-          <div className="findings-layout">
-            <FindingsTable rows={rows} selected={finding} onSelect={key => setChosenFinding(key)} />
-            <Inspector item={item} run={run} finding={finding} row={rows.find(row => row.key === finding)} citations={citations} canonical={canonical} onShowCitation={showCitation} />
-          </div>
-          <Coverage item={item} run={run} />
-        </TabsContent>
-
-        <TabsContent value="evidence" className="tab-panel">
-          <Evidence item={item} run={run} citations={citations} active={active} external={external}
-            onActivate={index => { setExternal(null); setActive(index); }} onInspect={key => inspect(key, true)} />
-          {external && <p className="external-note" role="status"><span className="legend-swatch is-external" />Highlighted passage comes from the compared run, not from this review. <button className="link-button" onClick={() => setExternal(null)}>Clear</button></p>}
+        <TabsContent value="review" className="tab-panel">
+          <ReviewSheet item={item} run={run} rows={rows} citations={citations} canonical={canonical} selected={selected} active={active} external={external}
+            list={list} request={request} onList={setList} onSelectClause={key => selectClause(key)} onSelectCitation={selectCitation} onClearExternal={() => setExternal(null)} />
         </TabsContent>
 
         <TabsContent value="compare" className="tab-panel">
@@ -250,8 +254,7 @@ export default function Workspace({ initialView }: { initialView: View }) {
         </TabsContent>
       </Tabs>
 
-      <footer className="page-footer"><span><FlaskConical aria-hidden="true" />Contract Review Evidence Lab</span><span>Synthetic benchmark · Human review required · v1 reference edition</span></footer>
     </main>
+    <footer className="page-footer"><span>Contract Review Evidence Lab</span><span>Synthetic benchmark, v1 reference answers. Results need human review.</span></footer>
   </div>;
 }
-

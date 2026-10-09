@@ -5,13 +5,14 @@ The public, interactive Evidence Lab for the Contract Review Evaluation project.
 Companion repository to [`contract-review-eval-harness`](https://github.com/sebastianfoerste/contract-review-eval-harness).
 
 ## Layout
-- `app/page.tsx` — Server component; reads the shareable view (`?case=&scenario=&tab=&finding=`) and passes it to the workspace.
-- `app/workspace.tsx` — Client state: current run, server evaluation queue, URL sync, WebMCP tool registration.
-- `components/lab/` — Workspace views: `findings.tsx` (score cards, findings table, inspector, clause coverage), `evidence.tsx` (rendered contract with in-place quotation highlights), `compare.tsx` (scenario matrix, change ledger, session runs), `method.tsx`, `primitives.tsx`.
+- `app/page.tsx` — Server component; reads the shareable view (`?case=&scenario=&tab=&list=&finding=`) and passes it to the workspace.
+- `app/workspace.tsx` — Client state: current run, server evaluation queue with retry, selection, URL sync, WebMCP tool registration.
+- `app/layout.tsx` — Metadata, viewport and the inline script that applies a stored theme before first paint. Keep that script in the body: a hand-written head element shifts React's generated ids and breaks hydration of the tabs.
+- `components/lab/` — Workspace views: `review.tsx` (the review sheet: list, clause notes, marked-up contract), `scores.tsx` (score band), `compare.tsx` (scenario matrix, change ledger, session runs), `method.tsx`, `primitives.tsx` (severity meter, tags, segmented control, theme switch).
 - `app/api/evaluate/route.ts` — Bounded evaluation server endpoint (1 KiB input cap, allowlisted cases only).
 - `lib/scoring.ts` — Deterministic TypeScript scoring engine (`scoreReview`, `locate`, `normalize`). Port of Python `score_review`.
-- `lib/inspection.ts` — Presentation logic: alias-resolved risk findings, severity direction, plain-language readout, clause coverage, run changes.
-- `lib/document.ts` — Contract block parsing with source offsets and overlap-safe highlight segments.
+- `lib/inspection.ts` — Presentation logic: alias resolution, risk findings, their priority and tier, plain-language readout, clause coverage, run changes.
+- `lib/document.ts` — Contract block parsing with source offsets, clause sections and overlap-safe highlight segments.
 - `lib/view.ts` — Allowlisted parsing and serialization of the shareable URL view.
 - `lib/benchmark.json` — Static snapshot of synthetic cases (`nda`, `saas`, `dpa`), gold answers, stub fixtures, and cryptographic hashes.
 - `scripts/export-benchmark.py` — Synchronizes synthetic inputs and parity vectors from `contract-review-eval-harness`.
@@ -22,6 +23,7 @@ Companion repository to [`contract-review-eval-harness`](https://github.com/seba
 ## Rules
 - **Authoritative Source**: The Python harness is the single source of truth for evaluation methodology, gold answers, and scoring algorithms. Never modify `lib/benchmark.json` or `tests/python-parity.json` manually.
 - **Node-loadable library modules**: Tests import `lib/*.ts` directly under Node type stripping. A module the tests load must import runtime helpers with explicit `.ts` extensions and receive `benchmark` data as a parameter rather than importing `lib/benchmark.ts`.
+- **Colour and theme**: Colours are tokens in `app/globals.css`, each defined once with `light-dark()`. Red marks hidden exposure and amber marks false alarms; severity uses the neutral meter. Check new text and background pairs for a 4.5:1 contrast ratio in both themes.
 - **Scoring Parity Invariant**: Any change to `lib/scoring.ts` must pass all 30 parity vectors (`npm test`). If the Python scorer changes, regenerate vectors via `npm run export:benchmark` (or `make web-export` in the harness).
 - **Public Safety & Privacy**: Synthetic contracts only. Zero live model calls, no arbitrary document uploads, no persistent shared state. Runs stay in-memory.
 - **Sites Deployment Compatibility**: Keep the repository root compatible with OpenAI Sites / Cloudflare Worker requirements.

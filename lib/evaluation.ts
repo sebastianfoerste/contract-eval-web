@@ -1,5 +1,6 @@
 import benchmark from './benchmark';
 import { applyScenario, scenarios, scoreReview, type Scenario, type Scores, type Review } from './scoring';
+import { canonicalClause } from './inspection';
 import type { Catalog } from './view';
 export type Evaluation = {
   id: string; caseId: string; scenario: Scenario; scoredAt: string; scores: Scores; review: Review;
@@ -27,9 +28,10 @@ export function snapshot(caseId: string, scenario: Scenario = 'baseline'): Evalu
 }
 export const catalog: Catalog = {
   cases: benchmark.cases.map(item => {
-    const canonical = (key: string) => item.gold.clause_aliases[key] || key;
+    const canonical = (key: string) => canonicalClause(item.gold.clause_aliases, key);
     return {id: item.id, keys: [...new Set([...item.gold.clause_types, ...Object.keys(item.gold.risk_flags),
-      ...item.review.clauses.map(c => canonical(c.clause_type)), ...item.review.risk_flags.map(f => canonical(f.clause_type))])]};
+      ...item.review.clauses.map(c => canonical(c.clause_type)), ...item.review.risk_flags.map(f => canonical(f.clause_type)),
+      ...item.review.citations.map(c => canonical(c.clause_type))])]};
   }),
   scenarios: Object.keys(scenarios),
 };

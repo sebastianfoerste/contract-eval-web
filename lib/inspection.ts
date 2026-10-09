@@ -8,6 +8,11 @@ export function clauseLabel(key: string) {
   return key.split('_').map((word, index) => acronyms.has(word) ? word.toUpperCase() : index === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word).join(' ');
 }
 
+/** Resolve a clause name through the reference aliases, exactly as scoreReview does. */
+export function canonicalClause(aliases: Record<string, string>, key: string) {
+  return Object.hasOwn(aliases, key) ? aliases[key] : key;
+}
+
 const severityRank: Record<string, number> = { low: 1, medium: 2, high: 3 };
 
 /** Positive when the review rates a risk higher than the reference, negative when it rates it lower. */
@@ -24,7 +29,7 @@ export type RiskFinding = { key: string; expected?: string; predicted?: string; 
  * resolved through the reference aliases so the rows agree with scoreReview.
  */
 export function riskFindings(gold: Pick<Gold, 'risk_flags' | 'clause_aliases'>, review: Review, scores: Pick<Scores, 'risk_conflicting_flags'>): RiskFinding[] {
-  const canonical = (key: string) => Object.hasOwn(gold.clause_aliases, key) ? gold.clause_aliases[key] : key;
+  const canonical = (key: string) => canonicalClause(gold.clause_aliases, key);
   const flagged = new Map<string, string[]>();
   for (const flag of review.risk_flags) {
     const key = canonical(flag.clause_type);
@@ -60,6 +65,14 @@ export function findingPriority(finding: RiskFinding): number {
   const overstated = Math.max((supplied.length ? Math.max(...supplied) : 0) - reference, 0);
   // Ties go to the higher-stakes clause, then to a contradiction, which makes the flag unusable.
   return 100 * hidden + 10 * overstated + 2 * reference + (finding.status === 'Conflict' ? 1 : 0);
+}
+
+/** The two kinds of error the ranking separates: exposure the reader cannot see, and alarm without basis. */
+export type FindingTier = 'match' | 'exposure' | 'alarm';
+
+export function findingTier(finding: RiskFinding): FindingTier {
+  const priority = findingPriority(finding);
+  return priority === 0 ? 'match' : priority >= 100 ? 'exposure' : 'alarm';
 }
 
 export function orderFindings(findings: RiskFinding[]) {
@@ -159,7 +172,7 @@ export function clauseFindings(gold: Gold, review: Review) {
   const expected = new Set(gold.clause_types);
   const predicted = new Map<string, Set<string>>();
   for (const clause of review.clauses) {
-    const canonical = gold.clause_aliases[clause.clause_type] || clause.clause_type;
+    const canonical = canonicalClause(gold.clause_aliases, clause.clause_type);
     const reported = predicted.get(canonical) || new Set<string>();
     reported.add(clause.clause_type);
     predicted.set(canonical, reported);
@@ -167,7 +180,7 @@ export function clauseFindings(gold: Gold, review: Review) {
   return [...new Set([...expected, ...predicted.keys()])].sort().map(key => {
     const reportedAs = [...(predicted.get(key) || [])].sort();
     const status = !expected.has(key) ? 'Extra' : !reportedAs.length ? 'Missed' : reportedAs.some(name => name !== key) ? 'Matched via alias' : 'Matched';
-    return { key, expected: expected.has(key), reportedAs, status, abstentions: (review.abstentions || []).filter(value => (gold.clause_aliases[value.clause_type] || value.clause_type) === key) };
+    return { key, expected: expected.has(key), reportedAs, status, abstentions: (review.abstentions || []).filter(value => canonicalClause(gold.clause_aliases, value.clause_type) === key) };
   });
 }
 

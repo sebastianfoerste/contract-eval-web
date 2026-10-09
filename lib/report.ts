@@ -1,7 +1,7 @@
 import type benchmark from './benchmark';
 import type { BenchmarkCase, Evaluation } from './evaluation';
 import { locateSource, scenarios } from './scoring.ts';
-import { clauseFindings, clauseLabel as title, displayMetric, readout, riskFindings, type RiskFinding } from './inspection.ts';
+import { canonicalClause, clauseFindings, clauseLabel as title, displayMetric, readout, riskFindings, type RiskFinding } from './inspection.ts';
 
 /** Export metadata the report needs. Passed in so the report stays loadable by the Node test runner. */
 export type ReportContext = Pick<typeof benchmark, 'repository' | 'referenceEvidence'>;
@@ -11,7 +11,7 @@ const findingText = (finding: RiskFinding) => finding.gap < 0 ? `${finding.statu
 
 export function renderReport(item: BenchmarkCase, run: Evaluation, context: ReportContext): string {
   const scores = run.scores;
-  const canonical = (key: string) => Object.hasOwn(item.gold.clause_aliases, key) ? item.gold.clause_aliases[key] : key;
+  const canonical = (key: string) => canonicalClause(item.gold.clause_aliases, key);
   const evidence = context.referenceEvidence;
   const candidate = evidence.cases.find(entry => entry.case === item.id);
   const lines = [

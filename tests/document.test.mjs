@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { test } from 'node:test';
-import { contractBlocks, segmentRange } from '../lib/document.ts';
+import { contractBlocks, sectionBlocks, segmentRange } from '../lib/document.ts';
 import { locateSource } from '../lib/scoring.ts';
 
 const benchmark = JSON.parse(fs.readFileSync(new URL('../lib/benchmark.json', import.meta.url)));
@@ -37,4 +37,26 @@ test('segments split overlapping marks without losing text', () => {
     { start: 14, end: 20, ids: [] },
   ]);
   assert.deepEqual(segmentRange(5, 8, [{ id: 1, span: [0, 20] }]), [{ start: 5, end: 8, ids: [1] }]);
+});
+
+test('a section runs from its heading to the next heading', () => {
+  const source = '# Title\n\nPreamble.\n\n## 1. Term\n\nFirst.\n\nSecond.\n\n## 2. Fees\n\nThird.';
+  const blocks = contractBlocks(source);
+  assert.deepEqual(sectionBlocks(blocks, source.indexOf('Second')), [2, 5]);
+  assert.deepEqual(sectionBlocks(blocks, source.indexOf('1. Term')), [2, 5]);
+  assert.deepEqual(sectionBlocks(blocks, source.indexOf('Third')), [5, 7]);
+  assert.equal(sectionBlocks(blocks, source.length + 5), null);
+});
+
+test('every reference anchor is located inside a headed section of its contract', () => {
+  for (const item of benchmark.cases) {
+    const blocks = contractBlocks(item.source);
+    for (const [key, anchor] of Object.entries(item.gold.clause_anchors)) {
+      const span = locateSource(item.source, anchor);
+      assert.ok(span, `${item.id}: ${key}`);
+      const section = sectionBlocks(blocks, span[0]);
+      assert.ok(section, `${item.id}: ${key}`);
+      assert.equal(blocks[section[0]].kind, 'heading', `${item.id}: ${key}`);
+    }
+  }
 });

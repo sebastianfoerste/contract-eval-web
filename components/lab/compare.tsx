@@ -4,7 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { findCase, type BenchmarkCase, type Evaluation } from '@/lib/evaluation';
 import { clauseLabel, displayMetric, reviewChanges } from '@/lib/inspection';
 import { locateSource, scenarios, type Scenario, type Scores } from '@/lib/scoring';
-import { Delta, metricDelta, metrics } from './findings';
+import { Delta, metricDelta, metrics } from './scores';
 import { download } from './primitives';
 
 export const scenarioLabels: Record<Scenario, string> = {
@@ -23,7 +23,7 @@ const counts: { title: string; value: (scores: Scores) => number }[] = [
 
 export function Compare({ item, run, matrix, target, onTarget, runs, busy, onReopen, onShowQuote }: {
   item: BenchmarkCase; run: Evaluation; matrix: Record<Scenario, Evaluation>; target: Scenario; onTarget: (scenario: Scenario) => void;
-  runs: Evaluation[]; busy: boolean; onReopen: (run: Evaluation) => void; onShowQuote: (quote: string) => void;
+  runs: Evaluation[]; busy: boolean; onReopen: (run: Evaluation) => void; onShowQuote: (quote: string, clause: string) => void;
 }) {
   const order = Object.keys(scenarios) as Scenario[];
   const base = matrix.baseline;
@@ -32,7 +32,7 @@ export function Compare({ item, run, matrix, target, onTarget, runs, busy, onReo
   return <div className="compare">
     <section className="panel" aria-labelledby="matrix-heading">
       <div className="panel-heading">
-        <div><h3 id="matrix-heading">Scenario sensitivity</h3><p>Every scenario scored against the same contract and reference answers. Changes are against the original fixture.</p></div>
+        <div><h2 id="matrix-heading">Scenario sensitivity</h2><p>Every scenario scored against the same contract and reference answers. Changes are against the original fixture.</p></div>
       </div>
       <div className="table-scroll">
         <table className="data-table matrix">
@@ -43,7 +43,7 @@ export function Compare({ item, run, matrix, target, onTarget, runs, busy, onReo
               {order.map(scenario => {
                 const result = matrix[scenario];
                 const display = displayMetric(metric.key, result.scores, result.review);
-                return <td key={scenario} className={scenario === run.scenario ? 'is-current' : ''}><span className="matrix-value">{display.value}</span>{scenario !== 'baseline' && display.defined && <Delta value={metricDelta(metric.key, result, base)} />}</td>;
+                return <td key={scenario} className={scenario === run.scenario ? 'is-current' : ''}><span className="matrix-value">{display.value}</span>{scenario !== 'baseline' && display.defined && <Delta value={metricDelta(metric.key, result, base)} quiet />}</td>;
               })}
             </tr>)}
             {counts.map(count => <tr key={count.title}>
@@ -61,7 +61,7 @@ export function Compare({ item, run, matrix, target, onTarget, runs, busy, onReo
 
     <section className="panel" aria-labelledby="pair-heading">
       <div className="panel-heading pair-heading">
-        <div><h3 id="pair-heading">What changed in the review</h3><p>Every clause, flag and quotation that differs between two scenarios. The entries explain the score movement.</p></div>
+        <div><h2 id="pair-heading">What changed in the review</h2><p>Every clause, flag and quotation that differs between two scenarios. The entries explain the score movement.</p></div>
         <div className="pair-controls">
           <label htmlFor="compare-target">From</label>
           <Select value={target} onValueChange={value => onTarget(value as Scenario)}>
@@ -86,21 +86,21 @@ export function Compare({ item, run, matrix, target, onTarget, runs, busy, onReo
               return <li key={`${change.kind}-${change.change}-${change.key}-${index}`}>
                 <span className={`change-kind ${change.change === 'Added' ? 'is-added' : 'is-removed'}`}>{change.change}</span>
                 <div className="change-body">
-                  <strong>{change.kind} · {clauseLabel(change.key)}{change.kind === 'Risk flag' && <span className="change-detail"> ({change.detail})</span>}</strong>
+                  <strong>{change.kind}: {clauseLabel(change.key)}{change.kind === 'Risk flag' && <span className="change-detail"> ({change.detail})</span>}</strong>
                   {change.kind === 'Quotation' && <blockquote>“{change.quote}”</blockquote>}
                 </div>
-                {located && <button className="link-button" onClick={() => onShowQuote(change.quote || '')}>Show in contract<ArrowRight /></button>}
+                {located && <button className="link-button" onClick={() => onShowQuote(change.quote || '', change.key)}>Show in contract</button>}
               </li>;
             })}</ul>}
       </>
     </section>
 
     <section className="session" aria-labelledby="session-heading">
-      <div className="panel-heading flat"><div><h3 id="session-heading">Runs in this session</h3><p>Server-scored runs, newest first. Refreshing clears the list; export to keep a result. Up to 30 are kept.</p></div></div>
-      {!runs.length ? <div className="panel empty-state"><GitCompareArrows aria-hidden="true" /><h3>No server runs yet</h3><p>Choose a contract or scenario above. Each choice is scored on the server and listed here.</p></div>
+      <div className="panel-heading flat"><div><h2 id="session-heading">Runs in this session</h2><p>Server-scored runs, newest first. Refreshing clears the list; export to keep a result. Up to 30 are kept.</p></div></div>
+      {!runs.length ? <div className="panel empty-state"><GitCompareArrows aria-hidden="true" /><p className="empty-title">No server runs yet</p><p>Choose a contract or scenario above. Each choice is scored on the server and listed here.</p></div>
         : <ol className="run-list">{runs.map(saved => <li key={saved.id}><button className={`panel saved-run ${saved.id === run.id ? 'is-current' : ''}`} disabled={busy} onClick={() => onReopen(saved)}>
-          <span><strong>{findCase(saved.caseId).title} · {scenarioLabels[saved.scenario]}</strong><small>Scored {new Date(saved.scoredAt).toLocaleTimeString()}</small></span>
-          <span className="saved-run-score">{displayMetric('risk_recall', saved.scores, saved.review).value} recall · {displayMetric('citation_grounding', saved.scores, saved.review).value} grounded<ArrowRight aria-hidden="true" /></span>
+          <span><strong>{findCase(saved.caseId).title}, {scenarioLabels[saved.scenario].toLowerCase()}</strong><small>Scored {new Date(saved.scoredAt).toLocaleTimeString()}</small></span>
+          <span className="saved-run-score">Recall {displayMetric('risk_recall', saved.scores, saved.review).value}, grounding {displayMetric('citation_grounding', saved.scores, saved.review).value}</span>
         </button></li>)}</ol>}
     </section>
   </div>;

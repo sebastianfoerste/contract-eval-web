@@ -6,14 +6,15 @@ This application serves as the **interactive explorer** tier of the Contract Rev
 
 ## Features
 
-- Choose a contract and a failure scenario with one click. Each choice is re-scored by the bounded server API; the first view is a reference snapshot computed in the browser with the same scorer.
-- Read each score with its meaning: the five score cards state in plain language what the review found, missed, under-rated or over-rated, and which quotations could not be located.
-- Inspect every risk finding against the reference severity, rationale, review reasoning and supporting quotations. Findings are listed most serious first: reference severity the review hides (a missed, under-rated or contradictory risk) ranks above any false alarm, and ties go to the higher-severity clause. Step through findings with the arrow keys.
-- Follow the evidence in the rendered contract: every located quotation is highlighted and numbered in place, linked both ways to the quotation list, and reference clauses without a located quotation are listed.
+- Choose a contract and a failure scenario with one click. Each choice is re-scored by the bounded server API; the first view is a reference snapshot computed in the browser with the same scorer. A failed request keeps the previous result and offers a retry.
+- Read each score with its meaning: one score band states in plain language what the review found, missed, under-rated or over-rated, and which quotations could not be located.
+- Work in one review sheet: a list on the left, notes on the selected clause beside it, and the contract on the right. Selecting a finding, a quotation or a clause scrolls the contract to it.
+- Findings are grouped and ordered by seriousness. Hidden exposure (a missed, under-rated or contradictory risk) ranks above any false alarm, and ties go to the higher-severity clause.
+- See every quoted passage highlighted and numbered in the contract. The selected clause carries a margin rule and its reference anchor is underlined, so a missed risk shows where the review should have looked.
 - Compare all four scenarios in a sensitivity matrix, list every clause, flag and quotation that differs between two scenarios, and reopen server runs from this session.
-- Share any view: contract, scenario, tab and selected finding are kept in the URL.
+- Share any view: contract, scenario, tab, list and selected clause are kept in the URL. Links from before the findings and evidence tabs were merged still open the right view.
 - Export evidence reports with a plain-language summary, rationales, quotation status and provenance, or complete JSON results. See source hashes and the exact originating Python repository commit.
-- Light and dark themes follow the system setting; the layout works down to phone width.
+- Light and dark themes follow the system setting and can be switched by hand. The layout works down to phone width, and text contrast meets WCAG 2.1 AA in both themes.
 
 The app calls no live model, accepts no contract uploads and stores no shared user history. Session runs are held in memory, capped at 30 and cleared on refresh. Reports must be downloaded for retention. The public API accepts only allowlisted synthetic cases and scenarios, with a 1 KiB input limit.
 
