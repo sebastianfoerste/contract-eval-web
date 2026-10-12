@@ -1,22 +1,54 @@
 # Contract Review Evidence Lab — Interactive Web Explorer
 
-A public, hosted evaluation workspace for the synthetic NDA, SaaS and DPA cases in Sebastian Förste's [contract-review-eval-harness](https://github.com/sebastianfoerste/contract-review-eval-harness).
+A browser evaluation workspace for the synthetic NDA, SaaS and DPA cases in Sebastian Förste's [contract-review-eval-harness](https://github.com/sebastianfoerste/contract-review-eval-harness).
 
-This application serves as the **interactive explorer** tier of the Contract Review Evaluation project. While the authoritative Python engine develops the evaluation methodology, release certificates, and model adapters, this web app provides a zero-dependency, browser-safe environment for visitors to explore evaluation results, inspect failure scenarios, and download reports.
+This application is the interactive explorer for the Contract Review Evaluation project. The authoritative Python engine owns evaluation methodology, reference answers, scoring and release evidence. The web app makes fixed results, failure scenarios and source quotations inspectable. It uses Next.js App Router conventions through the existing vinext/Vite Sites runtime.
 
 ## Features
 
-- Choose a contract and a failure scenario with one click. Each choice is re-scored by the bounded server API; the first view is a reference snapshot computed in the browser with the same scorer. A failed request keeps the previous result and offers a retry.
-- Read each score with its meaning: one score band states in plain language what the review found, missed, under-rated or over-rated, and which quotations could not be located.
-- Work in one review sheet: a list on the left, notes on the selected clause beside it, and the contract on the right. Selecting a finding, a quotation or a clause scrolls the contract to it.
+- Start with an existing fixture error: the synthetic NDA's permitted-disclosure clause is rated high in the reference and medium in the fixed review. Open that finding and its exact quotation, or move directly into exploration.
+- Choose a contract and failure scenario. Each choice is re-scored by the bounded server API; the first view is a deterministic reference snapshot. A failed request keeps the previous result and offers a retry.
+- Read a compact result summary first, then expand metric definitions and detailed scores.
+- Work in a three-column desktop review sheet. On phones, use the finding, explanation and contract steps; transitions move keyboard focus to the selected panel.
 - Findings are grouped and ordered by seriousness. Hidden exposure (a missed, under-rated or contradictory risk) ranks above any false alarm, and ties go to the higher-severity clause.
 - See every quoted passage highlighted and numbered in the contract. The selected clause carries a margin rule and its reference anchor is underlined, so a missed risk shows where the review should have looked.
 - Compare all four scenarios in a sensitivity matrix, list every clause, flag and quotation that differs between two scenarios, and reopen server runs from this session.
-- Share any view: contract, scenario, tab, list and selected clause are kept in the URL. Links from before the findings and evidence tabs were merged still open the right view.
-- Export evidence reports with a plain-language summary, rationales, quotation status and provenance, or complete JSON results. See source hashes and the exact originating Python repository commit.
-- Light and dark themes follow the system setting and can be switched by hand. The layout works down to phone width, and text contrast meets WCAG 2.1 AA in both themes.
+- Share contract, scenario, selected comparison, tab, list, finding, exact quotation index, phone panel and language. Removed comparison quotations have their own `cquote` index. Reference-edition mismatches show a warning; they do not silently claim to restore an old result. Legacy findings/evidence links still work.
+- Use English or German controls, explanations and reports. Original English contracts, quotations, reference rationales, identifiers and raw JSON retain their original wording and are labeled accordingly.
+- Download Markdown and JSON, or open `/report` for a readable print view with a browser **Print / Save as PDF** action. The app does not generate or confirm a saved PDF. The print route reconstructs the deterministic snapshot; export JSON or Markdown from the workspace to retain a session run's original timestamp and identifier. Historical print views are blocked when the reference edition differs.
+- Light and dark themes follow the system and remain switchable when local storage fails. A versioned, vendored design package supplies the shared palette and licensed local Newsreader/Geist fonts. No font CDN is required.
 
 The app calls no live model, accepts no contract uploads and stores no shared user history. Session runs are held in memory, capped at 30 and cleared on refresh. Reports must be downloaded for retention. The public API accepts only allowlisted synthetic cases and scenarios, with a 1 KiB input limit.
+
+## Native My Counsel replay
+
+`/candidates?lang=en` and `/candidates?lang=de` display one separate, **hand-authored REPLAY** in My Counsel's native format. The synthetic ICT agreement is reviewed with the commercial playbook. Four retained candidates include one duplicate and one unsupported playbook reference. The application rejected the original output; the Python evaluator retains and checks every finding. The view distinguishes exact quotation checks, missing-clause structure and playbook/category validity.
+
+This is an artifact viewer, not a live model result or an additional v1 benchmark case. Issue precision/recall are unavailable without independent annotation. Native output has no severity or complete clause inventory; legal reasoning and amendment quality remain for lawyer review. The viewer makes no DORA compliance claim. Token usage and model cost are unavailable.
+
+The original run and Python score are copied to `public/candidates/`. Before rendering, the server verifies the Python score's canonical recording SHA-256, source/playbook/instruction binding, complete run metadata and ordered finding indices. File hashes and the recorded dirty working-tree state remain visible. A hash binds bytes; it is not an independent attestation. Refresh only after validating and scoring in the adjacent harness:
+
+```bash
+python3 scripts/export-candidate-replay.py
+```
+
+This bounded exporter accepts the known synthetic replay and leaves the benchmark export and scoring algorithms untouched.
+
+## Candidate experiment bundle
+
+`/candidates/experiment?id=replay-dry-run&lang=en` and `/candidates/experiment?id=replay-dry-run&lang=de` display one preregistered experiment from the Python harness: the design, every planned cell with its denominators, the reference status per cell, each arm with its prompt version, code revision and model label, the comparison table for an iteration arm, provider-reported usage where a recording states it, and every recorded attempt with its recording hash and a download.
+
+The bundled example is a zero-cost dry run. It holds one hand-authored attempt, the replay shown at `/candidates`, registered in a twelve-slot REPLAY design. Eleven attempts were not run and no model was called. It is no model result: no reference is registered, so issue precision and recall appear as N/A, and no comparison is drawn.
+
+Python owns every number. `lib/candidate-experiment.ts` scores nothing and recomputes no rate. Before rendering, the server checks that `report.json` carries the SHA-256 of `experiment.json`, that each recording has the canonical digest its report row states and sits in the slot the experiment assigns to it, that the cells cover exactly arms × playbooks × variants, and that the integer counts of each cell agree with its attempt rows. A bundle that fails a check is not displayed. The bundler hands the page parsed JSON, so the page rebuilds the experiment file text in the harness's two-space JSON form; `tests/candidate-experiment.test.mjs` proves that this text equals the file bytes. A hash binds bytes; it is not an independent attestation.
+
+Only experiments imported in `app/candidates/experiment/page.tsx` are addressable. Any other id shows a not-found state. Refresh a bundle after the harness has registered the attempts and written `report.json`:
+
+```bash
+python3 scripts/export-candidate-experiment.py replay-dry-run
+```
+
+The exporter refuses a bundle whose schemas, hashes, attempt slots or synthetic-corpus marker do not match. It also refuses a corpus path that leaves the harness, because the published experiment file would name local directories, a corpus manifest that changed since the experiment was planned, and a harness module that changed after `report.json` was written. In the last two cases, aggregate again in the harness before exporting. It copies `experiment.json`, `report.json` and the registered attempt and reference files byte for byte to `public/candidates/experiments/<id>/` and writes `provenance.json` with their hashes, the hashes of two harness modules and the harness commit. A new attempt or reference file also needs its import in the page; `npm test` fails until the page imports every bundled file.
 
 ## Reference status
 
@@ -68,7 +100,11 @@ An [independent challenge-set protocol](docs/challenge-set-protocol.md) records 
 
 ## Validation limits
 
-The local browser check covered quotation navigation, scenario selection, evaluation refresh and narrow-viewport layout. The optional WebMCP registration is feature-detected. Ordinary app functions use the visible controls and evaluation API independently of WebMCP.
+The 2026-10-10 local browser check covered guided entry, DE/EN switching, keyboard finding navigation, a 390 CSS-pixel phone view, exact own/comparison quotation restoration, theme cycling, server scenario selection, reference-edition warnings and EN/DE print views. Print CSS was inspected; no saved PDF or deployment is claimed. Core text and status color pairs were checked at 4.5:1 or better in both themes. This is not a full screen-reader, browser-matrix or WCAG conformance audit.
+
+Tests cover denied-storage theme behavior, locale-invariant score identities, URL allowlists, replay hash binding and tamper rejection. The HTTP gate checks the report and replay routes alongside the original scoring requests. See [implementation and acceptance notes](docs/product-experience-acceptance.md) for the scope and remaining human acceptance work.
+
+The optional WebMCP registration is feature-detected. Ordinary app functions use the visible controls and evaluation API independently of WebMCP.
 
 ## License
 
