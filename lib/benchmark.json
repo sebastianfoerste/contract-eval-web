@@ -592,7 +592,7 @@
     }
   ],
   "goldStatus": "v1 reference answers; v2 evidence: awaiting_returns",
-  "integritySha256": "4d6d0877927570c879cc7adfc1584afe6a9a829042c98dc0e37c8234a7504f61",
+  "integritySha256": "0cb338bc7a3f1bc6ecdc099e60af1a77ad76d936c88501642a88a81f7b4b9131",
   "methodologyHashes": {
     "src/contract_eval/__init__.py": "8dfa209ea9d707f840e324a4ec38a77a4205579e5a61cc80002b92665f97e598",
     "src/contract_eval/__main__.py": "aed5144e7ede0574db80acd4336c9d7d8491285921234e5fda90d13ce45d5381",
@@ -603,7 +603,11 @@
     "src/contract_eval/adjudication.py": "8afd808d6d128dcadf8f6a0dafa32dd61bf20a20f2fcc107b14d2ee2c7b5295d",
     "src/contract_eval/annotators.py": "07eadcefd8de80d05998e8c1c5aa1c36256d891771262029691b1ebf71b0145e",
     "src/contract_eval/campaign_v2.py": "1363766bde2d5e99ed76d5659fcb43bcaf6b53bb51d086e2e67e9d41af4a31c5",
-    "src/contract_eval/candidates.py": "29e69d18c574c2a9cdc82e181c099ab8aaf5541864344b96a0c0ab3e0a7d0b65",
+    "src/contract_eval/candidate_adjudication.py": "40c414d76a3eedf9826d71a2920c02d92839f1f72a0c0f2f75b14f8cc8052c2c",
+    "src/contract_eval/candidate_annotation.py": "0aa69fa1ef133e1d2eb09fefdfedb3a2e40b6371db85a94f1e565feae336db9f",
+    "src/contract_eval/candidate_budget.py": "7316b05ccdbcd0b2038fd97a56b82113edc297ba26f38a1c512e72a769713608",
+    "src/contract_eval/candidate_experiment.py": "75403a636a1253666f4c8f0c255497c12c0a8d490306a920d2948fee4e65339a",
+    "src/contract_eval/candidates.py": "54d9084d3c8cbf7416f019e1b3f77b5e6e1ea562a65c22731d5aee0fd42221f9",
     "src/contract_eval/capture.py": "75bc630c08b2136767032cbbf9e94204d0095a1114c4ece62582ac68e897b5ae",
     "src/contract_eval/capture_runner.py": "5a0d2b964e26d8b09fec98dbe5d43b6a324b2732b83abae5cfbac0a911446105",
     "src/contract_eval/cases.py": "9d74e89adadebbfc6601e9ec503437918d403ac7674594f291aa6f6d897b73d7",
@@ -663,6 +667,6 @@
   "repository": "https://github.com/sebastianfoerste/contract-review-eval-harness",
   "schema": "contract-eval.web-benchmark.v2",
   "scoringEdition": "v1",
-  "sourceCommit": "f7b0fd714ddbba4531d971020f46b7b69c5c3544",
+  "sourceCommit": "259b00d5e9088262e18691b365835df4138ebda0",
   "version": "0.7.0rc1"
 }
