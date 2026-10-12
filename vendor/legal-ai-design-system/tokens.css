@@ -1,0 +1,55 @@
+/* @legal-ai/design-system 1.0.0. One vocabulary, independent application builds. */
+:root {
+  color-scheme: light dark;
+  --legal-paper: light-dark(#f7f5f0, #151c1a);
+  --legal-surface: light-dark(#ffffff, #1d2723);
+  --legal-sunken: light-dark(#eeece5, #26322d);
+  --legal-ink: light-dark(#1c1a17, #f1efe8);
+  --legal-ink-muted: light-dark(#4a4640, #c4cec7);
+  --legal-ink-subtle: light-dark(#686259, #a2b0a6);
+  --legal-line: light-dark(#e4dfd6, #3b4b42);
+  --legal-line-strong: light-dark(#a69e91, #798d7e);
+  --legal-accent: light-dark(#0f6b5c, #7fd1bc);
+  --legal-accent-ink: light-dark(#0a4a40, #c2f4e6);
+  --legal-accent-soft: light-dark(#e4f1ec, #233f35);
+  --legal-on-accent: light-dark(#ffffff, #0b221c);
+  --legal-danger: light-dark(#a3271f, #f6aca0);
+  --legal-danger-soft: light-dark(#fbebe9, #3b231f);
+  --legal-danger-line: light-dark(#c8766c, #b87567);
+  --legal-warning: light-dark(#7a4b0f, #f0c982);
+  --legal-warning-soft: light-dark(#fbf0dc, #382e1c);
+  --legal-warning-line: light-dark(#a87930, #b69256);
+  --legal-info: light-dark(#345a7c, #abc9e5);
+  --legal-focus: light-dark(#0f6b5c, #9ee8d0);
+  --legal-mark: light-dark(#fff0bf, #453912);
+  --legal-mark-own: light-dark(#ffdc73, #6e5813);
+  --legal-mark-ring: light-dark(#876300, #e9c046);
+  --legal-font-sans:
+    var(--font-geist-sans, "Geist"), "Helvetica Neue", Arial, sans-serif;
+  --legal-font-display:
+    var(--font-newsreader, "Newsreader"), Georgia, "Times New Roman", serif;
+  --legal-font-mono: var(--font-geist-mono, ui-monospace), Menlo, monospace;
+  --legal-radius-card: 14px;
+  --legal-radius-control: 10px;
+  --legal-space-1: 0.25rem;
+  --legal-space-2: 0.5rem;
+  --legal-space-3: 0.75rem;
+  --legal-space-4: 1rem;
+  --legal-space-6: 1.5rem;
+  --legal-space-8: 2rem;
+  --legal-reading-width: 72ch;
+  --legal-target-size: 44px;
+  --legal-shadow: 0 1px 2px light-dark(rgb(28 26 23 / 7%), rgb(0 0 0 / 25%));
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+@media print {
+  :root,
+  :root[data-theme="dark"] {
+    color-scheme: light;
+  }
+}

@@ -1,0 +1,70 @@
+/* Framework-independent controls. Native semantics belong to each application. */
+.legal-control {
+  min-height: var(--legal-target-size);
+  border: 1px solid var(--legal-line-strong);
+  border-radius: var(--legal-radius-control);
+  padding: 0.5rem 0.75rem;
+  background: var(--legal-surface);
+  color: var(--legal-ink);
+  font: inherit;
+}
+.legal-control:focus-visible {
+  outline: 2px solid var(--legal-focus);
+  outline-offset: 3px;
+}
+.legal-control:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+.legal-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border: 1px solid var(--legal-line-strong);
+  border-radius: 999px;
+  padding: 0.25rem 0.625rem;
+  color: var(--legal-ink-muted);
+  background: var(--legal-surface);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+.legal-status[data-tone="pending"] {
+  color: var(--legal-warning);
+  background: var(--legal-warning-soft);
+  border-style: dashed;
+}
+.legal-status[data-tone="error"] {
+  color: var(--legal-danger);
+  background: var(--legal-danger-soft);
+}
+.legal-status[data-tone="reviewed"] {
+  color: var(--legal-accent-ink);
+  background: var(--legal-accent-soft);
+}
+.legal-progress {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--legal-sunken);
+  color: var(--legal-accent);
+}
+.legal-progress::-webkit-progress-bar {
+  background: var(--legal-sunken);
+}
+.legal-progress::-webkit-progress-value {
+  background: var(--legal-accent);
+}
+.legal-progress::-moz-progress-bar {
+  background: var(--legal-accent);
+}
+@media (forced-colors: active) {
+  .legal-progress {
+    appearance: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .legal-control {
+    transition: none;
+  }
+}

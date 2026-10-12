@@ -1,0 +1,15 @@
+{
+  "name": "@legal-ai/design-system",
+  "version": "1.0.0",
+  "files": {
+    "tokens.css": "1809121338d6806a79d039a40e53d94c0badfb6f0e2c61b8a2c0255cf21cecf9",
+    "controls.css": "85acd2dcf9647ef16ff17b08da35b85dcf461be1748120bd8be140977e3d02a0",
+    "fonts.css": "55bc74ee8cf9ee8246d53ec61876351005a0ede9d5c5c42d596037df26b03a05",
+    "fonts/README.md": "1b3af551f0ccfa546f51ba9af58555a19384e79c3104a805708069d9499c33bc",
+    "fonts/Newsreader-OFL.txt": "fdfad38143ec470553cae82a1e45320bdd1b9ec70415d37bd0171051d8a4ded8",
+    "fonts/Geist-OFL.txt": "1781d2806a07d91c4edf4740b88449fab7d0eadad53f7c351b94cd4d4eb8c00f",
+    "fonts/geist-latin.woff2": "1b5ebfb3a01a97343ac96873e6d59a8cb285c66012b6a1ac509cb2765e995ba8",
+    "fonts/newsreader-latin.woff2": "2a69ec1c0fb79a464de0e19957cdb3a65b5f626d85fffd164f9de557d3a64878",
+    "fonts/newsreader-latin-italic.woff2": "19a83cc7ce02aab990c0f5fb8bd8f12f2f8e4f56430d5a3459521cabd852a51c"
+  }
+}
