@@ -13,4 +13,17 @@ for(const v of vectors){
 for(const [body,type,status] of [['{','application/json',400],[JSON.stringify({caseId:'unknown',scenario:'baseline'}),'application/json',400],[JSON.stringify({caseId:'nda',scenario:'baseline',apiKey:'rejected'}),'application/json',400],['x'.repeat(1025),'application/json',413],['hello','text/plain',415]]){
  const res=await fetch(new URL('/api/evaluate',origin),{method:'POST',headers:{'Content-Type':type},body,signal:timeout()});assert.equal(res.status,status);assert.ok((await res.json()).error);
 }
-console.log('PASS: 12 HTTP scoring comparisons and 5 invalid-request checks.');
+for (const [path, expected] of [
+ ['/report?case=nda&scenario=no-evidence&lang=de','Keine Zitate angegeben'],
+ ['/report?edition='+'0'.repeat(40),'Reference edition changed'],
+ ['/candidates?lang=en','hand-authored REPLAY'],
+ ['/candidates?lang=de','Anwendungsvalidierung: abgelehnt'],
+ ['/candidates/experiment?id=replay-dry-run&lang=en','No model was called'],
+ ['/candidates/experiment?id=replay-dry-run&lang=de','Es wurde kein Modell aufgerufen'],
+ ['/candidates/experiment?id=unknown-experiment&lang=en','No bundled experiment at this address'],
+]) {
+ const response=await fetch(new URL(path,origin),{signal:timeout()});
+ assert.equal(response.status,200);
+ assert.ok((await response.text()).includes(expected),`Missing report content at ${path}`);
+}
+console.log('PASS: 12 HTTP scoring comparisons, 5 invalid-request checks and 7 report/replay/experiment route checks.');

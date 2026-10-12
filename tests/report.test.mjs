@@ -43,3 +43,26 @@ test('the report attributes aliased flags and quotations to their reference clau
   assert.ok(residual.includes('- Review reasoning (high): Aliased flag.'));
   assert.ok(residual.includes('- Supporting quotations: 1'));
 });
+
+test('German report preserves original quotations, hashes, numbers and reference distinctions', () => {
+  const original = JSON.stringify(item);
+  const current = run(item.review);
+  const report = renderReport(item, current, benchmark, 'de');
+  assert.ok(report.includes('## Kennzahlen'));
+  assert.ok(report.includes('## Nachweisstand der v2-Kandidaten'));
+  assert.ok(report.includes(`- Bewertete v1-Referenzantworten SHA-256: ${item.hashes.gold}`));
+  assert.ok(report.includes('Referenzstand zur Freigabe geeignet: nein'));
+  for (const quotation of item.review.citations) assert.ok(report.includes(quotation.quote));
+  for (const flag of item.review.risk_flags) assert.ok(report.includes(flag.rationale));
+  assert.ok(report.includes('83.3%'));
+  assert.equal(JSON.stringify(item), original);
+});
+
+test('German no-evidence and no-risk reports retain undefined denominators', () => {
+  for (const scenario of ['no-evidence', 'missed-risks']) {
+    const review = applyScenario(item.review, scenario);
+    const report = renderReport(item, run(review, scenario), benchmark, 'de');
+    assert.ok(report.includes('N/A'));
+    if (scenario === 'no-evidence') assert.ok(report.includes('Es wurden keine Zitate angegeben.'));
+  }
+});

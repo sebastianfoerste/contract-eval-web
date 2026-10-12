@@ -1,16 +1,19 @@
 'use client';
 import { useState, useSyncExternalStore, type ReactNode } from 'react';
 import { ArrowDown, ArrowUp, Check, CircleAlert, CircleCheck, Info, Link2, LoaderCircle, Monitor, Moon, Plus, Split, Sun, TriangleAlert, X } from 'lucide-react';
+import { useLocale } from './locale';
 import { findingTier, type ReadoutPoint, type RiskFinding } from '@/lib/inspection';
+import { appliedTheme, applyTheme, nextTheme, type Theme } from '@/lib/theme';
 
 const levels: Record<string, number> = { low: 1, medium: 2, high: 3 };
 
 /** Severity as a three-step meter. It stays neutral so colour is free to mark the finding itself. */
 export function Severity({ value }: { value?: string }) {
+  const { severityText } = useLocale();
   const level = levels[value ?? ''] ?? 0;
   return <span className={`severity ${level ? '' : 'is-none'}`}>
     <span className="severity-bars" aria-hidden="true">{[1, 2, 3].map(step => <i key={step} className={step <= level ? 'is-on' : ''} />)}</span>
-    {value ? value.charAt(0).toUpperCase() + value.slice(1) : 'None'}
+    {severityText(value)}
   </span>;
 }
 
@@ -23,6 +26,7 @@ export function findingLabel(finding: RiskFinding) {
 }
 
 export function FindingTag({ finding }: { finding: RiskFinding }) {
+  const { t, statusText } = useLocale();
   const icon = finding.status === 'Match' ? <Check />
     : finding.status === 'Severity mismatch' ? finding.gap < 0 ? <ArrowDown /> : <ArrowUp />
     : finding.status === 'Missed' ? <X />
@@ -30,18 +34,20 @@ export function FindingTag({ finding }: { finding: RiskFinding }) {
     : <Split />;
   const steps = Math.abs(finding.gap);
   return <span className={`tag tag-${findingTier(finding)}`}>
-    {icon}{findingLabel(finding)}{finding.status === 'Severity mismatch' && steps > 1 && <span className="tag-note">by {steps} levels</span>}
+    {icon}{statusText(findingLabel(finding))}{finding.status === 'Severity mismatch' && steps > 1 && <span className="tag-note">{t('by', 'um')} {steps} {t('levels', 'Stufen')}</span>}
   </span>;
 }
 
 export function ToneIcon({ tone }: { tone: ReadoutPoint['tone'] }) {
-  return tone === 'good' ? <CircleCheck className="tone-icon tone-good" aria-label="No issue" />
-    : tone === 'issue' ? <CircleAlert className="tone-icon tone-issue" aria-label="Issue" />
-    : <Info className="tone-icon tone-info" aria-label="Note" />;
+  const { t } = useLocale();
+  return tone === 'good' ? <CircleCheck className="tone-icon tone-good" aria-label={t("No issue", "Kein Problem")} />
+    : tone === 'issue' ? <CircleAlert className="tone-icon tone-issue" aria-label={t("Issue", "Problem")} />
+    : <Info className="tone-icon tone-info" aria-label={t("Note", "Hinweis")} />;
 }
 
 export function LocatedTag({ located }: { located: boolean }) {
-  return <span className={`tag ${located ? 'tag-match' : 'tag-alarm'}`}>{located ? <Check /> : <TriangleAlert />}{located ? 'Found in contract' : 'Not in contract'}</span>;
+  const { t } = useLocale();
+  return <span className={`tag ${located ? 'tag-match' : 'tag-alarm'}`}>{located ? <Check /> : <TriangleAlert />}{located ? t('Found in contract', 'Im Vertrag gefunden') : t('Not in contract', 'Nicht im Vertrag')}</span>;
 }
 
 export type Option<T extends string> = { value: T; label: string };
@@ -53,64 +59,57 @@ export type Option<T extends string> = { value: T; label: string };
 export function Segmented<T extends string>({ legend, name, options, value, pending, onChange, children }: {
   legend: ReactNode; name: string; options: Option<T>[]; value: T; pending?: T | null; onChange: (value: T) => void; children?: ReactNode;
 }) {
+  const { t } = useLocale();
   const shown = pending ?? value;
   return <fieldset className="segmented-field">
     <legend>{legend}</legend>
     <div className="segmented">
       {options.map(option => <label key={option.value} className={`segment ${shown === option.value ? 'is-checked' : ''}`}>
         <input type="radio" name={name} value={option.value} checked={shown === option.value} onChange={() => onChange(option.value)} />
-        <span className="segment-label">{option.label}{pending === option.value && pending !== value && <LoaderCircle className="spin" aria-label="Scoring" />}</span>
+        <span className="segment-label">{option.label}{pending === option.value && pending !== value && <LoaderCircle className="spin" aria-label={t("Updating", "Wird aktualisiert")} />}</span>
       </label>)}
     </div>
     {children}
   </fieldset>;
 }
 
-type Theme = 'system' | 'light' | 'dark';
-const themeOrder: Theme[] = ['system', 'light', 'dark'];
 const themeEvent = 'lab-theme';
 
 function storedTheme(): Theme {
-  try {
-    const value = window.localStorage.getItem('theme');
-    return value === 'light' || value === 'dark' ? value : 'system';
-  } catch {
-    // Storage can be unavailable (private mode, blocked cookies); the system setting still applies.
-    return 'system';
-  }
+  // The applied DOM state is authoritative even when storage reads or writes fail.
+  return appliedTheme(document.documentElement);
 }
-
 function subscribeTheme(notify: () => void) {
+  function onStorage(event: StorageEvent) {
+    if (event.key !== 'theme' && event.key !== null) return;
+    if (event.newValue === 'light' || event.newValue === 'dark') document.documentElement.dataset.theme = event.newValue;
+    else delete document.documentElement.dataset.theme;
+    notify();
+  }
   window.addEventListener(themeEvent, notify);
-  window.addEventListener('storage', notify);
-  return () => {
-    window.removeEventListener(themeEvent, notify);
-    window.removeEventListener('storage', notify);
-  };
+  window.addEventListener('storage', onStorage);
+  return () => { window.removeEventListener(themeEvent, notify); window.removeEventListener('storage', onStorage); };
 }
 
 /** Cycles system, light and dark. The choice is applied by the inline script in the layout on the next load. */
 export function ThemeSwitch() {
+  const { t } = useLocale();
   const theme = useSyncExternalStore(subscribeTheme, storedTheme, () => 'system' as Theme);
-  const following = (current: Theme) => themeOrder[(themeOrder.indexOf(current) + 1) % themeOrder.length];
+  const following = nextTheme;
   function apply() {
-    // Read the stored value at click time: two fast clicks must advance twice, not repeat one step.
+    // Read the applied value at click time: two fast clicks advance twice.
     const next = following(storedTheme());
-    try {
-      if (next === 'system') window.localStorage.removeItem('theme');
-      else window.localStorage.setItem('theme', next);
-    } catch { /* The attribute below still switches the theme for this visit. */ }
-    if (next === 'system') delete document.documentElement.dataset.theme;
-    else document.documentElement.dataset.theme = next;
+    applyTheme(document.documentElement, () => window.localStorage, next);
     window.dispatchEvent(new Event(themeEvent));
   }
-  return <button className="icon-button" onClick={apply} aria-label={`Theme: ${theme}. Switch to ${following(theme)}.`} title={`Theme: ${theme}`}>
+  return <button className="icon-button" onClick={apply} aria-label={t(`Theme: ${theme}. Switch to ${following(theme)}.`, `Darstellung: ${{system:"System",light:"Hell",dark:"Dunkel"}[theme]}. Wechsel zu ${{system:"System",light:"Hell",dark:"Dunkel"}[following(theme)]}.`)} title={t(`Theme: ${theme}`, `Darstellung: ${{system:"System",light:"Hell",dark:"Dunkel"}[theme]}`)}>
     {theme === 'light' ? <Sun aria-hidden="true" /> : theme === 'dark' ? <Moon aria-hidden="true" /> : <Monitor aria-hidden="true" />}
   </button>;
 }
 
 /** Copies the current address, which carries the contract, scenario, view and selected clause. */
 export function CopyLink() {
+  const { t } = useLocale();
   const [copied, setCopied] = useState(false);
   async function copy() {
     try {
@@ -118,10 +117,10 @@ export function CopyLink() {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
-      window.prompt('Copy this link', window.location.href);
+      window.prompt(t('Copy this link', 'Diesen Link kopieren'), window.location.href);
     }
   }
-  return <button className="button button-quiet" onClick={() => void copy()}>{copied ? <Check aria-hidden="true" /> : <Link2 aria-hidden="true" />}<span aria-live="polite">{copied ? 'Link copied' : 'Copy link'}</span></button>;
+  return <button className="button button-quiet" onClick={() => void copy()}>{copied ? <Check aria-hidden="true" /> : <Link2 aria-hidden="true" />}<span aria-live="polite">{copied ? t('Link copied', 'Link kopiert') : t('Copy link', 'Link kopieren')}</span></button>;
 }
 
 export function download(name: string, text: string, type = 'application/json') {

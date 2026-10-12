@@ -1,50 +1,21 @@
 import { ArrowUpRight, Braces } from 'lucide-react';
 import benchmark from '@/lib/benchmark';
 import type { BenchmarkCase, Evaluation } from '@/lib/evaluation';
-import { clauseLabel, referenceReleaseReady } from '@/lib/inspection';
+import { referenceReleaseReady } from '@/lib/inspection';
 import { download } from './primitives';
-
-const formulas: { term: string; formula: string; note: string }[] = [
-  { term: 'Risk recall', formula: 'reference risks the review flagged ÷ reference risks', note: 'Measures missed risks.' },
-  { term: 'Severity accuracy', formula: 'shared risks with the reference severity ÷ shared risks', note: 'Only risks both sides flagged count. Where a clause carries several flags, the first severity is graded. N/A when no risk is shared.' },
-  { term: 'Risk precision', formula: 'flagged clauses the reference treats as risks ÷ flagged clauses', note: 'Penalizes extra flags. N/A when the review flags nothing; the exported JSON keeps the Python value of 1.0.' },
-  { term: 'Citation grounding', formula: 'quotations located in the contract ÷ quotations', note: 'Matching ignores case, punctuation and whitespace. N/A when no quotation is supplied.' },
-  { term: 'Clause F1', formula: 'harmonic mean of clause precision and clause recall', note: 'Clause names resolve through the reference aliases first.' },
-  { term: 'Span coverage', formula: 'reference clauses containing a located quotation ÷ reference clauses', note: 'A clause runs from its reference anchor to the next anchor in the contract.' },
-];
-
+import { metrics } from './scores';
+import { useLocale } from './locale';
 export function Method({ item, run }: { item: BenchmarkCase; run: Evaluation }) {
-  const evidence = benchmark.referenceEvidence;
-  const ready = referenceReleaseReady(evidence);
-  return <div className="method">
-    <div className="method-grid">
-      <section className="panel"><h2>Three synthetic contracts</h2><p>The cases test clause identification, risk identification, severity and quotation grounding. The fixtures contain deliberate errors.</p><p>Results describe fixture behavior on a small public reference set, not a blinded holdout. They are not a ranking of live models or a certification of legal reliability.</p></section>
-      <section className="panel"><h2>{ready ? 'v2 evidence frozen, scores still on v1 answers' : 'Scored on v1 answers, v2 pending'}</h2><p>The gate tracks the v2 candidate reference answers. The scores on this page use the v1 answers. Evidence stage: <strong>{clauseLabel(evidence.stage)}</strong>. Final release eligible: <strong>{ready ? 'yes' : 'no'}</strong>.</p><p>{evidence.missing.length ? `Still required: ${evidence.missing.map(clauseLabel).join(', ')}.` : 'No missing artifacts are recorded.'} {evidence.errors.length ? `Recorded errors: ${evidence.errors.join('; ')}.` : ''}</p><p>{evidence.limitation} This web edition remains on the v1 scorer until the v2 scoring export and parity checks are complete.</p></section>
-      <section className="panel"><h2>Read the dimensions together</h2><p>Risk precision penalizes extra flags; recall measures missed risks. Severity accuracy considers only jointly identified risks.</p><p>Grounding checks quotation matches. Span coverage measures where quotations land. Neither proves legal reasoning.</p></section>
-      <section className="panel"><h2>Reproducible and bounded</h2><p>The hosted evaluator recomputes scores from fixed synthetic inputs. Its scoring port is checked against Python outputs. Scenarios remove evidence, remove risks or introduce a conflicting severity.</p><p>No live model is called. This public edition has no document uploads, paid API calls or shared user histories.</p></section>
-    </div>
-
-    <section className="panel formulas" aria-labelledby="formulas-heading">
-      <div className="panel-heading"><div><h2 id="formulas-heading">How each score is computed</h2><p>Definitions follow the Python <code>score_review</code> function that this port reproduces.</p></div></div>
-      <dl>{formulas.map(entry => <div key={entry.term}><dt>{entry.term}</dt><dd><code>{entry.formula}</code><span>{entry.note}</span></dd></div>)}</dl>
-    </section>
-
-    <section className="panel provenance" aria-labelledby="provenance-heading">
-      <div className="panel-heading"><div><h2 id="provenance-heading">Current result provenance</h2><p>Hashes identify the original input files. The scenario and full evaluated review travel with the exported result.</p></div>
-        <div className="provenance-actions">
-          <a className="button button-quiet" href={benchmark.repository} target="_blank" rel="noreferrer">Harness source<ArrowUpRight aria-hidden="true" /></a>
-          <button className="button button-quiet" onClick={() => download(`${item.id}-${run.scenario}-evaluation.json`, JSON.stringify(run, null, 2))}><Braces />Evaluation JSON</button>
-        </div>
-      </div>
-      <dl>
-        <dt>Source commit</dt><dd><a href={`${benchmark.repository}/tree/${benchmark.sourceCommit}`} target="_blank" rel="noreferrer">{benchmark.sourceCommit}</a></dd>
-        <dt>Source contract</dt><dd>{item.hashes.source}</dd>
-        <dt>Reference answers (v1, scored)</dt><dd>{item.hashes.gold}</dd>
-        <dt>v2 candidate answers</dt><dd>{evidence.cases.find(entry => entry.case === item.id)?.candidateSha256 ?? 'Not recorded'}</dd>
-        <dt>Original review fixture</dt><dd>{item.hashes.review}</dd>
-        <dt>Evaluator</dt><dd>{run.provenance.evaluator}</dd>
-        <dt>Adapter</dt><dd>{run.provenance.adapter}</dd>
-      </dl>
-    </section>
-  </div>;
+  const { t, label, metricTitle, metricDefinition } = useLocale();
+  const evidence = benchmark.referenceEvidence, ready = referenceReleaseReady(evidence);
+  return <div className="method"><div className="method-grid">
+    <section className="panel"><h2>{t('Three synthetic contracts', 'Drei synthetische Verträge')}</h2><p>{t('The fixed reviews contain deliberate errors in clause identification, risk identification, severity and quotations.', 'Die festen Prüfungen enthalten absichtliche Fehler bei Klauselerkennung, Risiken, Schweregraden und Zitaten.')}</p><p>{t('This small public reference set is not a blind holdout, a live-model ranking or a certification of legal reliability.', 'Dieser kleine öffentliche Referenzsatz ist kein verdeckter Testsatz, kein Modellranking und kein Nachweis rechtlicher Zuverlässigkeit.')}</p></section>
+    <section className="panel"><h2>{t('v1 scores; separate v2 evidence gate', 'v1-Bewertung; gesonderter v2-Nachweisstand')}</h2><p>{t('The scores use v1 reference answers. The gate below describes only the v2 candidates.', 'Die Bewertung verwendet v1-Referenzantworten. Der folgende Nachweisstand betrifft ausschließlich die v2-Kandidaten.')}</p><p>{t('Evidence stage', 'Nachweisstand')}: <strong>{label(evidence.stage)}</strong>. {t('Final reference release eligible', 'Referenzstand zur Freigabe geeignet')}: <strong>{ready ? t('yes','ja') : t('no','nein')}</strong>.</p><p>{evidence.missing.length ? `${t('Still required', 'Noch erforderlich')}: ${evidence.missing.map(label).join(', ')}.` : t('No missing evidence recorded.', 'Keine fehlenden Nachweise verzeichnet.')}</p>{evidence.errors.length > 0 && <p>{t('Original diagnostic', 'Originaldiagnose')}: <span lang="en">{evidence.errors.join('; ')}</span></p>}<p>{t('Hashes establish file identity, not reviewer independence or legal correctness. v2 scoring requires a separate export and parity verification.', 'Hashes belegen die Dateiidentität, nicht die Unabhängigkeit der Prüfer oder die rechtliche Richtigkeit. Eine v2-Bewertung erfordert einen eigenen Export und verifizierte Bewertungsparität.')}</p></section>
+    <section className="panel"><h2>{t('Read the dimensions together', 'Kennzahlen gemeinsam lesen')}</h2><p>{t('Precision penalizes extra flags; recall measures missed risks. Severity accuracy covers only risks identified by both sides.', 'Präzision berücksichtigt zusätzliche Hinweise; Abdeckung erfasst übersehene Risiken. Schweregradtreffer beziehen sich nur auf beiderseits erkannte Risiken.')}</p><p>{t('A located quotation proves neither sound reasoning nor a correct amendment.', 'Ein gefundenes Zitat belegt weder tragfähige Argumentation noch eine richtige Vertragsänderung.')}</p></section>
+    <section className="panel"><h2>{t('Reproducible and bounded', 'Reproduzierbar und begrenzt')}</h2><p>{t('The TypeScript scorer is checked against Python parity vectors. No live model, uploads, payments or shared history are involved.', 'Die TypeScript-Bewertung wird mit Python-Testvektoren abgeglichen. Es gibt keine Live-Modellaufrufe, Uploads, Zahlungen oder gemeinsame Historie.')}</p><p>{t('Interface language does not change source documents, reference judgments or scores. Original English content is labeled.', 'Die Oberflächensprache verändert weder Quelldokumente noch Referenzurteile oder Bewertungen. Englischer Originalinhalt ist gekennzeichnet.')}</p></section>
+  </div>
+  <section className="panel formulas" aria-labelledby="formulas-heading"><div className="panel-heading"><h2 id="formulas-heading">{t('How each score is computed', 'Berechnung der Kennzahlen')}</h2></div><dl>{metrics.map(metric => <div key={metric.key}><dt>{metricTitle(metric.key)}</dt><dd>{metricDefinition(metric.key)}</dd></div>)}<div><dt>{t('Span coverage', 'Textabdeckung')}</dt><dd>{t('Reference clauses containing a located quotation ÷ reference clauses. This measures quotation placement.', 'Referenzklauseln mit gefundenem Zitat ÷ Referenzklauseln. Gemessen wird die Platzierung der Zitate.')}</dd></div></dl></section>
+  <section className="panel provenance" aria-labelledby="provenance-heading"><div className="panel-heading"><div><h2 id="provenance-heading">{t('Current result provenance', 'Herkunft des aktuellen Ergebnisses')}</h2><p>{t('Hashes identify the original inputs; exports include the evaluated review and scenario.', 'Hashes identifizieren die Originaleingaben; Exporte enthalten die ausgewertete Prüfung und das Szenario.')}</p></div><div className="provenance-actions"><a className="button button-quiet" href={benchmark.repository} target="_blank" rel="noreferrer">{t('Python source', 'Python-Quellcode')}<ArrowUpRight aria-hidden="true" /></a><button className="button button-quiet" onClick={() => download(`${item.id}-${run.scenario}-evaluation.json`, JSON.stringify(run, null, 2))}><Braces aria-hidden="true" />{t('Evaluation JSON', 'Bewertungs-JSON')}</button></div></div><dl>
+  <dt>{t('Source commit', 'Quellstand')}</dt><dd><a href={`${benchmark.repository}/tree/${benchmark.sourceCommit}`} target="_blank" rel="noreferrer">{benchmark.sourceCommit}</a></dd>
+  <dt>{t('Source contract', 'Quellvertrag')}</dt><dd>{item.hashes.source}</dd><dt>{t('v1 reference answers, scored', 'v1-Referenzantworten, bewertet')}</dt><dd>{item.hashes.gold}</dd><dt>{t('v2 candidate answers', 'v2-Kandidatenantworten')}</dt><dd>{evidence.cases.find(entry => entry.case === item.id)?.candidateSha256 ?? t('Not recorded','Nicht erfasst')}</dd><dt>{t('Original review fixture', 'Ursprüngliche Beispielprüfung')}</dt><dd>{item.hashes.review}</dd><dt>{t('Evaluator', 'Bewertungsverfahren')}</dt><dd>{run.provenance.evaluator}</dd><dt>Adapter</dt><dd>{run.provenance.adapter}</dd></dl></section></div>;
 }

@@ -1,3 +1,5 @@
+import { caseTitle, label, metricTitle, severityText, scenarioTitle, statusText, type Locale } from './i18n.ts';
+import { localizedReadout } from './presentation.ts';
 import type benchmark from './benchmark';
 import type { BenchmarkCase, Evaluation } from './evaluation';
 import { locateSource, scenarios } from './scoring.ts';
@@ -9,7 +11,7 @@ export type ReportContext = Pick<typeof benchmark, 'repository' | 'referenceEvid
 const percent = (value: number) => `${(value * 100).toFixed(1)}%`;
 const findingText = (finding: RiskFinding) => finding.gap < 0 ? `${finding.status} (under-rated)` : finding.gap > 0 ? `${finding.status} (over-rated)` : finding.status;
 
-export function renderReport(item: BenchmarkCase, run: Evaluation, context: ReportContext): string {
+function englishReport(item: BenchmarkCase, run: Evaluation, context: ReportContext): string {
   const scores = run.scores;
   const canonical = (key: string) => canonicalClause(item.gold.clause_aliases, key);
   const evidence = context.referenceEvidence;
@@ -98,5 +100,36 @@ export function renderReport(item: BenchmarkCase, run: Evaluation, context: Repo
     `- Missing evidence: ${evidence.missing.join(', ') || 'none'}`,
     '',
     'Hashes identify the original exported inputs. They do not prove reviewer independence, adjudication, or legal accuracy.');
+  return `${lines.join('\n')}\n`;
+}
+
+/** Keep original English evidence byte-for-byte; only the presentation is translated. */
+export function renderReport(item: BenchmarkCase, run: Evaluation, context: ReportContext, locale: Locale = 'en'): string {
+  if (locale === 'en') return englishReport(item, run, context);
+  const scores = run.scores, evidence = context.referenceEvidence;
+  const canonical = (key: string) => canonicalClause(item.gold.clause_aliases, key);
+  const candidate = evidence.cases.find(entry => entry.case === item.id);
+  const lines = ['# Contract Review Evidence Lab', '',
+    `Vertrag: ${caseTitle(locale, item.id, item.title)}`, `Szenario: ${scenarioTitle(locale, run.scenario)}`,
+    `Auswertung: ${run.scoredAt || 'Referenz-Snapshot'}`, 'Bewertung: v1-Referenzantworten; v2-Nachweisstand gesondert ausgewiesen.',
+    `Prüfperspektive (englische Originalvorgabe): ${item.gold.review_context?.party || 'Nicht angegeben'}`, '',
+    'Dieser Bericht bewertet eine feste synthetische Prüfung. Es wurde kein Live-Modell aufgerufen. Gefundene Zitate belegen keine rechtliche Richtigkeit. Alle Zitate, Referenzbegründungen und Prüfungsausgaben bleiben im englischen Original erhalten.', '',
+    '## Zusammenfassung', '', ...localizedReadout(item.gold, run.review, scores, locale).map(point => `- ${point.title}. ${point.detail}`), '', '## Kennzahlen', '',
+    ...(['clause_f1', 'risk_precision', 'risk_recall', 'risk_severity_accuracy', 'citation_grounding'] as const).map(key => `- ${metricTitle(locale, key)}: ${displayMetric(key, scores, run.review).value}`),
+    `- Gefundene Zitate: ${scores.citation_grounded} von ${scores.citation_total}`, `- Textabdeckung: ${percent(scores.span_coverage)}`, `- Unbelegte Zitate: ${scores.hallucination_count}`, `- Übersehene Referenzrisiken: ${scores.risk_missed.length}`, `- Zusätzliche Risikohinweise: ${scores.risk_false_positives.length}`, `- Widersprüchliche Schweregrade: ${scores.risk_conflicting_flags.length}`, '',
+    'N/A bedeutet, dass für diese Kennzahl keine Beobachtungen vorliegen. JSON enthält weiterhin die mit Python kompatiblen numerischen Werte.', '', '## Klauselabdeckung'];
+  for (const clause of clauseFindings(item.gold, run.review)) lines.push(`- ${label(locale, clause.key)}: ${statusText(locale, clause.status)}; Referenz: ${clause.expected ? 'ja' : 'nein'}; Originalbezeichnung: ${clause.reportedAs.join(', ') || 'keine'}${clause.abstentions.length ? `; Enthaltung (englisches Original): ${clause.abstentions.map(value => value.reason).join(' | ')}` : ''}`);
+  lines.push('', '## Feststellungen und Belege');
+  for (const finding of riskFindings(item.gold, run.review, scores)) {
+    lines.push('', `### ${label(locale, finding.key)}`, '', `- Feststellung: ${statusText(locale, finding.status)}${finding.gap < 0 ? ' (unterschätzt)' : finding.gap > 0 ? ' (überschätzt)' : ''}`, `- Referenzschweregrad: ${severityText(locale, finding.expected)}`, `- Schweregrad der Prüfung: ${finding.severities.map(value => severityText(locale, value)).join(', ') || 'keiner'}`, `- Referenzbegründung (englisches Original): ${item.gold.severity_rationale[finding.key] || 'Kein Referenzrisiko.'}`);
+    const flags = run.review.risk_flags.filter(flag => canonical(flag.clause_type) === finding.key);
+    if (flags.length) for (const flag of flags) lines.push(`- Begründung der Prüfung (englisches Original, ${severityText(locale, flag.severity)}): ${flag.rationale}`);
+    else lines.push('- Die Prüfung hat keinen Risikohinweis abgegeben.');
+    lines.push(`- Zugeordnete Zitate: ${run.review.citations.filter(citation => canonical(citation.clause_type) === finding.key).length} (siehe Zitatverzeichnis).`);
+  }
+  lines.push('', '## Zitatverzeichnis', '', `Alle ${run.review.citations.length} Zitate der Prüfung im unveränderten englischen Original.`);
+  if (!run.review.citations.length) lines.push('', 'Es wurden keine Zitate angegeben.');
+  for (const [index, citation] of run.review.citations.entries()) lines.push('', `### ${index + 1}. ${label(locale, canonical(citation.clause_type))}`, '', `Status: ${locateSource(item.source, citation.quote) !== null ? 'Im Vertrag gefunden' : 'Nicht im Vertrag gefunden'}`, '', ...citation.quote.split('\n').map(line => `> ${line}`));
+  lines.push('', '## Herkunft', '', `- Harness-Repository: ${context.repository}`, `- Harness-Quellstand: ${run.provenance.sourceCommit}`, `- Quellvertrag SHA-256: ${run.provenance.hashes.source}`, `- Bewertete v1-Referenzantworten SHA-256: ${run.provenance.hashes.gold}`, `- Ursprüngliche Beispielprüfung SHA-256: ${run.provenance.hashes.review}`, `- Bewertungsverfahren: ${run.provenance.evaluator}`, `- Adapter: ${run.provenance.adapter}`, '', '## Nachweisstand der v2-Kandidaten', '', 'Dieser Nachweisstand betrifft die v2-Kandidaten, nicht die oben bewerteten v1-Referenzantworten.', '', `- v2-Kandidaten SHA-256: ${candidate?.candidateSha256 || 'nicht erfasst'}`, `- Nachweisstand: ${label(locale, evidence.stage)}`, `- Referenzstand zur Freigabe geeignet: ${evidence.finalReleaseEligible ? 'ja' : 'nein'}`, `- Fehlende Nachweise: ${evidence.missing.map(key => label(locale, key)).join(', ') || 'keine'}`, '', 'Hashes belegen die Identität der Originaleingaben. Sie beweisen weder die Unabhängigkeit der Prüfer noch eine Abstimmung oder rechtliche Richtigkeit.');
   return `${lines.join('\n')}\n`;
 }

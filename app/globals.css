@@ -1,6 +1,13 @@
 @import "tailwindcss";
+@import "../vendor/legal-ai-design-system/tokens.css";
+@import "../vendor/legal-ai-design-system/controls.css";
 @import "tw-animate-css";
 @import "../vendor/shadcn-tailwind-4.13.0.css";
+
+/* Explicit asset paths are required by the Sites/Tailwind import pipeline. */
+@font-face { font-family:"Geist"; font-style:normal; font-weight:100 900; font-display:swap; src:url("../vendor/legal-ai-design-system/fonts/geist-latin.woff2") format("woff2"); }
+@font-face { font-family:"Newsreader"; font-style:normal; font-weight:400 600; font-display:swap; src:url("../vendor/legal-ai-design-system/fonts/newsreader-latin.woff2") format("woff2"); }
+@font-face { font-family:"Newsreader"; font-style:italic; font-weight:400 600; font-display:swap; src:url("../vendor/legal-ai-design-system/fonts/newsreader-latin-italic.woff2") format("woff2"); }
 
 @utility scrollbar-thin {
   scrollbar-width: thin;
@@ -39,33 +46,33 @@
 :root {
   color-scheme: light dark;
 
-  --desk: light-dark(#eef1f4, #0b131b);
-  --paper: light-dark(#ffffff, #141e28);
-  --sunken: light-dark(#f4f6f8, #1a2632);
-  --ink: light-dark(#14212c, #e4ebf0);
-  --ink-2: light-dark(#3f5262, #b9c5ce);
-  --ink-3: light-dark(#566876, #93a3af);
-  --line: light-dark(#d3dbe2, #2b3b48);
-  --line-2: light-dark(#e5eaee, #223140);
+  --desk: var(--legal-paper);
+  --paper: var(--legal-surface);
+  --sunken: var(--legal-sunken);
+  --ink: var(--legal-ink);
+  --ink-2: var(--legal-ink-muted);
+  --ink-3: var(--legal-ink-subtle);
+  --line: var(--legal-line-strong);
+  --line-2: var(--legal-line);
   --navy: light-dark(#11293b, #08111a);
-  --brand: light-dark(#136e70, #46b0a9);
-  --brand-ink: light-dark(#0e5a5c, #7fd1ca);
-  --brand-soft: light-dark(#e2f0ef, #14302f);
-  --on-brand: light-dark(#ffffff, #08111a);
-  --focus: light-dark(#1b7686, #6cc9c1);
-  --ok: light-dark(#1b6652, #74cfaa);
-  --exposure: light-dark(#a3271f, #f49c90);
-  --exposure-soft: light-dark(#fbebe9, #371c19);
-  --exposure-line: light-dark(#e6b3ad, #7a3a33);
-  --alarm: light-dark(#7c4f08, #e9b865);
-  --alarm-soft: light-dark(#fbf1dc, #2f2610);
-  --alarm-line: light-dark(#e0c38c, #6b5420);
-  --note: light-dark(#345a7c, #9fc4e6);
-  --mark: light-dark(#fff0bf, #3d3310);
-  --mark-own: light-dark(#ffdc73, #6e5813);
-  --mark-ring: light-dark(#876300, #e9c046);
+  --brand: var(--legal-accent);
+  --brand-ink: var(--legal-accent-ink);
+  --brand-soft: var(--legal-accent-soft);
+  --on-brand: var(--legal-on-accent);
+  --focus: var(--legal-focus);
+  --ok: var(--legal-accent-ink);
+  --exposure: var(--legal-danger);
+  --exposure-soft: var(--legal-danger-soft);
+  --exposure-line: var(--legal-danger-line);
+  --alarm: var(--legal-warning);
+  --alarm-soft: var(--legal-warning-soft);
+  --alarm-line: var(--legal-warning-line);
+  --note: var(--legal-info);
+  --mark: var(--legal-mark);
+  --mark-own: var(--legal-mark-own);
+  --mark-ring: var(--legal-mark-ring);
   --external: light-dark(#d6e6fb, #1f3553);
-  --shadow: 0 1px 2px light-dark(rgb(17 41 59 / 7%), rgb(0 0 0 / 35%));
+  --shadow: var(--legal-shadow);
 
   --background: var(--desk);
   --foreground: var(--ink);
@@ -140,10 +147,9 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-serif: "Iowan Old Style", Charter, "Bitstream Charter", Georgia, "Times New Roman", serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
+  --font-sans: var(--legal-font-sans);
+  --font-serif: var(--legal-font-display);
+  --font-mono: var(--legal-font-mono);
 }
 
 /* ---------- Base ---------- */
@@ -268,7 +274,7 @@ svg { flex-shrink: 0; }
 /* ---------- Case ---------- */
 
 .case { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin: 24px 0 14px; }
-.case h1 { margin: 0; font-family: var(--font-serif); font-size: clamp(27px, 2.6vw, 34px); font-weight: 500; line-height: 1.15; letter-spacing: -0.01em; }
+.case h2 { margin: 0; font-family: var(--font-serif); font-size: clamp(27px, 2.6vw, 34px); font-weight: 500; line-height: 1.15; letter-spacing: -0.01em; }
 .case-scenario { margin: 2px 0 8px; color: var(--ink-3); font-size: 14px; font-weight: 600; }
 .case-context { display: flex; flex-wrap: wrap; gap: 3px 22px; max-width: 880px; margin: 0; font-size: 13.5px; }
 .case-context div { display: flex; gap: 6px; }
@@ -521,4 +527,115 @@ mark.is-active .mark-tag { background: var(--mark-ring); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+/* Product-experience foundation. Original evidence remains visually distinct. */
+.language-switch { display:flex; gap:3px; }
+.language-switch button { min-height:36px; min-width:36px; background:none; border:1px solid transparent; border-radius:5px; color:#e6eef3; font-size:12px; }
+.language-switch button[aria-pressed=true] { border-color:#9edcd5; color:#fff; }
+.intro-line { display:flex; align-items:center; justify-content:space-between; gap:16px; margin:20px 0; }
+.intro-line p { max-width:70ch; margin:0; color:var(--ink-2); }
+.guided-intro { margin:28px 0 24px; padding:clamp(22px,4vw,46px); background:var(--paper); border:1px solid var(--line-2); border-radius:var(--legal-radius-card); max-width:1040px; }
+.eyebrow { color:var(--brand-ink); font-size:12px; font-weight:650; letter-spacing:.08em; text-transform:uppercase; }
+.guided-intro h1 { max-width:22ch; margin:8px 0 18px; font-family:var(--font-serif); font-size:clamp(30px,4vw,49px); line-height:1.12; font-weight:500; }
+.guided-intro > p:not(.eyebrow) { max-width:78ch; }
+.guided-intro blockquote { margin:20px 0 10px; border-left:3px solid var(--brand); padding:8px 18px; font-family:var(--font-serif); font-size:21px; }
+.source-language { color:var(--ink-3); font-size:12px; line-height:1.45; }
+.guided-intro .button-row { margin-top:20px; }
+.review-context { margin-top:10px; font-size:13px; }
+.review-context summary, .metrics-disclosure > summary, .metric-definition > summary { cursor:pointer; color:var(--brand-ink); font-weight:600; }
+.review-context[open] summary { margin-bottom:12px; }
+.result-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px 24px; padding:18px 22px; border:1px solid var(--line-2); border-radius:var(--legal-radius-card); background:var(--paper); }
+.result-summary > div { display:flex; align-items:center; gap:14px; }
+.result-summary strong { font-family:var(--font-serif); font-size:34px; font-weight:500; }
+.result-summary span { color:var(--ink-2); font-size:14px; max-width:26ch; }
+.result-summary p { grid-column:1/-1; margin:0; font-size:12.5px; color:var(--ink-3); }
+.metrics-disclosure { margin:14px 0; }
+.metrics-disclosure > summary { padding:6px 0; min-height:32px; font-size:14px; }
+.metrics-disclosure[open] > summary { margin-bottom:8px; }
+.metric-definition { font-size:12px; margin:5px 0; }
+.metric-definition p { max-width:45ch; }
+.mobile-steps { display:none; }
+.contract-bar small { display:block; color:var(--ink-3); font-size:11.5px; font-family:var(--font-sans); font-weight:400; }
+.edition-warning { background:var(--alarm-soft); color:var(--alarm); border:1px solid var(--alarm-line); padding:14px; border-radius:10px; }
+.print-report { max-width:860px; margin:0 auto; padding:32px; background:var(--paper); overflow-wrap:anywhere; }
+.print-report article { font-size:14px; line-height:1.6; }
+.print-report h1, .print-report h2, .print-report h3 { font-family:var(--font-serif); font-weight:500; line-height:1.25; }
+.print-report h1 { font-size:34px; margin:32px 0 20px; }
+.print-report h2 { margin:30px 0 12px; font-size:25px; border-top:1px solid var(--line-2); padding-top:16px; }
+.print-report h3 { margin:20px 0 10px; font-size:20px; }
+.print-report .report-line { margin:5px 0; }
+.print-report blockquote { margin:12px 0; border-left:3px solid var(--brand); padding:8px 16px; font-family:var(--font-serif); }
+.print-controls { display:flex; flex-wrap:wrap; gap:10px; }
+.print-controls p { flex-basis:100%; color:var(--ink-2); font-size:13px; }
+.candidate-language, .candidate-downloads { display:flex; flex-wrap:wrap; gap:12px; margin:18px 0; }
+.candidate-language a, .candidate-downloads a { color:var(--brand-ink); text-decoration:underline; text-underline-offset:3px; min-height:32px; }
+.candidate-language [aria-current=page] { font-weight:700; }
+.candidate-summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; padding:18px; background:var(--sunken); border:1px solid var(--line-2); border-radius:10px; }
+.candidate-summary dd { margin:4px 0 0; font-size:27px; font-family:var(--font-serif); }
+.candidate-summary dt { font-size:13px; color:var(--ink-2); }
+.candidate-finding { margin:20px 0; padding:4px 20px 20px; border:1px solid var(--line-2); border-radius:10px; }
+.candidate-finding h3 code { font-family:var(--font-mono); font-size:14px; }
+.candidate-checks > div { display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px 12px; margin:6px 0; }
+.candidate-checks dd { margin:0; font-weight:600; }
+.candidate-valid { color:var(--brand-ink); }
+.candidate-invalid { color:var(--exposure); }
+.candidate-report summary { color:var(--brand-ink); cursor:pointer; min-height:36px; font-weight:600; }
+.candidate-provenance { display:grid; grid-template-columns:minmax(100px,1fr) minmax(0,2fr); gap:10px 16px; }
+.candidate-provenance dt { color:var(--ink-2); }
+.candidate-provenance dd { margin:0; font-family:var(--font-mono); font-size:12px; }
+.candidate-source pre { white-space:pre-wrap; font-size:12px; }
+@media (max-width:999px) {
+  .mobile-steps { display:flex; gap:4px; position:sticky; top:0; z-index:3; padding:8px 0; background:var(--desk); }
+  .mobile-steps button { flex:1; min-height:44px; border:1px solid var(--line); border-radius:8px; color:var(--ink-2); background:var(--paper); font-size:13px; }
+  .mobile-steps button[aria-current=step] { color:var(--brand-ink); border-color:var(--brand); background:var(--brand-soft); font-weight:650; }
+  .sheet[data-panel=list] > :not(.sheet-list), .sheet[data-panel=detail] > :not(.sheet-detail), .sheet[data-panel=contract] > :not(.sheet-contract) { display:none; }
+  .sheet > * { scroll-margin-top:70px; min-height:220px; }
+  .sheet[data-panel=contract] .contract-body { height:65vh; max-height:none; overflow-y:auto; }
+  .sheet-detail, .sheet-list, .sheet-contract { border-radius:10px; border:0; }
+  .result-summary { gap:12px; }
+  .case-actions { align-items:flex-start; }
+}
+@media (max-width:640px) {
+  .topbar { height:auto; min-height:60px; flex-wrap:wrap; gap:8px; padding-block:10px; }
+  .topbar-right { gap:4px; font-size:12px; }
+  .topbar-right a { display:none; }
+  .language-switch button { min-height:44px; }
+  .intro-line { align-items:flex-start; flex-direction:column; gap:4px; font-size:14px; }
+  .guided-intro { margin:18px 0; padding:22px; }
+  .result-summary { grid-template-columns:1fr; padding:14px 18px; }
+  .result-summary strong { font-size:28px; min-width:32px; }
+  .result-summary span { max-width:none; }
+  .case-actions .button-row { gap:6px; }
+  .case-actions .button { font-size:12px; padding-inline:10px; }
+  .print-report { padding:20px; }
+  .candidate-summary, .candidate-provenance { grid-template-columns:1fr; }
+  .candidate-finding { padding-inline:14px; }
+}
+@media print {
+  @page { size:A4; margin:17mm 16mm; }
+  html, body { background:white; color:#1c1a17; }
+  .print-controls { display:none !important; }
+  .candidate-language, .candidate-downloads { display:none !important; }
+  .candidate-finding { break-inside:avoid; }
+  .print-report { width:auto; max-width:none; padding:0; margin:0; background:white; color:#1c1a17; }
+  .print-report article { font-size:10pt; line-height:1.5; }
+  .print-report h1 { font-size:23pt; margin-top:0; }
+  .print-report h2 { font-size:17pt; }
+  .print-report h3 { font-size:13pt; }
+  .print-report h1, .print-report h2, .print-report h3 { break-after:avoid; }
+  .print-report p, .print-report blockquote { orphans:3; widows:3; }
+  .print-report blockquote { break-inside:avoid; }
+  .print-report article > section { break-inside:avoid; }
+  .print-report article > section:has(> h2:only-child) { break-after:avoid; }
+}
+
+/* Candidate experiment viewer (/candidates/experiment). A cell stays on one line, so a wide table
+   scrolls inside its labelled region and a hash stays readable. Print cannot scroll: there the
+   region opens, headers and cells wrap and the type shrinks so no column is cut off. */
+.candidate-table td, .candidate-table tbody th { white-space:nowrap; font-variant-numeric:tabular-nums; }
+@media print {
+  .candidate-report .table-scroll { overflow:visible; }
+  .candidate-table { font-size:7.5pt; }
+  .candidate-table thead th, .candidate-table tbody th, .candidate-table td { white-space:normal; padding:3px 4px; }
 }

@@ -29,7 +29,7 @@ export function snapshot(caseId: string, scenario: Scenario = 'baseline'): Evalu
 export const catalog: Catalog = {
   cases: benchmark.cases.map(item => {
     const canonical = (key: string) => canonicalClause(item.gold.clause_aliases, key);
-    return {id: item.id, keys: [...new Set([...item.gold.clause_types, ...Object.keys(item.gold.risk_flags),
+    return {id: item.id, quotations: Object.fromEntries(Object.keys(scenarios).map(scenario => [scenario, applyScenario(item.review, scenario as Scenario).citations.map(citation => canonical(citation.clause_type))])), keys: [...new Set([...item.gold.clause_types, ...Object.keys(item.gold.risk_flags),
       ...item.review.clauses.map(c => canonical(c.clause_type)), ...item.review.risk_flags.map(f => canonical(f.clause_type)),
       ...item.review.citations.map(c => canonical(c.clause_type))])]};
   }),
