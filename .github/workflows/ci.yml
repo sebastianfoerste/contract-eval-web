@@ -1,0 +1,34 @@
+name: CI
+
+# Runs on the read-only GitHub mirror. Deployment stays with the Sites host, so the
+# Sites build and the local Worker API check (npm run check) are not repeated here.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm run install:ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run test:types
+
+      - name: Unit and parity tests
+        run: npm test
