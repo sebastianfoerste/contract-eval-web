@@ -1,0 +1,17 @@
+{
+  "schema": "evidence-lab.candidate-experiment-bundle.v1",
+  "experimentId": "replay-dry-run",
+  "origin": "contract-review-eval-harness/candidates/mycounsel/experiments/replay-dry-run",
+  "harnessHead": "f7b0fd714ddbba4531d971020f46b7b69c5c3544",
+  "harnessWorkingTreeDirty": true,
+  "harnessFiles": {
+    "src/contract_eval/candidate_experiment.py": "06c185effb3ffd4e858e91e5829f759ce61546704fc4373458468913211e5c50",
+    "src/contract_eval/candidates.py": "02cd145d1896e39a831f640d8131097da2c5f5311d70380221b3f75064ed7e68"
+  },
+  "files": {
+    "attempts/baseline/commercial-base-r1.json": "81f846afdef1406fdf6e0918bd962fb95d0e2cb1fd0afc132d3a0f821bfadcb4",
+    "experiment.json": "eaf56ebb3b21fa52af9357064291f390ca6ee8745298c6b6e35b907a936a037d",
+    "report.json": "8eac1a218678af4f369cc518cc230c80b58fba552ae71dab6360dd6cb5f0fe30"
+  },
+  "scope": "One preregistered REPLAY experiment over the synthetic My Counsel corpus: 1 recorded attempt file(s) copied, 11 planned attempt file(s) not run, 0 reference file(s). The recorded attempts are hand-authored fixtures; no model was called and no model result is claimed. A file hash binds bytes; it is not an independent attestation."
+}
