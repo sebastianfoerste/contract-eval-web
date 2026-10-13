@@ -1,7 +1,7 @@
 name: CI
 
-# Runs on the read-only GitHub mirror. Deployment stays with the Sites host, so the
-# Sites build and the local Worker API check (npm run check) are not repeated here.
+# Runs lint, types and Node tests on the read-only GitHub mirror. The production build
+# and the local Worker API check run locally with npm run check; nothing is deployed.
 on:
   push:
     branches: [main]
