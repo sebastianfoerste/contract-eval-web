@@ -16,14 +16,9 @@ for(const [body,type,status] of [['{','application/json',400],[JSON.stringify({c
 for (const [path, expected] of [
  ['/report?case=nda&scenario=no-evidence&lang=de','Keine Zitate angegeben'],
  ['/report?edition='+'0'.repeat(40),'Reference edition changed'],
- ['/candidates?lang=en','hand-authored REPLAY'],
- ['/candidates?lang=de','Anwendungsvalidierung: abgelehnt'],
- ['/candidates/experiment?id=replay-dry-run&lang=en','No model was called'],
- ['/candidates/experiment?id=replay-dry-run&lang=de','Es wurde kein Modell aufgerufen'],
- ['/candidates/experiment?id=unknown-experiment&lang=en','No bundled experiment at this address'],
 ]) {
  const response=await fetch(new URL(path,origin),{signal:timeout()});
  assert.equal(response.status,200);
  assert.ok((await response.text()).includes(expected),`Missing report content at ${path}`);
 }
-console.log('PASS: 12 HTTP scoring comparisons, 5 invalid-request checks and 7 report/replay/experiment route checks.');
+console.log('PASS: 12 HTTP scoring comparisons, 5 invalid-request checks and 2 report route checks.');

@@ -35,36 +35,6 @@ Then open `http://localhost:5173`. To serve the production build instead, run `n
 
 The app calls no live model, accepts no contract uploads and stores no shared user history. Session runs are held in memory, capped at 30 and cleared on refresh. Reports must be downloaded for retention. The public API accepts only allowlisted synthetic cases and scenarios, with a 1 KiB input limit.
 
-## Native My Counsel replay
-
-`/candidates?lang=en` and `/candidates?lang=de` display one separate, **hand-authored REPLAY** in My Counsel's native format. The synthetic ICT agreement is reviewed with the commercial playbook. Four retained candidates include one duplicate and one unsupported playbook reference. The application rejected the original output; the Python evaluator retains and checks every finding. The view distinguishes exact quotation checks, missing-clause structure and playbook/category validity.
-
-This is an artifact viewer, not a live model result or an additional v1 benchmark case. Issue precision/recall are unavailable without independent annotation. Native output has no severity or complete clause inventory; legal reasoning and amendment quality remain for lawyer review. The viewer makes no DORA compliance claim. Token usage and model cost are unavailable.
-
-The original run and Python score are copied to `public/candidates/`. Before rendering, the server verifies the Python score's canonical recording SHA-256, source/playbook/instruction binding, complete run metadata and ordered finding indices. File hashes and the recorded dirty working-tree state remain visible. A hash binds bytes; it is not an independent attestation. Refresh only after validating and scoring in the adjacent harness:
-
-```bash
-python3 scripts/export-candidate-replay.py
-```
-
-This bounded exporter accepts the known synthetic replay and leaves the benchmark export and scoring algorithms untouched.
-
-## Candidate experiment bundle
-
-`/candidates/experiment?id=replay-dry-run&lang=en` and `/candidates/experiment?id=replay-dry-run&lang=de` display one preregistered experiment from the Python harness: the design, every planned cell with its denominators, the reference status per cell, each arm with its prompt version, code revision and model label, the comparison table for an iteration arm, provider-reported usage where a recording states it, and every recorded attempt with its recording hash and a download.
-
-The bundled example is a zero-cost dry run. It holds one hand-authored attempt, the replay shown at `/candidates`, registered in a twelve-slot REPLAY design. Eleven attempts were not run and no model was called. It is no model result: no reference is registered, so issue precision and recall appear as N/A, and no comparison is drawn.
-
-Python owns every number. `lib/candidate-experiment.ts` scores nothing and recomputes no rate. Before rendering, the server checks that `report.json` carries the SHA-256 of `experiment.json`, that each recording has the canonical digest its report row states and sits in the slot the experiment assigns to it, that the cells cover exactly arms × playbooks × variants, and that the integer counts of each cell agree with its attempt rows. A bundle that fails a check is not displayed. The bundler hands the page parsed JSON, so the page rebuilds the experiment file text in the harness's two-space JSON form; `tests/candidate-experiment.test.mjs` proves that this text equals the file bytes. A hash binds bytes; it is not an independent attestation.
-
-Only experiments imported in `app/candidates/experiment/page.tsx` are addressable. Any other id shows a not-found state. Refresh a bundle after the harness has registered the attempts and written `report.json`:
-
-```bash
-python3 scripts/export-candidate-experiment.py replay-dry-run
-```
-
-The exporter refuses a bundle whose schemas, hashes, attempt slots or synthetic-corpus marker do not match. It also refuses a corpus path that leaves the harness, because the published experiment file would name local directories, a corpus manifest that changed since the experiment was planned, and a harness module that changed after `report.json` was written. In the last two cases, aggregate again in the harness before exporting. It copies `experiment.json`, `report.json` and the registered attempt and reference files byte for byte to `public/candidates/experiments/<id>/` and writes `provenance.json` with their hashes, the hashes of two harness modules and the harness commit. A new attempt or reference file also needs its import in the page; `npm test` fails until the page imports every bundled file.
-
 ## Reference status
 
 This release scores reviews against the v1 reference answers from the Python repository. At the recorded harness commit, the exported evidence gate for the v2 candidate answers stands at `awaiting_returns`: independent returns, written adjudication and a verified freeze are still missing. This app cannot verify or publish a v2 benchmark until those artifacts are imported and checked in the Python harness. It issues no release certificate. The Python harness version remains 0.7.0rc1.
@@ -117,7 +87,7 @@ An [independent challenge-set protocol](docs/challenge-set-protocol.md) records 
 
 The 2026-10-10 local browser check covered guided entry, DE/EN switching, keyboard finding navigation, a 390 CSS-pixel phone view, exact own/comparison quotation restoration, theme cycling, server scenario selection, reference-edition warnings and EN/DE print views. Print CSS was inspected; no saved PDF or deployment is claimed. Core text and status color pairs were checked at 4.5:1 or better in both themes. This is not a full screen-reader, browser-matrix or WCAG conformance audit.
 
-Tests cover denied-storage theme behavior, locale-invariant score identities, URL allowlists, replay hash binding and tamper rejection. The HTTP gate checks the report and replay routes alongside the original scoring requests. See [implementation and acceptance notes](docs/product-experience-acceptance.md) for the scope and remaining human acceptance work.
+Tests cover denied-storage theme behavior, locale-invariant score identities and URL allowlists. The HTTP gate checks the report route alongside the original scoring requests. See [implementation and acceptance notes](docs/product-experience-acceptance.md) for the scope and remaining human acceptance work.
 
 The optional WebMCP registration is feature-detected. Ordinary app functions use the visible controls and evaluation API independently of WebMCP.
 
