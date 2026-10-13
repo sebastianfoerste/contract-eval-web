@@ -4,6 +4,6 @@
   "runSha256": "81f846afdef1406fdf6e0918bd962fb95d0e2cb1fd0afc132d3a0f821bfadcb4",
   "scoreSha256": "5d4cc3728503676e44d6704720a0b65924c4f8a3a336d9157da8dd58986ae28f",
   "scorerPath": "src/contract_eval/candidates.py",
-  "scorerSha256": "54d9084d3c8cbf7416f019e1b3f77b5e6e1ea562a65c22731d5aee0fd42221f9",
+  "scorerSha256": "bce264e9b94748624794f74517e81f02625aeebace63a95cf1a13e4743a5d3f1",
   "scope": "One synthetic hand-authored replay; no independent issue annotation or live model result"
 }
