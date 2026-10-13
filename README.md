@@ -6,7 +6,7 @@ This application is the interactive explorer for the Contract Review Evaluation 
 
 ![Review sheet for the synthetic mutual NDA: the findings list, the selected "Permitted disclosure" finding and the highlighted source contract](docs/screenshot-review-sheet.png)
 
-*Local screenshot, not a hosted page: the production build served by `npm start` at `http://127.0.0.1:8787`, captured with Playwright at 1440 × 900 after **Inspect this finding** (synthetic mutual NDA, original fixture scenario).*
+*Local screenshot, not a hosted page: the production build served by `npm start` at `http://127.0.0.1:8787`, captured with Playwright in a 1440 × 900 viewport after **Inspect this finding**, scrolled down to the review sheet, so the page header and result summary above it are not shown (synthetic mutual NDA, original fixture scenario).*
 
 ## Run it locally
 
