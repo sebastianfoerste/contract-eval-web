@@ -1,0 +1,28 @@
+{
+  "schema": "evidence-lab.candidate-experiment-bundle.v1",
+  "experimentId": "synthetic-lost-dispatch-fixture",
+  "origin": "tests/fixtures/candidate-experiment/build_fixture.py, run against a temporary copy of contract-review-eval-harness/candidates/mycounsel",
+  "harnessHead": "cce3c46666ec15227e9286ead26baa1163a98e29",
+  "harnessWorkingTreeDirty": true,
+  "harnessFiles": {
+    "src/contract_eval/candidate_experiment.py": "ecd81f150e85ce2de8c5f918fb5dc71930753a2fb9af3ebb795d341b9e19ee52",
+    "src/contract_eval/candidates.py": "bce264e9b94748624794f74517e81f02625aeebace63a95cf1a13e4743a5d3f1",
+    "src/contract_eval/candidate_annotation.py": "11897759fe197c812e0bfb8ca5a1e4cd1781f86c49b3009d0670e7d740cedbb6",
+    "src/contract_eval/candidate_adjudication.py": "adda53887b42db2b7367577184f4e1011d4787deafd99ba26b3e5c184c4b97fe",
+    "src/contract_eval/candidate_budget.py": "98fb5d723502e2e73fdf463fcc21c8363fb8c2aac10271cc502d19ebb6bfd528"
+  },
+  "files": {
+    "attempts/baseline/dora-base-r1.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "attempts/baseline/dora-base-r2.json": "dcecb81daba8b34a343e557633861789da965fede7edf4c6d31a5369f9958575",
+    "attempts/baseline/dora-changed-r1.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "attempts/baseline/dora-changed-r2.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "attempts/baseline/dora-injection-r1.json": "02c3f11f709ef029c1a669e835411862e15a1da0153153c8d3e4e3b7d70fe7a3",
+    "attempts/baseline/dora-injection-r2.json": "3aa8cab9141cd7f90fea669830c65fe297dac1b042cbf43e20439b9aef0926fc",
+    "experiment.json": "af2935d370e84a61ce740aef15c02150c204ef6611c93fb73a59479fee9e3d5b",
+    "references/dora-base.json": "79ac72279e76589f4d60abdbe1567766c0ca65bf6acb795b788e8f66d19ccf52",
+    "references/dora-changed.json": "85337ec64ecf83c5ae6893cd72f9fd2eff8dcfeda05868de02a0dd499e0916fb",
+    "references/dora-injection.json": "e179d0750052f48bd97336f0bb5687023215a740e832398f7c8349e38ada6717",
+    "report.json": "13f94eb81a6b20a28759e5292c18e94ff799846cd86750b1d82b779cd0b5dafc"
+  },
+  "scope": "Synthetic test fixture for the Evidence Lab viewer tests: a LIVE-shaped experiment that the harness aggregated from three recordings derived from the hand-authored replay and three slot files written empty to stand for dispatches that left no recording. No model was called, no call was dispatched, no money was reserved or spent, and nothing here is a model result. A file hash binds bytes; it is not an independent attestation."
+}

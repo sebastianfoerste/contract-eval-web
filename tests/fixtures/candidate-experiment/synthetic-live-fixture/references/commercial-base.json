@@ -1,0 +1,36 @@
+{
+  "schema": "mycounsel.candidate-reference.v1",
+  "sourceSha256": "08c870e7f7410b37a4c9e6f3aef2039cc10242250bfbe789923b165c429d925e",
+  "playbookSha256": "ad974d96506f0b8a6507425dd52cef11dc86bc8a0b59f8f1764b3156dbf7303c",
+  "status": "DRAFT",
+  "reviewerEvidence": "single annotation; annotation-sha256:2277d84e81ac30947fe38ad561e8791a05d273118177c0db0f56bef08b30fe6a",
+  "issues": [
+    {
+      "playbookReference": "COM-FEES",
+      "anchorId": "9247a4f892a4d082c5c7ad4d132957fafe1ceffe2a7f9d19d59ab3bf0c917fbd",
+      "missingClause": false,
+      "rationale": "Confidence HIGH: Synthetic test rationale for COM-FEES; not a legal view."
+    },
+    {
+      "playbookReference": "COM-SLA",
+      "anchorId": "b1038e66d302e963a3f2a25e129d33471ed727cb8638f0f0570daaa0b042a937",
+      "missingClause": false,
+      "rationale": "Confidence LOW: Synthetic test rationale for COM-SLA; not a legal view."
+    },
+    {
+      "playbookReference": "COM-EXIT",
+      "anchorId": null,
+      "missingClause": true,
+      "rationale": "Confidence HIGH: Synthetic test rationale for COM-EXIT; not a legal view."
+    }
+  ],
+  "provenance": {
+    "route": "SINGLE_ANNOTATION",
+    "corpusManifestSha256": "528c537edf925703248347463e4d7b5d4d41072491a121bfbdfaa2ba452e196e",
+    "guidelineSha256": "7b9f4f7e3dea4558472a2fa1f9d3f2777c1db7b5b88bfcdaaf3326e0076ba555",
+    "sourceRegisterSha256": "ca9760f48430747135d78460e5ff3468c0f3a5c9068c2743f42562456e96c8bd",
+    "lowConfidenceIssues": 1,
+    "uncertaintiesRecorded": true,
+    "annotatorSawModelOutput": false
+  }
+}

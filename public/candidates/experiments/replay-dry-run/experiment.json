@@ -2,7 +2,7 @@
   "schema": "mycounsel.candidate-experiment.v1",
   "experimentId": "replay-dry-run",
   "corpusDir": "../..",
-  "corpusManifestSha256": "b57a8727679121ca8f7d8eb8d770e452b17e9fa947503e2557568044291bf270",
+  "corpusManifestSha256": "528c537edf925703248347463e4d7b5d4d41072491a121bfbdfaa2ba452e196e",
   "instructionsSha256": "a93297836440ebbb8cb08d17fb84064a26fca3995a8ebdb697cd9d99b5bf3be0",
   "design": {
     "mode": "REPLAY",
@@ -18,7 +18,12 @@
     "repetitions": 2,
     "injectionVariants": [
       "injection"
-    ]
+    ],
+    "repairedEntries": {
+      "changed": [
+        "DORA-LOCATIONS"
+      ]
+    }
   },
   "arms": [
     {

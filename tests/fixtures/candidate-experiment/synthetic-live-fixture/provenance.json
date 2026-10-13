@@ -1,0 +1,42 @@
+{
+  "schema": "evidence-lab.candidate-experiment-bundle.v1",
+  "experimentId": "synthetic-live-fixture",
+  "origin": "tests/fixtures/candidate-experiment/build_fixture.py, run against a temporary copy of contract-review-eval-harness/candidates/mycounsel",
+  "harnessHead": "cce3c46666ec15227e9286ead26baa1163a98e29",
+  "harnessWorkingTreeDirty": true,
+  "harnessFiles": {
+    "src/contract_eval/candidate_experiment.py": "ecd81f150e85ce2de8c5f918fb5dc71930753a2fb9af3ebb795d341b9e19ee52",
+    "src/contract_eval/candidates.py": "bce264e9b94748624794f74517e81f02625aeebace63a95cf1a13e4743a5d3f1",
+    "src/contract_eval/candidate_annotation.py": "11897759fe197c812e0bfb8ca5a1e4cd1781f86c49b3009d0670e7d740cedbb6",
+    "src/contract_eval/candidate_adjudication.py": "adda53887b42db2b7367577184f4e1011d4787deafd99ba26b3e5c184c4b97fe",
+    "src/contract_eval/candidate_budget.py": "98fb5d723502e2e73fdf463fcc21c8363fb8c2aac10271cc502d19ebb6bfd528"
+  },
+  "files": {
+    "attempts/baseline/commercial-base-r1.json": "7ca4244dda80df2646650163aaaae942a300954132afbb8e0a18b7f5fb1a346e",
+    "attempts/baseline/commercial-base-r2.json": "d4243a855fdf1bf7890c26e700a96a7ddef6ebba950f6f55534caa4082879898",
+    "attempts/baseline/commercial-changed-r1.json": "dabe45da7c8db23b39f8c6f52716b3fa29270a617f1d09bf28d6db9d05976737",
+    "attempts/baseline/commercial-changed-r2.json": "6bb12c3a688819a90bbf3c07cb72dcccaf5cba7c39df43ca46b67cff2b78d82b",
+    "attempts/baseline/commercial-injection-r1.json": "aba07f1ca4f13743a10ba02d04c886d39af25f3622df1421dd954d23ab6d9f07",
+    "attempts/baseline/commercial-injection-r2.json": "a225d961d5f593ec4f013cce4371808067f0d40a74b228807080861cb556748c",
+    "attempts/baseline/dora-base-r1.json": "162e214f59b52abb723ac1f051aae2ad1ea0ea79c7b1bb0d9083d62ecd99e45c",
+    "attempts/baseline/dora-base-r2.json": "bddfd7283b56373d7009de78e9cb494c3c39085243d653406e7d4e2619ade598",
+    "attempts/baseline/dora-changed-r1.json": "4153ef6e3996db77900182f4d820d10a1e43a783efd437d78d5838927075c694",
+    "attempts/baseline/dora-changed-r2.json": "5555e00e7feb17693ded029404e36346b484cd3513298e2804d10c6ca5d4c5d6",
+    "attempts/baseline/dora-injection-r1.json": "66212a662205b5289b15d651a6a2a9466c560baaa71dc00b51b15a92be80c1b1",
+    "attempts/iteration/commercial-base-r1.json": "a57ec25768cf95512ae25ed0243c46322aa1ba09642eb629bd03eea60af1aa68",
+    "attempts/iteration/commercial-base-r2.json": "fd45a96b46266364a62fbfb8ed251dbb1714fc649e32a9f8276a9658f99983aa",
+    "attempts/iteration/commercial-changed-r1.json": "387142578b17bd0fe3827553f6ea1d4dda1959bc9ba8a582ec17fdf67fba2787",
+    "attempts/iteration/commercial-injection-r1.json": "8bbafdc47031b9c57be3b2ce3446da4c3d0913d74e0854e05bc3b03ba6247791",
+    "attempts/iteration/dora-base-r1.json": "160f1a6bb27ec865cd5111ea90c9d0c8333f20db20b91a1195201d6c02b7fedc",
+    "attempts/iteration/dora-changed-r1.json": "e27f973d6aa7ba8475cb8f67684aee8df1ccf9926ce113116ed7680352801422",
+    "experiment.json": "dac9dfb51ebd24716d9d2298ded266cc4fc370d2ed46417aacc45e1323b5cfd1",
+    "references/commercial-base.json": "9c663cca82b81f82904f1e091cc24e5d06769cb2211e67162240d8fe8862d4be",
+    "references/commercial-changed.json": "ebc7ee55854e596bde9a7ddd5e57f997bdb49615ff1b1d56bb0544bf126a3153",
+    "references/commercial-injection.json": "4bcdd3578cebd28efd982216ddc4c54d4de4e34bcdd364be1a1ac1c9e96283cb",
+    "references/dora-base.json": "79ac72279e76589f4d60abdbe1567766c0ca65bf6acb795b788e8f66d19ccf52",
+    "references/dora-changed.json": "85337ec64ecf83c5ae6893cd72f9fd2eff8dcfeda05868de02a0dd499e0916fb",
+    "references/dora-injection.json": "2660ecb02d2a686362964a2babf9f9a21758d5561021737ec83cb3b694ee4d7b",
+    "report.json": "33db7703dce1766502f1365d82c102dd1f30b0f3576afdd84b777c02ee9d8e8e"
+  },
+  "scope": "Synthetic test fixture for the Evidence Lab viewer tests: a LIVE-shaped experiment that the harness aggregated from recordings derived from the hand-authored replay. No model was called, no money was reserved or spent, and nothing here is a model result. A file hash binds bytes; it is not an independent attestation."
+}

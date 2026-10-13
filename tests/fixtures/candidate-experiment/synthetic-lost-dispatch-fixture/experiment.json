@@ -1,0 +1,119 @@
+{
+  "schema": "mycounsel.candidate-experiment.v1",
+  "experimentId": "synthetic-lost-dispatch-fixture",
+  "corpusDir": "../..",
+  "corpusManifestSha256": "528c537edf925703248347463e4d7b5d4d41072491a121bfbdfaa2ba452e196e",
+  "instructionsSha256": "a93297836440ebbb8cb08d17fb84064a26fca3995a8ebdb697cd9d99b5bf3be0",
+  "design": {
+    "mode": "LIVE",
+    "playbooks": [
+      "dora"
+    ],
+    "variants": [
+      "base",
+      "changed",
+      "injection"
+    ],
+    "repetitions": 2,
+    "injectionVariants": [
+      "injection"
+    ],
+    "repairedEntries": {
+      "changed": [
+        "DORA-LOCATIONS"
+      ]
+    }
+  },
+  "arms": [
+    {
+      "id": "baseline",
+      "role": "BASELINE",
+      "promptVersion": "contracts/candidates/2026-09-11",
+      "codeRevision": "041d0157c364f0919ba5227c7159c3d6906507c4",
+      "model": "synthetic-fixture-not-a-model",
+      "hypothesis": null,
+      "change": null,
+      "budgetReservation": {
+        "ledgerEntryId": "res-synthetic-lost-dispatch",
+        "recordedAt": "2026-10-12T14:00:00Z",
+        "amountMinorUnits": 240,
+        "preregistrationSha256": "3b2dc7c63461ac26fd6f54371c22be71004e445c9974118c83d3f40918683867",
+        "ledgerEntrySha256": "696ba2159b9b0b1697dde4890339cb180e55b192d9664bebbd0e3ad9d2be39a7"
+      }
+    }
+  ],
+  "attempts": [
+    {
+      "arm": "baseline",
+      "playbook": "dora",
+      "variant": "base",
+      "repetition": 1,
+      "file": "attempts/baseline/dora-base-r1.json",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "arm": "baseline",
+      "playbook": "dora",
+      "variant": "base",
+      "repetition": 2,
+      "file": "attempts/baseline/dora-base-r2.json",
+      "sha256": "dcecb81daba8b34a343e557633861789da965fede7edf4c6d31a5369f9958575"
+    },
+    {
+      "arm": "baseline",
+      "playbook": "dora",
+      "variant": "changed",
+      "repetition": 1,
+      "file": "attempts/baseline/dora-changed-r1.json",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "arm": "baseline",
+      "playbook": "dora",
+      "variant": "changed",
+      "repetition": 2,
+      "file": "attempts/baseline/dora-changed-r2.json",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "arm": "baseline",
+      "playbook": "dora",
+      "variant": "injection",
+      "repetition": 1,
+      "file": "attempts/baseline/dora-injection-r1.json",
+      "sha256": "02c3f11f709ef029c1a669e835411862e15a1da0153153c8d3e4e3b7d70fe7a3"
+    },
+    {
+      "arm": "baseline",
+      "playbook": "dora",
+      "variant": "injection",
+      "repetition": 2,
+      "file": "attempts/baseline/dora-injection-r2.json",
+      "sha256": "3aa8cab9141cd7f90fea669830c65fe297dac1b042cbf43e20439b9aef0926fc"
+    }
+  ],
+  "references": [
+    {
+      "playbook": "dora",
+      "variant": "base",
+      "file": "references/dora-base.json",
+      "sha256": "79ac72279e76589f4d60abdbe1567766c0ca65bf6acb795b788e8f66d19ccf52",
+      "sources": null
+    },
+    {
+      "playbook": "dora",
+      "variant": "changed",
+      "file": "references/dora-changed.json",
+      "sha256": "85337ec64ecf83c5ae6893cd72f9fd2eff8dcfeda05868de02a0dd499e0916fb",
+      "sources": null
+    },
+    {
+      "playbook": "dora",
+      "variant": "injection",
+      "file": "references/dora-injection.json",
+      "sha256": "e179d0750052f48bd97336f0bb5687023215a740e832398f7c8349e38ada6717",
+      "sources": null
+    }
+  ],
+  "notes": "Synthetic test fixture for the Evidence Lab viewer tests. Three slot files were written empty to stand for dispatches that left no recording; the three recordings are derived from the hand-authored replay. No model was called, no call was dispatched and no money was spent. Not a model result."
+}

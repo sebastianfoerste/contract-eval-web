@@ -1,0 +1,301 @@
+{
+  "schema": "mycounsel.candidate-experiment.v1",
+  "experimentId": "synthetic-live-fixture",
+  "corpusDir": "../..",
+  "corpusManifestSha256": "528c537edf925703248347463e4d7b5d4d41072491a121bfbdfaa2ba452e196e",
+  "instructionsSha256": "a93297836440ebbb8cb08d17fb84064a26fca3995a8ebdb697cd9d99b5bf3be0",
+  "design": {
+    "mode": "LIVE",
+    "playbooks": [
+      "commercial",
+      "dora"
+    ],
+    "variants": [
+      "base",
+      "changed",
+      "injection"
+    ],
+    "repetitions": 2,
+    "injectionVariants": [
+      "injection"
+    ],
+    "repairedEntries": {
+      "changed": [
+        "DORA-LOCATIONS"
+      ]
+    }
+  },
+  "arms": [
+    {
+      "id": "baseline",
+      "role": "BASELINE",
+      "promptVersion": "contracts/candidates/2026-09-11",
+      "codeRevision": "041d0157c364f0919ba5227c7159c3d6906507c4",
+      "model": "synthetic-fixture-not-a-model",
+      "hypothesis": null,
+      "change": null,
+      "budgetReservation": {
+        "ledgerEntryId": "res-synthetic-baseline",
+        "recordedAt": "2026-10-12T09:00:00Z",
+        "amountMinorUnits": 480,
+        "preregistrationSha256": "2033cad0adafc3d2bca321ccc55289f0c321dc61fffaccc58c30d004e133195f",
+        "ledgerEntrySha256": "25b6c0eb721d5f38f33f33c4512c0f048c331c73cbcde9ffc1712d5ca37580a0"
+      }
+    },
+    {
+      "id": "iteration",
+      "role": "ITERATION",
+      "promptVersion": "contracts/candidates/synthetic-fixture-iteration",
+      "codeRevision": "041d0157c364f0919ba5227c7159c3d6906507c4",
+      "model": "synthetic-fixture-not-a-model",
+      "hypothesis": "Synthetic test hypothesis: fewer findings cite an entry the playbook does not hold.",
+      "change": "Synthetic test change: the prompt names the playbook entry before the clause.",
+      "budgetReservation": {
+        "ledgerEntryId": "res-synthetic-iteration",
+        "recordedAt": "2026-10-12T12:30:00Z",
+        "amountMinorUnits": 480,
+        "preregistrationSha256": "ba5bfb10c682bff5cbb114a1be5e2a663f8ec7e93ae277ba6e6f67aa66cda155",
+        "ledgerEntrySha256": "bfa633a3faab770adb02698568687e366d87fa3c6130fafe82fb501a095d301d"
+      }
+    }
+  ],
+  "attempts": [
+    {
+      "arm": "baseline",
+      "playbook": "commercial",
+      "variant": "base",
+      "repetition": 1,
+      "file": "attempts/baseline/commercial-base-r1.json",
+      "sha256": "7ca4244dda80df2646650163aaaae942a300954132afbb8e0a18b7f5fb1a346e"
+    },
+    {
+      "arm": "baseline",
+      "playbook": "commercial",
+      "variant": "base",
+      "repetition": 2,
+      "file": "attempts/baseline/commercial-base-r2.json",
+      "sha256": "d4243a855fdf1bf7890c26e700a96a7ddef6ebba950f6f55534caa4082879898"
+    },
+    {
+      "arm": "baseline",
+      "playbook": "commercial",
+      "variant": "changed",
+      "repetition": 1,
+      "file": "attempts/baseline/commercial-changed-r1.json",
+      "sha256": "dabe45da7c8db23b39f8c6f52716b3fa29270a617f1d09bf28d6db9d05976737"
+    },
+    {
+      "arm": "baseline",
+      "playbook": "commercial",
+      "variant": "changed",
+      "repetition": 2,
+      "file": "attempts/baseline/commercial-changed-r2.json",
+      "sha256": "6bb12c3a688819a90bbf3c07cb72dcccaf5cba7c39df43ca46b67cff2b78d82b"
+    },
+    {
+      "arm": "baseline",
+      "playbook": "commercial",
+      "variant": "injection",
+      "repetition": 1,
+      "file": "attempts/baseline/commercial-injection-r1.json",
+      "sha256": "aba07f1ca4f13743a10ba02d04c886d39af25f3622df1421dd954d23ab6d9f07"
+    },
+    {
+      "arm": "baseline",
+      "playbook": "commercial",
+      "variant": "injection",
+      "repetition": 2,
+      "file": "attempts/baseline/commercial-injection-r2.json",
+      "sha256": "a225d961d5f593ec4f013cce4371808067f0d40a74b228807080861cb556748c"
+    },
+    {
+      "arm": "baseline",
+      "playbook": "dora",
+      "variant": "base",
+      "repetition": 1,
+      "file": "attempts/baseline/dora-base-r1.json",
+      "sha256": "162e214f59b52abb723ac1f051aae2ad1ea0ea79c7b1bb0d9083d62ecd99e45c"
+    },
+    {
+      "arm": "baseline",
+      "playbook": "dora",
+      "variant": "base",
+      "repetition": 2,
+      "file": "attempts/baseline/dora-base-r2.json",
+      "sha256": "bddfd7283b56373d7009de78e9cb494c3c39085243d653406e7d4e2619ade598"
+    },
+    {
+      "arm": "baseline",
+      "playbook": "dora",
+      "variant": "changed",
+      "repetition": 1,
+      "file": "attempts/baseline/dora-changed-r1.json",
+      "sha256": "4153ef6e3996db77900182f4d820d10a1e43a783efd437d78d5838927075c694"
+    },
+    {
+      "arm": "baseline",
+      "playbook": "dora",
+      "variant": "changed",
+      "repetition": 2,
+      "file": "attempts/baseline/dora-changed-r2.json",
+      "sha256": "5555e00e7feb17693ded029404e36346b484cd3513298e2804d10c6ca5d4c5d6"
+    },
+    {
+      "arm": "baseline",
+      "playbook": "dora",
+      "variant": "injection",
+      "repetition": 1,
+      "file": "attempts/baseline/dora-injection-r1.json",
+      "sha256": "66212a662205b5289b15d651a6a2a9466c560baaa71dc00b51b15a92be80c1b1"
+    },
+    {
+      "arm": "baseline",
+      "playbook": "dora",
+      "variant": "injection",
+      "repetition": 2,
+      "file": "attempts/baseline/dora-injection-r2.json",
+      "sha256": null
+    },
+    {
+      "arm": "iteration",
+      "playbook": "commercial",
+      "variant": "base",
+      "repetition": 1,
+      "file": "attempts/iteration/commercial-base-r1.json",
+      "sha256": "a57ec25768cf95512ae25ed0243c46322aa1ba09642eb629bd03eea60af1aa68"
+    },
+    {
+      "arm": "iteration",
+      "playbook": "commercial",
+      "variant": "base",
+      "repetition": 2,
+      "file": "attempts/iteration/commercial-base-r2.json",
+      "sha256": "fd45a96b46266364a62fbfb8ed251dbb1714fc649e32a9f8276a9658f99983aa"
+    },
+    {
+      "arm": "iteration",
+      "playbook": "commercial",
+      "variant": "changed",
+      "repetition": 1,
+      "file": "attempts/iteration/commercial-changed-r1.json",
+      "sha256": "387142578b17bd0fe3827553f6ea1d4dda1959bc9ba8a582ec17fdf67fba2787"
+    },
+    {
+      "arm": "iteration",
+      "playbook": "commercial",
+      "variant": "changed",
+      "repetition": 2,
+      "file": "attempts/iteration/commercial-changed-r2.json",
+      "sha256": null
+    },
+    {
+      "arm": "iteration",
+      "playbook": "commercial",
+      "variant": "injection",
+      "repetition": 1,
+      "file": "attempts/iteration/commercial-injection-r1.json",
+      "sha256": "8bbafdc47031b9c57be3b2ce3446da4c3d0913d74e0854e05bc3b03ba6247791"
+    },
+    {
+      "arm": "iteration",
+      "playbook": "commercial",
+      "variant": "injection",
+      "repetition": 2,
+      "file": "attempts/iteration/commercial-injection-r2.json",
+      "sha256": null
+    },
+    {
+      "arm": "iteration",
+      "playbook": "dora",
+      "variant": "base",
+      "repetition": 1,
+      "file": "attempts/iteration/dora-base-r1.json",
+      "sha256": "160f1a6bb27ec865cd5111ea90c9d0c8333f20db20b91a1195201d6c02b7fedc"
+    },
+    {
+      "arm": "iteration",
+      "playbook": "dora",
+      "variant": "base",
+      "repetition": 2,
+      "file": "attempts/iteration/dora-base-r2.json",
+      "sha256": null
+    },
+    {
+      "arm": "iteration",
+      "playbook": "dora",
+      "variant": "changed",
+      "repetition": 1,
+      "file": "attempts/iteration/dora-changed-r1.json",
+      "sha256": "e27f973d6aa7ba8475cb8f67684aee8df1ccf9926ce113116ed7680352801422"
+    },
+    {
+      "arm": "iteration",
+      "playbook": "dora",
+      "variant": "changed",
+      "repetition": 2,
+      "file": "attempts/iteration/dora-changed-r2.json",
+      "sha256": null
+    },
+    {
+      "arm": "iteration",
+      "playbook": "dora",
+      "variant": "injection",
+      "repetition": 1,
+      "file": "attempts/iteration/dora-injection-r1.json",
+      "sha256": null
+    },
+    {
+      "arm": "iteration",
+      "playbook": "dora",
+      "variant": "injection",
+      "repetition": 2,
+      "file": "attempts/iteration/dora-injection-r2.json",
+      "sha256": null
+    }
+  ],
+  "references": [
+    {
+      "playbook": "commercial",
+      "variant": "base",
+      "file": "references/commercial-base.json",
+      "sha256": "9c663cca82b81f82904f1e091cc24e5d06769cb2211e67162240d8fe8862d4be",
+      "sources": null
+    },
+    {
+      "playbook": "commercial",
+      "variant": "changed",
+      "file": "references/commercial-changed.json",
+      "sha256": "ebc7ee55854e596bde9a7ddd5e57f997bdb49615ff1b1d56bb0544bf126a3153",
+      "sources": null
+    },
+    {
+      "playbook": "commercial",
+      "variant": "injection",
+      "file": "references/commercial-injection.json",
+      "sha256": "4bcdd3578cebd28efd982216ddc4c54d4de4e34bcdd364be1a1ac1c9e96283cb",
+      "sources": null
+    },
+    {
+      "playbook": "dora",
+      "variant": "base",
+      "file": "references/dora-base.json",
+      "sha256": "79ac72279e76589f4d60abdbe1567766c0ca65bf6acb795b788e8f66d19ccf52",
+      "sources": null
+    },
+    {
+      "playbook": "dora",
+      "variant": "changed",
+      "file": "references/dora-changed.json",
+      "sha256": "85337ec64ecf83c5ae6893cd72f9fd2eff8dcfeda05868de02a0dd499e0916fb",
+      "sources": null
+    },
+    {
+      "playbook": "dora",
+      "variant": "injection",
+      "file": "references/dora-injection.json",
+      "sha256": "2660ecb02d2a686362964a2babf9f9a21758d5561021737ec83cb3b694ee4d7b",
+      "sources": null
+    }
+  ],
+  "notes": "Synthetic test fixture for the Evidence Lab viewer tests. Every recording is derived from the hand-authored replay. No model was called and no money was spent. Not a model result."
+}

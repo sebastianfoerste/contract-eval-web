@@ -1,0 +1,30 @@
+{
+  "schema": "mycounsel.candidate-reference.v1",
+  "sourceSha256": "e52547caebdb262cfd72fc4c1dcfa2ca4a7b9d9daf4012a291b6be3c60edc28a",
+  "playbookSha256": "cc93a15be20d867d0d4be0826fa4992007c63293dfe9d7a4e8c460f8cb57abbd",
+  "status": "DRAFT",
+  "reviewerEvidence": "single annotation; annotation-sha256:ccdc39578ea73575800b367c07c4514112a04a13c7f30cc834fc29afa6b8fc77",
+  "issues": [
+    {
+      "playbookReference": "DORA-LOCATIONS",
+      "anchorId": "caa8036e6eb8da63340196aed223253f0cf3def50a3e0670e5fded98dda2deb8",
+      "missingClause": false,
+      "rationale": "Confidence HIGH: Synthetic test rationale for DORA-LOCATIONS; not a legal view."
+    },
+    {
+      "playbookReference": "DORA-AUDIT",
+      "anchorId": "f3b32ff74f21741e4478ba64bc48a87935c8464aceecf3cbaa7cc5e4458ed43f",
+      "missingClause": false,
+      "rationale": "Confidence HIGH: Synthetic test rationale for DORA-AUDIT; not a legal view."
+    }
+  ],
+  "provenance": {
+    "route": "SINGLE_ANNOTATION",
+    "corpusManifestSha256": "528c537edf925703248347463e4d7b5d4d41072491a121bfbdfaa2ba452e196e",
+    "guidelineSha256": "7b9f4f7e3dea4558472a2fa1f9d3f2777c1db7b5b88bfcdaaf3326e0076ba555",
+    "sourceRegisterSha256": "ca9760f48430747135d78460e5ff3468c0f3a5c9068c2743f42562456e96c8bd",
+    "lowConfidenceIssues": 0,
+    "uncertaintiesRecorded": false,
+    "annotatorSawModelOutput": false
+  }
+}
