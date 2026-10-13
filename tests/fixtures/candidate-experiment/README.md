@@ -31,4 +31,4 @@ After the harness changes the shape of an experiment file or a report, rebuild t
 
 The output directory then holds one folder per fixture. Replace the two folders of the same names here with them and run `npm test`. The script writes nothing into the harness: `-B` keeps Python from writing bytecode there, and every file it creates lies under `--work` or `--out`.
 
-Built on 2026-10-13 against harness commit `cce3c46666ec15227e9286ead26baa1163a98e29`; the harness working tree held untracked files at that time, which each `provenance.json` records. A second build into another directory was byte-identical.
+Built on 2026-10-13 against harness commit `cce3c46666ec15227e9286ead26baa1163a98e29`; the harness working tree was clean, which each `provenance.json` records. A second build into another directory was byte-identical.

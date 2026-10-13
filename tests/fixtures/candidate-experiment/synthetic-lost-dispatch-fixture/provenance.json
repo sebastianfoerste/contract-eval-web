@@ -3,7 +3,7 @@
   "experimentId": "synthetic-lost-dispatch-fixture",
   "origin": "tests/fixtures/candidate-experiment/build_fixture.py, run against a temporary copy of contract-review-eval-harness/candidates/mycounsel",
   "harnessHead": "cce3c46666ec15227e9286ead26baa1163a98e29",
-  "harnessWorkingTreeDirty": true,
+  "harnessWorkingTreeDirty": false,
   "harnessFiles": {
     "src/contract_eval/candidate_experiment.py": "ecd81f150e85ce2de8c5f918fb5dc71930753a2fb9af3ebb795d341b9e19ee52",
     "src/contract_eval/candidates.py": "bce264e9b94748624794f74517e81f02625aeebace63a95cf1a13e4743a5d3f1",
