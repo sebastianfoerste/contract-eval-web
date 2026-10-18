@@ -33,7 +33,7 @@ Then open `http://localhost:5173`. To serve the production build instead, run `n
 - Download Markdown and JSON, or open `/report` for a readable print view with a browser **Print / Save as PDF** action. The app does not generate or confirm a saved PDF. The print route reconstructs the deterministic snapshot; export JSON or Markdown from the workspace to retain a session run's original timestamp and identifier. Historical print views are blocked when the reference edition differs.
 - Light and dark themes follow the system and remain switchable when local storage fails. A versioned, vendored design package supplies the shared palette and licensed local Newsreader/Geist fonts. No font CDN is required.
 
-The app calls no live model, accepts no contract uploads and stores no shared user history. Session runs are held in memory, capped at 30 and cleared on refresh. Reports must be downloaded for retention. The public API accepts only allowlisted synthetic cases and scenarios, with a 1 KiB input limit.
+The app calls no live model, accepts no contract uploads and stores no shared user history. Session runs are held in memory, capped at 30 and cleared on refresh. Reports must be downloaded for retention. The evaluation API accepts only allowlisted synthetic cases and scenarios, with a 1 KiB input limit.
 
 ## Reference status
 
@@ -54,7 +54,7 @@ npm run build
 npm run check
 ```
 
-`npm run build` writes a Cloudflare Worker to `dist/`, and `npm start` serves that build locally with Wrangler. The site is maintained in its own source repository, separately from the Python harness. See [PROJECT_ARCHITECTURE.md](https://github.com/sebastianfoerste/contract-review-eval-harness/blob/main/docs/PROJECT_ARCHITECTURE.md) for architectural details.
+`npm run build` writes a Cloudflare Worker to `dist/`, and `npm start` serves that build locally with Wrangler. The app is maintained in this repository, separately from the Python harness. See [PROJECT_ARCHITECTURE.md](https://github.com/sebastianfoerste/contract-review-eval-harness/blob/main/docs/PROJECT_ARCHITECTURE.md) for architectural details.
 
 The production scoring port is `lib/scoring.ts`. Regenerate inputs and expected parity scores from the harness:
 
@@ -70,7 +70,7 @@ python3 scripts/export-benchmark.py --repo /path/to/contract-review-eval-harness
 node tests/api-check.mjs http://127.0.0.1:8787
 ```
 
-Every supported case and scenario is checked against Python `score_review` (30 parity vectors in `tests/scoring.test.mjs`). Additional tests cover edge cases, score presentation, alias-resolved risk findings, severity direction, the plain-language readout, clause coverage, comparison changes, contract rendering offsets, source offsets after characters outside the Basic Multilingual Plane, the evidence report, shareable URL parsing and the reference gate. `tests/export.test.mjs` recomputes the export's integrity and source hashes and checks that its schema, scoring edition and release match this app, so a hand-edited `lib/benchmark.json` fails `npm test`. The HTTP suite checks 12 supported case-scenario combinations and five invalid requests. These checks cover the bounded public inputs; they do not establish general equivalence for arbitrary documents or Unicode inputs.
+Every supported case and scenario is checked against Python `score_review` (30 parity vectors in `tests/scoring.test.mjs`). Additional tests cover edge cases, score presentation, alias-resolved risk findings, severity direction, the plain-language readout, clause coverage, comparison changes, contract rendering offsets, source offsets after characters outside the Basic Multilingual Plane, the evidence report, shareable URL parsing and the reference gate. `tests/export.test.mjs` recomputes the export's integrity and source hashes and checks that its schema, scoring edition and release match this app, so a hand-edited `lib/benchmark.json` fails `npm test`. The HTTP suite checks 12 supported case-scenario combinations and five invalid requests. These checks cover the bounded API inputs; they do not establish general equivalence for arbitrary documents or Unicode inputs.
 
 ## Incorporating adjudicated evidence
 
@@ -79,7 +79,7 @@ Every supported case and scenario is checked against Python `score_review` (30 p
 3. Regenerate and verify the evidence-bound campaign and certificates there.
 4. Extend this app's versioned input export and scoring parity coverage to the v2 scorer before displaying v2 validation status.
 
-Never replace missing annotation evidence with generated answers or remove the Python release hold based on this web deployment.
+Never replace missing annotation evidence with generated answers or remove the Python release hold based on this web app.
 
 An [independent challenge-set protocol](docs/challenge-set-protocol.md) records the acceptance criteria for a future blinded evaluation. No unseen, independently adjudicated challenge set is claimed in this release.
 
