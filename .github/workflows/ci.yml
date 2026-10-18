@@ -1,7 +1,7 @@
 name: CI
 
 # Runs lint, types and Node tests on GitHub. The production build and the local
-# Worker API check run locally with npm run check; nothing is deployed.
+# Worker API check run locally with npm run check; this workflow deploys nothing.
 on:
   push:
     branches: [main]

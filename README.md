@@ -54,7 +54,7 @@ npm run build
 npm run check
 ```
 
-`npm run build` writes a Cloudflare Worker to `dist/`, and `npm start` serves that build locally with Wrangler. The app is maintained in this repository, separately from the Python harness. See [PROJECT_ARCHITECTURE.md](https://github.com/sebastianfoerste/contract-review-eval-harness/blob/main/docs/PROJECT_ARCHITECTURE.md) for architectural details.
+`npm run build` writes a Cloudflare Worker to `dist/`, and `npm start` serves that build locally with Wrangler. The app is maintained separately from the Python harness. See [PROJECT_ARCHITECTURE.md](https://github.com/sebastianfoerste/contract-review-eval-harness/blob/main/docs/PROJECT_ARCHITECTURE.md) for architectural details.
 
 The production scoring port is `lib/scoring.ts`. Regenerate inputs and expected parity scores from the harness:
 
