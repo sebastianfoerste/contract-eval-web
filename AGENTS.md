@@ -1,6 +1,6 @@
 # contract-eval-web
 
-The interactive Evidence Lab for the Contract Review Evaluation project. It runs locally and lets users explore deterministic AI contract review evaluations, toggle failure scenarios, inspect supporting evidence, and export reports without invoking live models.
+The interactive Evidence Lab for the Contract Review Evaluation project. It runs as a Cloudflare Worker and lets users explore deterministic AI contract review evaluations, toggle failure scenarios, inspect supporting evidence, and export reports without invoking live models.
 
 Companion repository to [`contract-review-eval-harness`](https://github.com/sebastianfoerste/contract-review-eval-harness).
 
@@ -20,7 +20,7 @@ Companion repository to [`contract-review-eval-harness`](https://github.com/seba
 - `scripts/export-benchmark.py` — Synchronizes synthetic inputs and parity vectors from `contract-review-eval-harness`.
 - `tests/scoring.test.mjs` — 30 Python scoring parity vectors plus edge-case tests; `tests/inspection.test.mjs`, `tests/document.test.mjs`, `tests/view.test.mjs` and `tests/report.test.mjs` check presentation, rendering, URL and report logic; `tests/export.test.mjs` verifies the export's integrity hashes, edition and release.
 - `tests/python-parity.json` — Parity test vectors produced directly by the Python harness.
-- `vite.config.ts`, `scripts/run-framework.mjs`, `scripts/install-ci.mjs` — Vite/vinext build as a Cloudflare Worker, and the dependency installer.
+- `vite.config.ts`, `scripts/run-framework.mjs`, `scripts/install-ci.mjs` — Vite/vinext build as a Cloudflare Worker, and the dependency installer. Cloudflare Workers Builds deploys every push to `main` (see README, Deployment).
 
 ## Rules
 - **Authoritative Source**: The Python harness is the single source of truth for evaluation methodology, gold answers, and scoring algorithms. Never modify `lib/benchmark.json` or `tests/python-parity.json` manually.
@@ -28,14 +28,14 @@ Companion repository to [`contract-review-eval-harness`](https://github.com/seba
 - **Colour and theme**: `app/globals.css` maps local semantics to `vendor/legal-ai-design-system/tokens.css`. Refresh that versioned package from its source rather than editing vendored tokens independently. Local font faces use explicit vendor asset paths because Tailwind import rebasing does not work for this pipeline. Red marks hidden exposure and amber marks false alarms; severity uses the neutral meter. Check new text and background pairs for a 4.5:1 contrast ratio in both themes.
 - **Scoring Parity Invariant**: Any change to `lib/scoring.ts` must pass all 30 parity vectors (`npm test`). If the Python scorer changes, regenerate vectors via `npm run export:benchmark` (or `make web-export` in the harness).
 - **Public Safety & Privacy**: Synthetic contracts only. Zero live model calls, no arbitrary document uploads, no persistent shared state. Runs stay in-memory.
-- **Worker build**: Keep the repository root buildable as a Cloudflare Worker (`npm run build`, served locally by `npm start`). There is no hosted demo.
+- **Cloudflare Workers Deployment**: Every push to `main` deploys. Keep `npm run build` producing a Worker that `npx wrangler deploy` can publish from the repository root, and keep `npm run check` passing before merging.
 
 ## Commands
-- `npm run install:ci` — Install the locked dependencies (`npm ci`).
+- `npm run install:ci` — Install the locked dependencies (`npm ci`), including dev and optional packages.
 - `npm test` — Run Node parity and inspection tests.
 - `npm run test:types` — Typecheck TypeScript without emitting output (`tsc --noEmit`).
 - `npm run dev` — Launch local development server.
-- `npm run build` — Build the Cloudflare Worker into `dist/`.
+- `npm run build` — Build the production Cloudflare Worker into `dist/`.
 - `npm start` — Serve the built Worker locally at `http://127.0.0.1:8787`.
 - `npm run check` — Run lint, types, Node tests, build, and local HTTP API checks.
 - `npm run export:benchmark` — Refresh benchmark data from adjacent harness.

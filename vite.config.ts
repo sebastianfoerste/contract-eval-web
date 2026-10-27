@@ -6,7 +6,8 @@ import { readExecutionProfile } from "./scripts/execution-profile.mjs";
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
 const managedLinux = readExecutionProfile() === "managed-linux";
 
-const localBindingConfig = {
+// The Worker needs no D1 database, R2 bucket or secret.
+const workerConfig = {
   main: "vinext/server/fetch-handler",
   compatibility_flags: ["nodejs_compat"],
 };
@@ -36,7 +37,7 @@ export default defineConfig(async () => {
       cloudflare({
         viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] },
         inspectorPort: false,
-        config: localBindingConfig,
+        config: workerConfig,
       }),
     ],
   };

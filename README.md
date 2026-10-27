@@ -2,15 +2,15 @@
 
 A browser evaluation workspace for the synthetic NDA, SaaS and DPA cases in Sebastian Förste's [contract-review-eval-harness](https://github.com/sebastianfoerste/contract-review-eval-harness).
 
-This application is the interactive explorer for the Contract Review Evaluation project. The authoritative Python engine owns evaluation methodology, reference answers, scoring and release evidence. The web app makes fixed results, failure scenarios and source quotations inspectable. It uses Next.js App Router conventions through vinext on Vite and builds as a Cloudflare Worker.
+This application is the interactive explorer for the Contract Review Evaluation project. The authoritative Python engine owns evaluation methodology, reference answers, scoring and release evidence. The web app makes fixed results, failure scenarios and source quotations inspectable. It uses Next.js App Router conventions through vinext on Vite and runs as a Cloudflare Worker.
 
 ![Review sheet for the synthetic mutual NDA: the findings list, the selected "Permitted disclosure" finding and the highlighted source contract](docs/screenshot-review-sheet.png)
 
-*Local screenshot, not a hosted page: the production build served by `npm start` at `http://127.0.0.1:8787`, captured with Playwright in a 1440 × 900 viewport after **Inspect this finding**, scrolled down to the review sheet, so the page header and result summary above it are not shown (synthetic mutual NDA, original fixture scenario).*
+*Local screenshot: the production build served by `npm start` at `http://127.0.0.1:8787`, captured with Playwright in a 1440 × 900 viewport after **Inspect this finding**, scrolled down to the review sheet, so the page header and result summary above it are not shown (synthetic mutual NDA, original fixture scenario).*
 
 ## Run it locally
 
-There is no hosted demo. The app runs on your own machine and needs Node 22.13 or later:
+The app needs Node 22.13 or later:
 
 ```bash
 npm run install:ci
@@ -54,7 +54,7 @@ npm run build
 npm run check
 ```
 
-`npm run build` writes a Cloudflare Worker to `dist/`, and `npm start` serves that build locally with Wrangler. The app is maintained separately from the Python harness. See [PROJECT_ARCHITECTURE.md](https://github.com/sebastianfoerste/contract-review-eval-harness/blob/main/docs/PROJECT_ARCHITECTURE.md) for architectural details.
+`npm run build` writes a Cloudflare Worker to `dist/`, and `npm start` serves that build locally with Wrangler. This repository is the app's source, maintained separately from the Python harness. See [PROJECT_ARCHITECTURE.md](https://github.com/sebastianfoerste/contract-review-eval-harness/blob/main/docs/PROJECT_ARCHITECTURE.md) for architectural details.
 
 The production scoring port is `lib/scoring.ts`. Regenerate inputs and expected parity scores from the harness:
 
@@ -64,13 +64,26 @@ npm run export:benchmark
 python3 scripts/export-benchmark.py --repo /path/to/contract-review-eval-harness
 ```
 
-`npm run check` also starts the built local Worker and runs the HTTP contract checks. To run the same checks against a server you started yourself, for example with `npm start`, pass its origin:
+`npm run check` also starts the built local Worker and runs the HTTP contract checks. To run the same checks against a server you started yourself, for example with `npm start`, or against the deployed Worker, pass its origin:
 
 ```bash
 node tests/api-check.mjs http://127.0.0.1:8787
 ```
 
 Every supported case and scenario is checked against Python `score_review` (30 parity vectors in `tests/scoring.test.mjs`). Additional tests cover edge cases, score presentation, alias-resolved risk findings, severity direction, the plain-language readout, clause coverage, comparison changes, contract rendering offsets, source offsets after characters outside the Basic Multilingual Plane, the evidence report, shareable URL parsing and the reference gate. `tests/export.test.mjs` recomputes the export's integrity and source hashes and checks that its schema, scoring edition and release match this app, so a hand-edited `lib/benchmark.json` fails `npm test`. The HTTP suite checks 12 supported case-scenario combinations and five invalid requests. These checks cover the bounded API inputs; they do not establish general equivalence for arbitrary documents or Unicode inputs.
+
+## Deployment
+
+The app is deployed to Cloudflare Workers as the Worker `contract-eval-web`. Cloudflare Workers Builds is connected to this repository: every push to `main` runs `npm run build` and then `npx wrangler deploy`. GitHub Actions runs lint, types, tests, the build and the local Worker API check on every pull request first. `.node-version` keeps the Cloudflare build on the same Node major as CI. The Worker uses no database, storage bucket or secret.
+
+To deploy by hand, sign in once with `npx wrangler login`, then run:
+
+```bash
+npm run build
+npx wrangler deploy
+```
+
+`npm run build` writes the Worker and its configuration to `dist/`, and `.wrangler/deploy/config.json` points `wrangler deploy` there.
 
 ## Incorporating adjudicated evidence
 
