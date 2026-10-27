@@ -1,7 +1,8 @@
 name: CI
 
-# Runs on the read-only GitHub mirror. Deployment stays with the Sites host, so the
-# Sites build and the local Worker API check (npm run check) are not repeated here.
+# Cloudflare Workers Builds deploys every push to main, so a pull request must
+# pass the full npm run check sequence, including the build and the local Worker
+# API check, before it is merged.
 on:
   push:
     branches: [main]
@@ -32,3 +33,9 @@ jobs:
 
       - name: Unit and parity tests
         run: npm test
+
+      - name: Build the Worker
+        run: npm run build
+
+      - name: Local Worker API check
+        run: npm run test:api:local

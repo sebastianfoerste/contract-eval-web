@@ -2,7 +2,7 @@
 
 A browser evaluation workspace for the synthetic NDA, SaaS and DPA cases in Sebastian Förste's [contract-review-eval-harness](https://github.com/sebastianfoerste/contract-review-eval-harness).
 
-This application is the interactive explorer for the Contract Review Evaluation project. The authoritative Python engine owns evaluation methodology, reference answers, scoring and release evidence. The web app makes fixed results, failure scenarios and source quotations inspectable. It uses Next.js App Router conventions through the existing vinext/Vite Sites runtime.
+This application is the interactive explorer for the Contract Review Evaluation project. The authoritative Python engine owns evaluation methodology, reference answers, scoring and release evidence. The web app makes fixed results, failure scenarios and source quotations inspectable. It uses Next.js App Router conventions through vinext on Vite and runs as a Cloudflare Worker.
 
 ## Features
 
@@ -69,7 +69,7 @@ npm run build
 npm run check
 ```
 
-The Sites build is Cloudflare Worker compatible. Logical hosting metadata is in `.openai/hosting.json`. The site is maintained in its own source repository, separately from the Python harness. See [PROJECT_ARCHITECTURE.md](https://github.com/sebastianfoerste/contract-review-eval-harness/blob/main/docs/PROJECT_ARCHITECTURE.md) for architectural details.
+This repository is the app's source, maintained separately from the Python harness. See [PROJECT_ARCHITECTURE.md](https://github.com/sebastianfoerste/contract-review-eval-harness/blob/main/docs/PROJECT_ARCHITECTURE.md) for architectural details.
 
 The production scoring port is `lib/scoring.ts`. Regenerate inputs and expected parity scores from the harness:
 
@@ -86,6 +86,19 @@ node tests/api-check.mjs https://YOUR_SITE
 ```
 
 Every supported case and scenario is checked against Python `score_review` (30 parity vectors in `tests/scoring.test.mjs`). Additional tests cover edge cases, score presentation, alias-resolved risk findings, severity direction, the plain-language readout, clause coverage, comparison changes, contract rendering offsets, source offsets after characters outside the Basic Multilingual Plane, the evidence report, shareable URL parsing and the reference gate. `tests/export.test.mjs` recomputes the export's integrity and source hashes and checks that its schema, scoring edition and release match this app, so a hand-edited `lib/benchmark.json` fails `npm test`. The HTTP suite checks 12 supported case-scenario combinations and five invalid requests. These checks cover the bounded public inputs; they do not establish general equivalence for arbitrary documents or Unicode inputs.
+
+## Deployment
+
+The app is deployed to Cloudflare Workers as the Worker `contract-eval-web`. Cloudflare Workers Builds is connected to this repository: every push to `main` runs `npm run build` and then `npx wrangler deploy`. GitHub Actions runs lint, types, tests, the build and the local Worker API check on every pull request first. `.node-version` keeps the Cloudflare build on the same Node major as CI. The Worker uses no database, storage bucket or secret.
+
+To deploy by hand, sign in once with `npx wrangler login`, then run:
+
+```bash
+npm run build
+npx wrangler deploy
+```
+
+`npm run build` writes the Worker and its configuration to `dist/`, and `.wrangler/deploy/config.json` points `wrangler deploy` there.
 
 ## Incorporating adjudicated evidence
 
