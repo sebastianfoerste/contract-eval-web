@@ -40,7 +40,7 @@
           "assignment",
           "notices"
         ],
-        "comment": "Human-authored gold answer for the synthetic mutual NDA. Exception: the severity_rationale entries for term, permitted_disclosure, definition and notices were redrafted with AI assistance on 2026-10-13 and await the maintainer's adoption; see annotations/README.md. severity_rationale records why each flag carries its severity, so the calibration can be challenged rather than assumed. Sections 2, 4, 5, 8 and 9 carry no risk flag: a reviewer who flags them is producing false positives. clause_aliases declares synonyms for the SAME clause of the SAME document — spelling, plural and hyphenation variants, or an equally accurate name. Scoring a correct review as a miss because it wrote 'no_licence' for 'no_license' measures vocabulary, not legal judgment. An alias never maps onto a different clause.",
+        "comment": "Human-authored gold answer for the synthetic mutual NDA. severity_rationale records why each flag carries its severity, so the calibration can be challenged rather than assumed. Sections 2, 4, 5, 8 and 9 carry no risk flag: a reviewer who flags them is producing false positives. clause_aliases declares synonyms for the SAME clause of the SAME document — spelling, plural and hyphenation variants, or an equally accurate name. Scoring a correct review as a miss because it wrote 'no_licence' for 'no_license' measures vocabulary, not legal judgment. An alias never maps onto a different clause.",
         "review_context": {
           "governing_law": "Germany",
           "objective": "Pre-signature review before disclosing technical information to a prospective supplier.",
@@ -66,7 +66,7 @@
         "thresholds": {}
       },
       "hashes": {
-        "gold": "53c6239b7a8870fb8f3bcdab3875f6d0ec15604f06702d94df8c5f7df13d07f9",
+        "gold": "ed95991a0f96b42d80a218a108feaac04904ed0fef15f6b077febd6dc31ced58",
         "review": "f8f9b17131c68054df54c45d0782ae472914ec580ea3a345ab22df67b6e82fa8",
         "source": "915cfb648881a251528062ec95a4131ba8e9e72f30e1f639747293b4df3bdb43"
       },
@@ -592,7 +592,7 @@
     }
   ],
   "goldStatus": "v1 reference answers; v2 evidence: awaiting_returns",
-  "integritySha256": "bcd9bc504ce087be5fcb34a99015f985c11974362b54d9625c8afe91f6dea1c0",
+  "integritySha256": "3bd640c4c6cfd2251e0ac91e134bda8aeb0e6611f5f78cf547c1d2460b3bb918",
   "methodologyHashes": {
     "src/contract_eval/__init__.py": "dda1d0206b667dedb690a8f56edcef647f62b81839a46a2cb3d03812b4c574b5",
     "src/contract_eval/__main__.py": "aed5144e7ede0574db80acd4336c9d7d8491285921234e5fda90d13ce45d5381",
@@ -634,7 +634,7 @@
   "referenceEvidence": {
     "cases": [
       {
-        "candidateSha256": "d4a479652c27a6bddb45354a233db890e2389642a9178cce2707e8c972f38015",
+        "candidateSha256": "c517f420c5ec058bebebf301bcf5ae45101cd4dc77443172ec7a7d756df4b713",
         "case": "nda",
         "obligations": 11,
         "sourceSha256": "915cfb648881a251528062ec95a4131ba8e9e72f30e1f639747293b4df3bdb43"
@@ -655,7 +655,7 @@
     "errors": [],
     "finalReleaseEligible": false,
     "humanReviewRequired": true,
-    "integritySha256": "c9fb53306145419b84ff9adc77578be08797e80d2e846457c40ad77431b60807",
+    "integritySha256": "8bde07b9bfdefaf15fb0da5882a2c79d95a73ceca8d383c1f08747b0ddce19b0",
     "limitation": "File integrity and recorded decisions do not establish reviewer independence or legal correctness.",
     "missing": [
       "independent_returns",
@@ -669,6 +669,6 @@
   "repository": "https://github.com/sebastianfoerste/contract-review-eval-harness",
   "schema": "contract-eval.web-benchmark.v2",
   "scoringEdition": "v1",
-  "sourceCommit": "5730e2202e70e181a99c1564cdb257a2949965ff",
+  "sourceCommit": "fcc8476f60b47bdca5ff9a8bc33e3283ee6101ee",
   "version": "0.7.0rc1"
 }
