@@ -4,7 +4,7 @@
 @import "tw-animate-css";
 @import "../vendor/shadcn-tailwind-4.13.0.css";
 
-/* Explicit asset paths are required by the Sites/Tailwind import pipeline. */
+/* Explicit asset paths are required because Tailwind import rebasing does not work in this pipeline. */
 @font-face { font-family:"Geist"; font-style:normal; font-weight:100 900; font-display:swap; src:url("../vendor/legal-ai-design-system/fonts/geist-latin.woff2") format("woff2"); }
 @font-face { font-family:"Newsreader"; font-style:normal; font-weight:400 600; font-display:swap; src:url("../vendor/legal-ai-design-system/fonts/newsreader-latin.woff2") format("woff2"); }
 @font-face { font-family:"Newsreader"; font-style:italic; font-weight:400 600; font-display:swap; src:url("../vendor/legal-ai-design-system/fonts/newsreader-latin-italic.woff2") format("woff2"); }
@@ -568,23 +568,6 @@ mark.is-active .mark-tag { background: var(--mark-ring); }
 .print-report blockquote { margin:12px 0; border-left:3px solid var(--brand); padding:8px 16px; font-family:var(--font-serif); }
 .print-controls { display:flex; flex-wrap:wrap; gap:10px; }
 .print-controls p { flex-basis:100%; color:var(--ink-2); font-size:13px; }
-.candidate-language, .candidate-downloads { display:flex; flex-wrap:wrap; gap:12px; margin:18px 0; }
-.candidate-language a, .candidate-downloads a { color:var(--brand-ink); text-decoration:underline; text-underline-offset:3px; min-height:32px; }
-.candidate-language [aria-current=page] { font-weight:700; }
-.candidate-summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; padding:18px; background:var(--sunken); border:1px solid var(--line-2); border-radius:10px; }
-.candidate-summary dd { margin:4px 0 0; font-size:27px; font-family:var(--font-serif); }
-.candidate-summary dt { font-size:13px; color:var(--ink-2); }
-.candidate-finding { margin:20px 0; padding:4px 20px 20px; border:1px solid var(--line-2); border-radius:10px; }
-.candidate-finding h3 code { font-family:var(--font-mono); font-size:14px; }
-.candidate-checks > div { display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px 12px; margin:6px 0; }
-.candidate-checks dd { margin:0; font-weight:600; }
-.candidate-valid { color:var(--brand-ink); }
-.candidate-invalid { color:var(--exposure); }
-.candidate-report summary { color:var(--brand-ink); cursor:pointer; min-height:36px; font-weight:600; }
-.candidate-provenance { display:grid; grid-template-columns:minmax(100px,1fr) minmax(0,2fr); gap:10px 16px; }
-.candidate-provenance dt { color:var(--ink-2); }
-.candidate-provenance dd { margin:0; font-family:var(--font-mono); font-size:12px; }
-.candidate-source pre { white-space:pre-wrap; font-size:12px; }
 @media (max-width:999px) {
   .mobile-steps { display:flex; gap:4px; position:sticky; top:0; z-index:3; padding:8px 0; background:var(--desk); }
   .mobile-steps button { flex:1; min-height:44px; border:1px solid var(--line); border-radius:8px; color:var(--ink-2); background:var(--paper); font-size:13px; }
@@ -609,15 +592,11 @@ mark.is-active .mark-tag { background: var(--mark-ring); }
   .case-actions .button-row { gap:6px; }
   .case-actions .button { font-size:12px; padding-inline:10px; }
   .print-report { padding:20px; }
-  .candidate-summary, .candidate-provenance { grid-template-columns:1fr; }
-  .candidate-finding { padding-inline:14px; }
 }
 @media print {
   @page { size:A4; margin:17mm 16mm; }
   html, body { background:white; color:#1c1a17; }
   .print-controls { display:none !important; }
-  .candidate-language, .candidate-downloads { display:none !important; }
-  .candidate-finding { break-inside:avoid; }
   .print-report { width:auto; max-width:none; padding:0; margin:0; background:white; color:#1c1a17; }
   .print-report article { font-size:10pt; line-height:1.5; }
   .print-report h1 { font-size:23pt; margin-top:0; }
@@ -628,14 +607,4 @@ mark.is-active .mark-tag { background: var(--mark-ring); }
   .print-report blockquote { break-inside:avoid; }
   .print-report article > section { break-inside:avoid; }
   .print-report article > section:has(> h2:only-child) { break-after:avoid; }
-}
-
-/* Candidate experiment viewer (/candidates/experiment). A cell stays on one line, so a wide table
-   scrolls inside its labelled region and a hash stays readable. Print cannot scroll: there the
-   region opens, headers and cells wrap and the type shrinks so no column is cut off. */
-.candidate-table td, .candidate-table tbody th { white-space:nowrap; font-variant-numeric:tabular-nums; }
-@media print {
-  .candidate-report .table-scroll { overflow:visible; }
-  .candidate-table { font-size:7.5pt; }
-  .candidate-table thead th, .candidate-table tbody th, .candidate-table td { white-space:normal; padding:3px 4px; }
 }

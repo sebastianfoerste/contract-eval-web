@@ -37,7 +37,7 @@ try {
     } catch { /* The local Worker is starting. */ }
     await new Promise(resolve => setTimeout(resolve, 250));
   }
-  if (!ready) throw new Error(`Local Site did not start. ${log}`);
+  if (!ready) throw new Error(`Local Worker did not start. ${log}`);
   const check = spawn(process.execPath, ['tests/api-check.mjs', origin], { stdio: 'inherit' });
   const checkTimer = setTimeout(() => check.kill('SIGKILL'), 120000);
   const [code, signal] = await once(check, 'exit');

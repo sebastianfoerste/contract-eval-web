@@ -4,6 +4,21 @@ A browser evaluation workspace for the synthetic NDA, SaaS and DPA cases in Seba
 
 This application is the interactive explorer for the Contract Review Evaluation project. The authoritative Python engine owns evaluation methodology, reference answers, scoring and release evidence. The web app makes fixed results, failure scenarios and source quotations inspectable. It uses Next.js App Router conventions through vinext on Vite and runs as a Cloudflare Worker.
 
+![Review sheet for the synthetic mutual NDA: the findings list, the selected "Permitted disclosure" finding and the highlighted source contract](docs/screenshot-review-sheet.png)
+
+*Local screenshot: the production build served by `npm start` at `http://127.0.0.1:8787`, captured with Playwright in a 1440 × 900 viewport after **Inspect this finding**, scrolled down to the review sheet, so the page header and result summary above it are not shown (synthetic mutual NDA, original fixture scenario).*
+
+## Run it locally
+
+The app needs Node 22.13 or later:
+
+```bash
+npm run install:ci
+npm run dev
+```
+
+Then open `http://localhost:5173`. To serve the production build instead, run `npm run build` and then `npm start`, which serves it at `http://127.0.0.1:8787`.
+
 ## Features
 
 - Start with an existing fixture error: the synthetic NDA's permitted-disclosure clause is rated high in the reference and medium in the fixed review. Open that finding and its exact quotation, or move directly into exploration.
@@ -18,37 +33,7 @@ This application is the interactive explorer for the Contract Review Evaluation 
 - Download Markdown and JSON, or open `/report` for a readable print view with a browser **Print / Save as PDF** action. The app does not generate or confirm a saved PDF. The print route reconstructs the deterministic snapshot; export JSON or Markdown from the workspace to retain a session run's original timestamp and identifier. Historical print views are blocked when the reference edition differs.
 - Light and dark themes follow the system and remain switchable when local storage fails. A versioned, vendored design package supplies the shared palette and licensed local Newsreader/Geist fonts. No font CDN is required.
 
-The app calls no live model, accepts no contract uploads and stores no shared user history. Session runs are held in memory, capped at 30 and cleared on refresh. Reports must be downloaded for retention. The public API accepts only allowlisted synthetic cases and scenarios, with a 1 KiB input limit.
-
-## Native My Counsel replay
-
-`/candidates?lang=en` and `/candidates?lang=de` display one separate, **hand-authored REPLAY** in My Counsel's native format. The synthetic ICT agreement is reviewed with the commercial playbook. Four retained candidates include one duplicate and one unsupported playbook reference. The application rejected the original output; the Python evaluator retains and checks every finding. The view distinguishes exact quotation checks, missing-clause structure and playbook/category validity.
-
-This is an artifact viewer, not a live model result or an additional v1 benchmark case. Issue precision/recall are unavailable without independent annotation. Native output has no severity or complete clause inventory; legal reasoning and amendment quality remain for lawyer review. The viewer makes no DORA compliance claim. Token usage and model cost are unavailable.
-
-The original run and Python score are copied to `public/candidates/`. Before rendering, the server verifies the Python score's canonical recording SHA-256, source/playbook/instruction binding, complete run metadata and ordered finding indices. File hashes and the recorded dirty working-tree state remain visible. A hash binds bytes; it is not an independent attestation. Refresh only after validating and scoring in the adjacent harness:
-
-```bash
-python3 scripts/export-candidate-replay.py
-```
-
-This bounded exporter accepts the known synthetic replay and leaves the benchmark export and scoring algorithms untouched.
-
-## Candidate experiment bundle
-
-`/candidates/experiment?id=replay-dry-run&lang=en` and `/candidates/experiment?id=replay-dry-run&lang=de` display one preregistered experiment from the Python harness: the design, every planned cell with its denominators, the reference status per cell, each arm with its prompt version, code revision and model label, the comparison table for an iteration arm, provider-reported usage where a recording states it, and every recorded attempt with its recording hash and a download.
-
-The bundled example is a zero-cost dry run. It holds one hand-authored attempt, the replay shown at `/candidates`, registered in a twelve-slot REPLAY design. Eleven attempts were not run and no model was called. It is no model result: no reference is registered, so issue precision and recall appear as N/A, and no comparison is drawn.
-
-Python owns every number. `lib/candidate-experiment.ts` scores nothing and recomputes no rate. Before rendering, the server checks that `report.json` carries the SHA-256 of `experiment.json`, that each recording has the canonical digest its report row states and sits in the slot the experiment assigns to it, that the cells cover exactly arms × playbooks × variants, and that the integer counts of each cell agree with its attempt rows. A bundle that fails a check is not displayed. The bundler hands the page parsed JSON, so the page rebuilds the experiment file text in the harness's two-space JSON form; `tests/candidate-experiment.test.mjs` proves that this text equals the file bytes. A hash binds bytes; it is not an independent attestation.
-
-Only experiments imported in `app/candidates/experiment/page.tsx` are addressable. Any other id shows a not-found state. Refresh a bundle after the harness has registered the attempts and written `report.json`:
-
-```bash
-python3 scripts/export-candidate-experiment.py replay-dry-run
-```
-
-The exporter refuses a bundle whose schemas, hashes, attempt slots or synthetic-corpus marker do not match. It also refuses a corpus path that leaves the harness, because the published experiment file would name local directories, a corpus manifest that changed since the experiment was planned, and a harness module that changed after `report.json` was written. In the last two cases, aggregate again in the harness before exporting. It copies `experiment.json`, `report.json` and the registered attempt and reference files byte for byte to `public/candidates/experiments/<id>/` and writes `provenance.json` with their hashes, the hashes of two harness modules and the harness commit. A new attempt or reference file also needs its import in the page; `npm test` fails until the page imports every bundled file.
+The app calls no live model, accepts no contract uploads and stores no shared user history. Session runs are held in memory, capped at 30 and cleared on refresh. Reports must be downloaded for retention. The evaluation API accepts only allowlisted synthetic cases and scenarios, with a 1 KiB input limit.
 
 ## Reference status
 
@@ -69,7 +54,7 @@ npm run build
 npm run check
 ```
 
-This repository is the app's source, maintained separately from the Python harness. See [PROJECT_ARCHITECTURE.md](https://github.com/sebastianfoerste/contract-review-eval-harness/blob/main/docs/PROJECT_ARCHITECTURE.md) for architectural details.
+`npm run build` writes a Cloudflare Worker to `dist/`, and `npm start` serves that build locally with Wrangler. This repository is the app's source, maintained separately from the Python harness. See [PROJECT_ARCHITECTURE.md](https://github.com/sebastianfoerste/contract-review-eval-harness/blob/main/docs/PROJECT_ARCHITECTURE.md) for architectural details.
 
 The production scoring port is `lib/scoring.ts`. Regenerate inputs and expected parity scores from the harness:
 
@@ -79,13 +64,13 @@ npm run export:benchmark
 python3 scripts/export-benchmark.py --repo /path/to/contract-review-eval-harness
 ```
 
-`npm run check` also starts the built local Worker and runs the HTTP contract checks. To check a deployed URL separately:
+`npm run check` also starts the built local Worker and runs the HTTP contract checks. To run the same checks against a server you started yourself, for example with `npm start`, or against the deployed Worker, pass its origin:
 
 ```bash
-node tests/api-check.mjs https://YOUR_SITE
+node tests/api-check.mjs http://127.0.0.1:8787
 ```
 
-Every supported case and scenario is checked against Python `score_review` (30 parity vectors in `tests/scoring.test.mjs`). Additional tests cover edge cases, score presentation, alias-resolved risk findings, severity direction, the plain-language readout, clause coverage, comparison changes, contract rendering offsets, source offsets after characters outside the Basic Multilingual Plane, the evidence report, shareable URL parsing and the reference gate. `tests/export.test.mjs` recomputes the export's integrity and source hashes and checks that its schema, scoring edition and release match this app, so a hand-edited `lib/benchmark.json` fails `npm test`. The HTTP suite checks 12 supported case-scenario combinations and five invalid requests. These checks cover the bounded public inputs; they do not establish general equivalence for arbitrary documents or Unicode inputs.
+Every supported case and scenario is checked against Python `score_review` (30 parity vectors in `tests/scoring.test.mjs`). Additional tests cover edge cases, score presentation, alias-resolved risk findings, severity direction, the plain-language readout, clause coverage, comparison changes, contract rendering offsets, source offsets after characters outside the Basic Multilingual Plane, the evidence report, shareable URL parsing and the reference gate. `tests/export.test.mjs` recomputes the export's integrity and source hashes and checks that its schema, scoring edition and release match this app, so a hand-edited `lib/benchmark.json` fails `npm test`. The HTTP suite checks 12 supported case-scenario combinations and five invalid requests. These checks cover the bounded API inputs; they do not establish general equivalence for arbitrary documents or Unicode inputs.
 
 ## Deployment
 
@@ -107,7 +92,7 @@ npx wrangler deploy
 3. Regenerate and verify the evidence-bound campaign and certificates there.
 4. Extend this app's versioned input export and scoring parity coverage to the v2 scorer before displaying v2 validation status.
 
-Never replace missing annotation evidence with generated answers or remove the Python release hold based on this web deployment.
+Never replace missing annotation evidence with generated answers or remove the Python release hold based on this web app.
 
 An [independent challenge-set protocol](docs/challenge-set-protocol.md) records the acceptance criteria for a future blinded evaluation. No unseen, independently adjudicated challenge set is claimed in this release.
 
@@ -115,7 +100,7 @@ An [independent challenge-set protocol](docs/challenge-set-protocol.md) records 
 
 The 2026-10-10 local browser check covered guided entry, DE/EN switching, keyboard finding navigation, a 390 CSS-pixel phone view, exact own/comparison quotation restoration, theme cycling, server scenario selection, reference-edition warnings and EN/DE print views. Print CSS was inspected; no saved PDF or deployment is claimed. Core text and status color pairs were checked at 4.5:1 or better in both themes. This is not a full screen-reader, browser-matrix or WCAG conformance audit.
 
-Tests cover denied-storage theme behavior, locale-invariant score identities, URL allowlists, replay hash binding and tamper rejection. The HTTP gate checks the report and replay routes alongside the original scoring requests. See [implementation and acceptance notes](docs/product-experience-acceptance.md) for the scope and remaining human acceptance work.
+Tests cover denied-storage theme behavior, locale-invariant score identities and URL allowlists. The HTTP gate checks the report route alongside the original scoring requests. See [implementation and acceptance notes](docs/product-experience-acceptance.md) for the scope and remaining human acceptance work.
 
 The optional WebMCP registration is feature-detected. Ordinary app functions use the visible controls and evaluation API independently of WebMCP.
 
