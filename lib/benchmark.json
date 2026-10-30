@@ -592,7 +592,7 @@
     }
   ],
   "goldStatus": "v1 reference answers; v2 evidence: awaiting_returns",
-  "integritySha256": "d8de085b05beddc32cedf3ccaf4b6c2860c7c18c34be13aa556dabd49febbecf",
+  "integritySha256": "26e0bc0ac06a6ae6f020dab0f91d9c4eaa6424111123cf83151f8564516ca76f",
   "methodologyHashes": {
     "src/contract_eval/__init__.py": "dda1d0206b667dedb690a8f56edcef647f62b81839a46a2cb3d03812b4c574b5",
     "src/contract_eval/__main__.py": "aed5144e7ede0574db80acd4336c9d7d8491285921234e5fda90d13ce45d5381",
@@ -605,7 +605,7 @@
     "src/contract_eval/adjudication.py": "c3221a66454285182893fec1942fa7b881f227f514b72662561d6cff5eec2241",
     "src/contract_eval/annotators.py": "07eadcefd8de80d05998e8c1c5aa1c36256d891771262029691b1ebf71b0145e",
     "src/contract_eval/api.py": "70b1a2100b6b6a65e9c97b522c59db786c3085136e682778598238d091bae762",
-    "src/contract_eval/campaign_v2.py": "1363766bde2d5e99ed76d5659fcb43bcaf6b53bb51d086e2e67e9d41af4a31c5",
+    "src/contract_eval/campaign_v2.py": "c21d5178e127eb84af50b1085713349aa5abcf4b1d0f02ab1992bfa64050472e",
     "src/contract_eval/capture.py": "d752727da161a3d81098c0ac26f6a8117087ffc45e9f43e451cc54e0c3e87bd4",
     "src/contract_eval/capture_runner.py": "ed90dc6b6f2053619dd79ef419ca7f8b69f0d85ce4342836abaa5c8967890262",
     "src/contract_eval/cases.py": "9d74e89adadebbfc6601e9ec503437918d403ac7674594f291aa6f6d897b73d7",
@@ -669,6 +669,6 @@
   "repository": "https://github.com/sebastianfoerste/contract-review-eval-harness",
   "schema": "contract-eval.web-benchmark.v2",
   "scoringEdition": "v1",
-  "sourceCommit": "d5f6fbbc3c3d833fe2c6f02c20cd5cb5dfafd33c",
+  "sourceCommit": "291916886ae0725d5e17649993263b88814a958c",
   "version": "0.7.0rc1"
 }
