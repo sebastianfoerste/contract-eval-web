@@ -10,9 +10,22 @@ portServer.close();
 await once(portServer, 'close');
 
 const origin = `http://127.0.0.1:${port}`;
-const server = spawn(process.execPath, ['--import', './scripts/sites-env.mjs', './node_modules/wrangler/bin/wrangler.js', 'dev', '--config', 'dist/server/wrangler.json', '--local', '--persist-to', '.wrangler/state', '--ip', '127.0.0.1', '--inspector-port', '0', '--port', String(port)], { stdio: ['ignore', 'pipe', 'pipe'] });
+// Only the debug level shows uncaught runtime exceptions. One answer sent before
+// its request body was read raises such an exception every time, while the stalled
+// request it can cause in Wrangler's local proxy depends on timing.
+const server = spawn(process.execPath, ['--import', './scripts/sites-env.mjs', './node_modules/wrangler/bin/wrangler.js', 'dev', '--config', 'dist/server/wrangler.json', '--local', '--persist-to', '.wrangler/state', '--ip', '127.0.0.1', '--inspector-port', '0', '--port', String(port), '--log-level', 'debug'], { stdio: ['ignore', 'pipe', 'pipe'] });
 let log = '';
-for (const stream of [server.stdout, server.stderr]) stream.on('data', chunk => { log = (log + chunk.toString()).slice(-10000); });
+const uncaught = [];
+for (const stream of [server.stdout, server.stderr]) {
+  let partial = '';
+  stream.on('data', chunk => {
+    const text = chunk.toString();
+    log = (log + text).slice(-10000);
+    const lines = (partial + text).split('\n');
+    partial = lines.pop();
+    uncaught.push(...lines.filter(line => line.includes('uncaught exception')));
+  });
+}
 
 try {
   const deadline = Date.now() + 30000;
@@ -29,7 +42,8 @@ try {
   const checkTimer = setTimeout(() => check.kill('SIGKILL'), 120000);
   const [code, signal] = await once(check, 'exit');
   clearTimeout(checkTimer);
-  if (code !== 0) throw new Error(signal ? `API contract check was stopped after 120 s (${signal}).` : `API contract check exited with status ${code}.`);
+  if (code !== 0) throw new Error(`${signal ? `API contract check was stopped after 120 s (${signal}).` : `API contract check exited with status ${code}.`}\nLocal Worker output:\n${log}`);
+  if (uncaught.length) throw new Error(`The local Worker reported ${uncaught.length} uncaught exception(s) during the API contract check:\n${uncaught.join('\n')}`);
 } finally {
   if (server.exitCode === null && server.signalCode === null) {
     const stopped = once(server, 'exit');
