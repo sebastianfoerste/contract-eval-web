@@ -48,7 +48,10 @@ try {
   if (server.exitCode === null && server.signalCode === null) {
     const stopped = once(server, 'exit');
     server.kill('SIGTERM');
-    const exited = await Promise.race([stopped.then(() => true), new Promise(resolve => setTimeout(resolve, 5000, false))]);
+    let timer;
+    const exited = await Promise.race([stopped.then(() => true), new Promise(resolve => { timer = setTimeout(resolve, 5000, false); })]);
+    // A pending timer would keep this process alive for 5 s after Wrangler exited.
+    clearTimeout(timer);
     // Wrangler ignoring SIGTERM would otherwise keep the port bound and this process alive.
     if (!exited) server.kill('SIGKILL');
   }
