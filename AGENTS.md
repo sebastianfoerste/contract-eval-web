@@ -18,8 +18,9 @@ Companion repository to [`contract-review-eval-harness`](https://github.com/seba
 - `lib/view.ts` — Allowlisted parsing and serialization of the shareable URL view.
 - `lib/benchmark.json` — Static snapshot of synthetic cases (`nda`, `saas`, `dpa`), gold answers, stub fixtures, and cryptographic hashes.
 - `scripts/export-benchmark.py` — Synchronizes synthetic inputs and parity vectors from `contract-review-eval-harness`.
-- `tests/scoring.test.mjs` — 30 Python scoring parity vectors plus edge-case tests; `tests/inspection.test.mjs`, `tests/document.test.mjs`, `tests/view.test.mjs` and `tests/report.test.mjs` check presentation, rendering, URL and report logic; `tests/export.test.mjs` verifies the export's integrity hashes, edition and release.
+- `tests/scoring.test.mjs` — 30 Python scoring parity vectors plus edge-case tests; `tests/inspection.test.mjs`, `tests/document.test.mjs`, `tests/view.test.mjs` and `tests/report.test.mjs` check presentation, rendering, URL and report logic; `tests/export.test.mjs` verifies the export's integrity hashes, edition and release; `tests/annotator-names.test.mjs` mirrors the harness guard that fails if either annotator's personal name appears in a tracked file.
 - `tests/python-parity.json` — Parity test vectors produced directly by the Python harness.
+- `tests/grounding-vectors.json` — Hand-authored quotation-grounding vectors, byte-identical to the harness's `tests/fixtures/grounding-vectors.json`. Change both copies together.
 - `vite.config.ts`, `scripts/run-framework.mjs`, `scripts/install-ci.mjs` — Vite/vinext build as a Cloudflare Worker, and the dependency installer. Cloudflare Workers Builds deploys every push to `main` (see README, Deployment).
 
 ## Rules

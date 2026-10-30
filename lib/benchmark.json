@@ -40,7 +40,7 @@
           "assignment",
           "notices"
         ],
-        "comment": "Human-authored gold answer for the synthetic mutual NDA. Exception: the severity_rationale entries for term, permitted_disclosure, definition and notices were redrafted with AI assistance on 2026-10-13 and await the maintainer's adoption; see annotations/README.md. severity_rationale records why each flag carries its severity, so the calibration can be challenged rather than assumed. Sections 2, 4, 5, 8 and 9 carry no risk flag: a reviewer who flags them is producing false positives. clause_aliases declares synonyms for the SAME clause of the SAME document — spelling, plural and hyphenation variants, or an equally accurate name. Scoring a correct review as a miss because it wrote 'no_licence' for 'no_license' measures vocabulary, not legal judgment. An alias never maps onto a different clause.",
+        "comment": "Human-authored gold answer for the synthetic mutual NDA. severity_rationale records why each flag carries its severity, so the calibration can be challenged rather than assumed. Sections 2, 4, 5, 8 and 9 carry no risk flag: a reviewer who flags them is producing false positives. clause_aliases declares synonyms for the SAME clause of the SAME document — spelling, plural and hyphenation variants, or an equally accurate name. Scoring a correct review as a miss because it wrote 'no_licence' for 'no_license' measures vocabulary, not legal judgment. An alias never maps onto a different clause.",
         "review_context": {
           "governing_law": "Germany",
           "objective": "Pre-signature review before disclosing technical information to a prospective supplier.",
@@ -66,7 +66,7 @@
         "thresholds": {}
       },
       "hashes": {
-        "gold": "53c6239b7a8870fb8f3bcdab3875f6d0ec15604f06702d94df8c5f7df13d07f9",
+        "gold": "ed95991a0f96b42d80a218a108feaac04904ed0fef15f6b077febd6dc31ced58",
         "review": "f8f9b17131c68054df54c45d0782ae472914ec580ea3a345ab22df67b6e82fa8",
         "source": "915cfb648881a251528062ec95a4131ba8e9e72f30e1f639747293b4df3bdb43"
       },
@@ -592,7 +592,7 @@
     }
   ],
   "goldStatus": "v1 reference answers; v2 evidence: awaiting_returns",
-  "integritySha256": "bcd9bc504ce087be5fcb34a99015f985c11974362b54d9625c8afe91f6dea1c0",
+  "integritySha256": "eea57f0f42edf3f4181260fb4489c8ffb26130576ce15661494f1c437c58e6e7",
   "methodologyHashes": {
     "src/contract_eval/__init__.py": "dda1d0206b667dedb690a8f56edcef647f62b81839a46a2cb3d03812b4c574b5",
     "src/contract_eval/__main__.py": "aed5144e7ede0574db80acd4336c9d7d8491285921234e5fda90d13ce45d5381",
@@ -602,14 +602,14 @@
     "src/contract_eval/adapters/live.py": "f760af5429d1b60f0d690f4f68d1b7accddd1b4840a79f16aea9046b4dec6b10",
     "src/contract_eval/adapters/openai_compat.py": "ba5b364d316327d766e28596da6540034c03a83e31d12f2709649755f8bf7fc2",
     "src/contract_eval/adapters/stub.py": "b8b8b0df6261fa29fa1318d9179840f6dfdd34ca8c8941ce075b08dec33879cc",
-    "src/contract_eval/adjudication.py": "8afd808d6d128dcadf8f6a0dafa32dd61bf20a20f2fcc107b14d2ee2c7b5295d",
-    "src/contract_eval/annotators.py": "07eadcefd8de80d05998e8c1c5aa1c36256d891771262029691b1ebf71b0145e",
+    "src/contract_eval/adjudication.py": "c3221a66454285182893fec1942fa7b881f227f514b72662561d6cff5eec2241",
+    "src/contract_eval/annotators.py": "481b20e7ed59118ee79e459fc36f866dd81fddaaacf165e6910e6f8f4302ba35",
     "src/contract_eval/api.py": "70b1a2100b6b6a65e9c97b522c59db786c3085136e682778598238d091bae762",
-    "src/contract_eval/campaign_v2.py": "1363766bde2d5e99ed76d5659fcb43bcaf6b53bb51d086e2e67e9d41af4a31c5",
+    "src/contract_eval/campaign_v2.py": "c21d5178e127eb84af50b1085713349aa5abcf4b1d0f02ab1992bfa64050472e",
     "src/contract_eval/capture.py": "d752727da161a3d81098c0ac26f6a8117087ffc45e9f43e451cc54e0c3e87bd4",
-    "src/contract_eval/capture_runner.py": "8e56e17390a15606f2b32360ee1c0bd3e9940e0c2b95693e0529a4a24ebc35c8",
+    "src/contract_eval/capture_runner.py": "ed90dc6b6f2053619dd79ef419ca7f8b69f0d85ce4342836abaa5c8967890262",
     "src/contract_eval/cases.py": "9d74e89adadebbfc6601e9ec503437918d403ac7674594f291aa6f6d897b73d7",
-    "src/contract_eval/cli.py": "347865f2ea503b887b6a048a07b22e4b7392a9bfbc88e7c5611751421b623d53",
+    "src/contract_eval/cli.py": "98b7fcb37ffb628d4ba84d1f9fa2b253b076099d1b85c99f1c11f54a6101c2cc",
     "src/contract_eval/evidence.py": "6c9b7332ef0a609e809831d479d6e23beee143c5a369e2ad12c41944e1e2ef17",
     "src/contract_eval/github_action.py": "4e5e2e9b86d7e2a7dee4e74e84443d7a8d5d8c31b98a6286ed34ecd6ed36e239",
     "src/contract_eval/gold_v2.py": "e8b8873f446ea3a1ba82f29955b1c3e9522584451104ae7a8be791523002172b",
@@ -627,26 +627,26 @@
     "src/contract_eval/robustness.py": "8625d0aabcd5d286631baf1164d5a04996f6c506d6b909ee4ca8335de81e1b4b",
     "src/contract_eval/schemas.py": "52e63755d1be63941e8a7226906091668b54ba0e0256d7171a06b16e37fb45c3",
     "src/contract_eval/scorecard.py": "698276e7145366652dcfd93e2357ac47672b6ec747dc0de398f325b73f045801",
-    "src/contract_eval/scorer.py": "99cb93e91893d0d4e6e70a32f67501bd13323e2e7886f3a9196c72be348c2d55",
+    "src/contract_eval/scorer.py": "ac482dffbc83dd8ce343650c55e1c0be51fefd77f65a977c412d9d71f04be5d1",
     "src/contract_eval/upgrade.py": "40384666cb857aba973db9590c472545e86192e53d3b41c520f91b1b75800e44",
-    "src/contract_eval/web_export.py": "32a1e65e1c280ce55d9390886048366a57993916a7b76d249fd4095321276208"
+    "src/contract_eval/web_export.py": "df9af6d9bffdc105fefaedb9a6eae20971d8acb7f76697cffd8636852cb90f20"
   },
   "referenceEvidence": {
     "cases": [
       {
-        "candidateSha256": "d4a479652c27a6bddb45354a233db890e2389642a9178cce2707e8c972f38015",
+        "candidateSha256": "8b7cb682c6c1c2091ea8dd3ae1015e97d9ebffb99d0c69d4f51cda5e5028c7b1",
         "case": "nda",
         "obligations": 11,
         "sourceSha256": "915cfb648881a251528062ec95a4131ba8e9e72f30e1f639747293b4df3bdb43"
       },
       {
-        "candidateSha256": "36d72f7ec2d7f196072465fc0444ee7997520e3b0ef857253e16f68d1c5f4c8f",
+        "candidateSha256": "0cc710983e99724be3f0605b6e04b9d091eeb066cbe477815796059e15b92fac",
         "case": "saas",
         "obligations": 11,
         "sourceSha256": "47f67a676df59622621a3fccfc09f0737d0564414df6e730f7accb9198145c73"
       },
       {
-        "candidateSha256": "419b7f658b47f39527ff40e0dfeb3a94ee9365bd16d52e1da59ddc2fd3f4d662",
+        "candidateSha256": "f054b439a61e8dc5637ede1b02b5d54c88c9f0a497165ba9161df1bda3f347af",
         "case": "dpa",
         "obligations": 11,
         "sourceSha256": "17a0c7b0dc7e74fe23fda6fcb394d331ada6e7286c2fb6a9497a9e58ed96f79e"
@@ -655,7 +655,7 @@
     "errors": [],
     "finalReleaseEligible": false,
     "humanReviewRequired": true,
-    "integritySha256": "c9fb53306145419b84ff9adc77578be08797e80d2e846457c40ad77431b60807",
+    "integritySha256": "a6e73f3d73c700415181a6b5541519ae7d5fa738a9865a44efb3682ed4f412dd",
     "limitation": "File integrity and recorded decisions do not establish reviewer independence or legal correctness.",
     "missing": [
       "independent_returns",
@@ -669,6 +669,6 @@
   "repository": "https://github.com/sebastianfoerste/contract-review-eval-harness",
   "schema": "contract-eval.web-benchmark.v2",
   "scoringEdition": "v1",
-  "sourceCommit": "5730e2202e70e181a99c1564cdb257a2949965ff",
+  "sourceCommit": "3eb91a1aa3c7f83ff30c52fb7f93c7f7d00aed03",
   "version": "0.7.0rc1"
 }
