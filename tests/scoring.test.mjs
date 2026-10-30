@@ -4,10 +4,16 @@ import {test} from 'node:test';
 import {applyScenario,scoreReview,locate,locateSource,normalize} from '../lib/scoring.ts';
 const benchmark = JSON.parse(fs.readFileSync(new URL('../lib/benchmark.json',import.meta.url)));
 const vectors = JSON.parse(fs.readFileSync(new URL('./python-parity.json',import.meta.url)));
+// Byte-identical to tests/fixtures/grounding-vectors.json in the harness, where Python grounded_span must return the same spans.
+const groundingVectors = JSON.parse(fs.readFileSync(new URL('./grounding-vectors.json',import.meta.url))).vectors;
 for(const [i,v] of vectors.entries()) test(`Python scoring parity ${i+1}: ${v.caseId} ${v.scenario || 'edge'} ${v.aliases}`,()=>{
   const c = benchmark.cases.find(c=>c.id===v.caseId);
   const output = v.customReview || applyScenario(c.review,v.scenario);
   assert.deepEqual(scoreReview(c.source,c.gold,output,v.aliases),v.expected);
+});
+for(const v of groundingVectors) test(`shared grounding vector: ${v.id}`,()=>{
+  assert.deepEqual(locate(v.source,v.quote),v.span);
+  assert.equal(locateSource(v.source,v.quote)!==null,v.span!==null);
 });
 test('quotation grounding rejects reordered, empty and fabricated text',()=>{
   assert.equal(locate('One two three','three two one'),null);
