@@ -22,6 +22,7 @@ Companion repository to [`contract-review-eval-harness`](https://github.com/seba
 - `scripts/export-benchmark.py` — Synchronizes synthetic inputs and parity vectors from `contract-review-eval-harness`.
 - `tests/scoring.test.mjs` — 30 Python scoring parity vectors plus edge-case tests; `tests/inspection.test.mjs`, `tests/document.test.mjs`, `tests/view.test.mjs` and `tests/report.test.mjs` check presentation, rendering, URL and report logic; `tests/export.test.mjs` verifies the export's integrity hashes, edition and release.
 - `tests/python-parity.json` — Parity test vectors produced directly by the Python harness.
+- `tests/grounding-vectors.json` — Hand-authored quotation-grounding vectors, byte-identical to the harness's `tests/fixtures/grounding-vectors.json`. Change both copies together.
 - `vite.config.ts` — vinext and Cloudflare Worker build configuration. Cloudflare Workers Builds deploys every push to `main` (see README, Deployment).
 
 ## Rules
