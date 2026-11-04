@@ -1,9 +1,0 @@
-{
-  "schema": "evidence-lab.candidate-bundle.v1",
-  "origin": "contract-review-eval-harness/candidates/mycounsel",
-  "runSha256": "81f846afdef1406fdf6e0918bd962fb95d0e2cb1fd0afc132d3a0f821bfadcb4",
-  "scoreSha256": "f4bff7079bcb773e2a2ab9159fc0ad9a2e1c45e91b923660416de571786626fe",
-  "scorerPath": "src/contract_eval/candidates.py",
-  "scorerSha256": "29e69d18c574c2a9cdc82e181c099ab8aaf5541864344b96a0c0ab3e0a7d0b65",
-  "scope": "One synthetic hand-authored replay; no independent issue annotation or live model result"
-}
