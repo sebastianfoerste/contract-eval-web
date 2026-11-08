@@ -1,9 +1,9 @@
 {
   "name": "@legal-ai/design-system",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "files": {
-    "tokens.css": "1809121338d6806a79d039a40e53d94c0badfb6f0e2c61b8a2c0255cf21cecf9",
-    "controls.css": "85acd2dcf9647ef16ff17b08da35b85dcf461be1748120bd8be140977e3d02a0",
+    "tokens.css": "c8357adab967c95425071d813ae68bd4231fec4f3b88c4bd2fe8072660875734",
+    "controls.css": "e4e66624b388cef62e337aaecfc553b89559030d465e7ea72fb6822176410495",
     "fonts.css": "55bc74ee8cf9ee8246d53ec61876351005a0ede9d5c5c42d596037df26b03a05",
     "fonts/README.md": "1b3af551f0ccfa546f51ba9af58555a19384e79c3104a805708069d9499c33bc",
     "fonts/Newsreader-OFL.txt": "fdfad38143ec470553cae82a1e45320bdd1b9ec70415d37bd0171051d8a4ded8",
