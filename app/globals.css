@@ -60,7 +60,7 @@
   --brand-soft: var(--legal-accent-soft);
   --on-brand: var(--legal-on-accent);
   --focus: var(--legal-focus);
-  --ok: var(--legal-accent-ink);
+  --ok: var(--legal-ink);
   --exposure: var(--legal-danger);
   --exposure-soft: var(--legal-danger-soft);
   --exposure-line: var(--legal-danger-line);
