@@ -10,7 +10,9 @@ export function readExecutionProfile() {
     throw error;
   }
   if (!["managed-linux", "portable"].includes(settings?.executionProfile)) {
-    throw new Error("Invalid local execution profile; rerun the Sites plugin's configure-execution-profile.mjs.");
+    throw new Error(
+      'Invalid local execution profile in .sites-runtime/execution-profile.json: set "executionProfile" to "managed-linux" or "portable", or delete the file to use "portable".',
+    );
   }
   return settings.executionProfile;
 }
