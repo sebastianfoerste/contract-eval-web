@@ -592,7 +592,7 @@
     }
   ],
   "goldStatus": "v1 reference answers; v2 evidence: awaiting_returns",
-  "integritySha256": "9691a4f3dcbb418f32f89e75c187b20eb71a271df9ccfe8915c4ba162da2d741",
+  "integritySha256": "75caa22f8cbcc05b0d8ac5ac722fb1c71cb1295d7b2a022db47ba110398e87e4",
   "methodologyHashes": {
     "src/contract_eval/__init__.py": "dda1d0206b667dedb690a8f56edcef647f62b81839a46a2cb3d03812b4c574b5",
     "src/contract_eval/__main__.py": "aed5144e7ede0574db80acd4336c9d7d8491285921234e5fda90d13ce45d5381",
@@ -600,7 +600,7 @@
     "src/contract_eval/adapters/base.py": "50ab6a933c9761e66fda2a592403a9c1c5298a551ce6f2adc71081e4d88065bd",
     "src/contract_eval/adapters/command.py": "fe0af0c903198327b29ed771c0cf0be72f18b6dbe1371c6767e3891f3d3b48c0",
     "src/contract_eval/adapters/live.py": "5ede3f424c48e65398def7932c518f87e81431b4c0bfd313a122e5b654ab0a1f",
-    "src/contract_eval/adapters/matter.py": "61c245d373449ec482384c780fe95bbd6482895063602d4a5a5b274a709c588e",
+    "src/contract_eval/adapters/matter.py": "772460e04035c206697b8686432a22cf2bece14aadebf4671c6012ac08974194",
     "src/contract_eval/adapters/openai_compat.py": "1b75829284e98d4f10ee02275ccab8441627c7e317f123c728e7f61c6870959c",
     "src/contract_eval/adapters/stub.py": "b8b8b0df6261fa29fa1318d9179840f6dfdd34ca8c8941ce075b08dec33879cc",
     "src/contract_eval/adjudication.py": "937d5f7ad5ccb89b014ec1f2f6985a2cc6c5a551c074a73936c2730a3de4e316",
@@ -620,8 +620,8 @@
     "src/contract_eval/github_action.py": "4e5e2e9b86d7e2a7dee4e74e84443d7a8d5d8c31b98a6286ed34ecd6ed36e239",
     "src/contract_eval/gold_v2.py": "be6655de31524a5db6e9af5c337aa3e39b278e1917e88f4fdff6efbf52f71870",
     "src/contract_eval/matter.py": "0627441e63f3e788f4802fdca60062da0d069199148ff22648667ec7e53b616f",
-    "src/contract_eval/matter_cli.py": "21d1cd19923754467d5520f92bb11bfe95b55a86dd45b3773be39e7d5525221a",
-    "src/contract_eval/matter_experiment.py": "9366011310d27afa30634fdda7470f825c1b98902aed98e02f08dee1394f5086",
+    "src/contract_eval/matter_cli.py": "7684ba6b350c72887f1106a5cfa0c9ea5d3cede42e8842e8d43e45ed24169daf",
+    "src/contract_eval/matter_experiment.py": "02af5e9eb657e9d64d4675f905fbf841e374d9f2ff6020255b21d74933c71e7f",
     "src/contract_eval/matter_scorer.py": "cf02852276164eb607cf2ee8555b8d09211128f1c26c172f4338b42eb83ff121",
     "src/contract_eval/models.py": "5e4d83d0e917ceabadedda8bbd504ec0e28ea5b4e8bd72c1968eb0e43964c0c6",
     "src/contract_eval/obligation_cli.py": "5a211275860fed20bbd5dc48022bdd6e07a0754c817c417ca85f3adf78e60a64",
@@ -680,6 +680,6 @@
   "repository": "https://github.com/sebastianfoerste/contract-review-eval-harness",
   "schema": "contract-eval.web-benchmark.v2",
   "scoringEdition": "v1",
-  "sourceCommit": "83b9fe428280d0c0e6f087ea5d6a8ed55ac77a8d",
+  "sourceCommit": "de67e4640f5bcf61731663eed0df3bdf4bde9e85",
   "version": "0.7.0rc1"
 }
